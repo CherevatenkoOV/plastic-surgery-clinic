@@ -43,6 +43,12 @@
           "day": "Sunday",
           "isAvailable": false
         }
+      ],
+      "appointments": [
+        {
+          "timeISO": "2025-07-04T08:30:00.000Z",
+          "patientName": "Martina Vitale"
+        }
       ]
     },
     {
@@ -87,6 +93,12 @@
           "isAvailable": true,
           "open": "08:00",
           "close": "14:00"
+        }
+      ],
+      "appointments": [
+        {
+          "timeISO": "2025-07-08T010:30:00.000Z",
+          "patientName": "Leonardo Gallo"
         }
       ]
     },
@@ -133,7 +145,8 @@
           "open": "08:00",
           "close": "14:00"
         }
-      ]
+      ],
+      "appointments": []
     },
     {
       "id": "6f4922f4-6a16-4a3b-9c12-95b5b4a7f1bc",
@@ -178,7 +191,8 @@
           "open": "08:00",
           "close": "14:00"
         }
-      ]
+      ],
+      "appointments": []
     },
     {
       "id": "7c5aba41-60ef-43a8-9a1c-32811e14a7b0",
@@ -219,7 +233,8 @@
           "day": "Sunday",
           "isAvailable": false
         }
-      ]
+      ],
+      "appointments": []
     },
     {
       "id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
@@ -262,7 +277,8 @@
           "day": "Sunday",
           "isAvailable": false
         }
-      ]
+      ],
+      "appointments": []
     },
     {
       "id": "c9f0f895-7e61-4e94-bb26-cff59d12a401",
@@ -306,7 +322,8 @@
           "open": "08:00",
           "close": "14:00"
         }
-      ]
+      ],
+      "appointments": []
     }
   ],
   "Patients": [
@@ -431,6 +448,5 @@
       "procedureType": "chin augmentation"
     }
   ]
-
 
 }
