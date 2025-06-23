@@ -9,8 +9,7 @@ export function checkIfAppointmentTimeIsAvailable(doctor, newAppointmentTimeISO)
         }
         return isAvailable
     } catch(err) {
-        console.log(`Something went wrong with appointments`)
+        console.error(`Something went wrong with appointments`)
         return err.message
     }
-
 }
