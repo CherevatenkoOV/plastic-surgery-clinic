@@ -2,15 +2,15 @@ import express from 'express'
 import {doctorsRoutes} from "./doctors/index.js"
 import {patientsRoutes} from "./patients/index.js";
 
-const index = express()
+const main = express()
 const PORT = process.env.PORT
 
-index.use(express.json())
+main.use(express.json())
 
-index.use('/doctors', doctorsRoutes)
-index.use('/patients', patientsRoutes)
+main.use('/doctors', doctorsRoutes)
+main.use('/patients', patientsRoutes)
 
-index.listen(PORT, () => {
+main.listen(PORT, () => {
     console.log(`Response: ${PORT}`)
 })
 

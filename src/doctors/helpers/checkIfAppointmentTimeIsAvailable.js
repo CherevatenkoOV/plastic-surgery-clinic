@@ -1,15 +1,12 @@
 export function checkIfAppointmentTimeIsAvailable(doctor, newAppointmentTimeISO){
     try {
-        let isAvailable = true
-        for (const appointment in doctor.appointments) {
+        for (const appointment of doctor.appointments) {
             if (appointment.timeISO === newAppointmentTimeISO) {
-                isAvailable = false;
-                console.log("Specified time is occupied. Try to choose another time")
+                return false;
             }
         }
-        return isAvailable
+        return true;
     } catch(err) {
-        console.error(`Something went wrong with appointments`)
         return err.message
     }
 }
