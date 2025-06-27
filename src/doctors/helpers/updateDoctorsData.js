@@ -1,10 +1,8 @@
 import fs from "fs";
 import {doctorsConstants} from "../doctorsConstants.js";
 
-
-export function updateDoctorsData(doctors) {
+export async function updateDoctorsData(doctors) {
     const doctorsDataJSON = JSON.stringify(doctors)
-
     fs.writeFile(
         doctorsConstants.DATA_PATH,
         doctorsDataJSON,
@@ -16,5 +14,4 @@ export function updateDoctorsData(doctors) {
                 console.log("Data is updated")
             }
         })
-
 }

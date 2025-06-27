@@ -14,5 +14,3 @@ export function updatePatientsData(doctors) {
                 console.log("Data is updated")
             }
         })
-
-}
