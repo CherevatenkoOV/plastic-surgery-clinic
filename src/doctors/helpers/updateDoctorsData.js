@@ -4,7 +4,7 @@ import {doctorsConstants} from "../doctorsConstants.js";
 export async function updateDoctorsData(doctors) {
     const doctorsDataJSON = JSON.stringify(doctors)
     fs.writeFile(
-        doctorsConstants.DATA_PATH,
+        doctorsConstants.paths.DATA_PATH,
         doctorsDataJSON,
         {encoding: 'utf-8'},
         err => {
