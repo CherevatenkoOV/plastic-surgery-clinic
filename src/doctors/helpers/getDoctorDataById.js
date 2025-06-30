@@ -1,14 +1,13 @@
 import {getDoctorsData} from "./getDoctorsData.js";
-import {doctorsConstants} from "../doctorsConstants.js";
 
 export const getDoctorDataById = async (doctorId) => {
     const doctors = await getDoctorsData();
     if(!doctors) {
-        throw new Error(doctorsConstants.errorMessages.GETTING_DOCTOR_ERROR)
+        throw new Error("The doctor was not found")
     } else {
         const targetDoctor = doctors.find(doctor => doctor.id === doctorId);
         if(!targetDoctor) {
-            throw new Error(doctorsConstants.errorMessages.DOCTOR_NOT_FOUND)
+            throw new Error("The doctor with the specified id was not found")
         } else {
             return targetDoctor;
         }

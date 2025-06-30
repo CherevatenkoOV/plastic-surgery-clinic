@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 import {getDoctorsData} from "./getDoctorsData.js";
-import {doctorsConstants} from "../doctorsConstants.js";
 
 export const createDoctor = async (newDoctorData) => {
     const {name, specialization} = newDoctorData;
@@ -8,12 +7,12 @@ export const createDoctor = async (newDoctorData) => {
     const doctors = await getDoctorsData();
 
     if(!doctors) {
-        throw new Error(doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR)
+        throw new Error("When getting doctors something went wrong")
     } else {
         const doctorIsExist = !!doctors.find(doctor => doctor.name === name)
 
         if(doctorIsExist) {
-            throw new Error(doctorsConstants.errorMessages.DOCTOR_ALREADY_EXISTS)
+            throw new Error("The doctor with the specified name already exists")
         } else {
             let uuid = crypto.randomUUID();
 

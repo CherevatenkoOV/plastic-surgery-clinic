@@ -1,7 +1,6 @@
 import {checkIfAppointmentTimeIsAvailable} from "./helpers/checkIfAppointmentTimeIsAvailable.js";
 import {getDoctorsData} from "./helpers/getDoctorsData.js";
 import {updateDoctorsData} from "./helpers/updateDoctorsData.js";
-import {doctorsConstants} from "./doctorsConstants.js";
 import {createDoctor} from "./helpers/createDoctor.js";
 import {changeDoctorData} from "./helpers/changeDoctorData.js";
 
@@ -9,7 +8,7 @@ export const getDoctors = async (req, res) => {
     const doctors = await getDoctorsData();
 
     if (!doctors) {
-        res.status(400).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+        res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
         res.status(200).send(doctors);
     }
@@ -20,14 +19,14 @@ export const getDoctorById = async (req, res) => {
     const doctors = await getDoctorsData();
 
     if (!doctors) {
-        res.status(404).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+        res.status(404).send({message: "When getting doctors something went wrong"})
     } else {
         const targetDoctor = doctors.find(doctor => doctor.id === id)
 
         if (targetDoctor != null) {
             res.status(200).send(targetDoctor)
         } else {
-            res.status(404).send({message: doctorsConstants.errorMessages.GETTING_DOCTOR_ERROR})
+            res.status(404).send({message: "The doctor was not found"})
         }
     }
 }
@@ -36,12 +35,12 @@ export const putDoctor = async (req, res) => {
     const newDoctorData = req.body;
 
     if (!newDoctorData) {
-        res.status(400).send({message: doctorsConstants.errorMessages.REQUEST_BODY_OF_NEW_DOCTOR_ERROR})
+        res.status(400).send({message: "Something went wrong with request body of new doctor."})
     } else {
         const doctors = await getDoctorsData();
 
         if (!doctors) {
-            res.status(404).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+            res.status(404).send({message: "When getting doctors something went wrong"})
         } else {
             const newDoctor = await createDoctor(newDoctorData)
                 .catch(err => res.status(400).send({message: err.message}));
@@ -49,7 +48,7 @@ export const putDoctor = async (req, res) => {
             doctors.push(newDoctor);
             await updateDoctorsData(doctors);
 
-            res.status(200).send({message: doctorsConstants.successMessages.DOCTOR_CREATED_SUCCESSFULLY})
+            res.status(200).send({message: "New doctor was created successfulyy."})
         }
     }
 }
@@ -60,7 +59,7 @@ export const updateDoctorById = async (req, res) => {
     const doctors = await getDoctorsData();
 
     if (!doctors) {
-        res.status(400).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+        res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
         const updatedDoctors = doctors.map(doctor => {
             if(doctor.id === newDoctorData.id) {
@@ -73,7 +72,7 @@ export const updateDoctorById = async (req, res) => {
         })
         await updateDoctorsData(updatedDoctors)
 
-        res.status(200).send({message: doctorsConstants.successMessages.DOCTOR_UPDATED_SUCCESSFULLY})
+        res.status(200).send({message:"Doctor was updated successfuly."})
     }
 }
 
@@ -82,16 +81,18 @@ export const deleteDoctorById = async (req, res) => {
     const doctors = await getDoctorsData();
 
     if (!doctors) {
-        res.status(400).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+        res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
         const targetDoctor = doctors.find(doctor => doctor.id === id);
         if (!targetDoctor) {
-            res.status(400).send({message: doctorsConstants.errorMessages.GETTING_DOCTOR_ERROR})
+            // БЫЛО:
+            // res.status(200).send({message: "Doctor was deleted successfuly."})
+            // СТАЛО:
+            res.status(200).send({message: "Doctor was deleted successfuly."})
         } else {
             const updatedDoctors = doctors.filter(doctor => doctor.id !== id)
             await updateDoctorsData(updatedDoctors);
-            //
-            res.status(200).send(`Doctor ${targetDoctor.name} was successfully removed`)
+            res.status(200).send({messages: "Doctor was deleted successfuly."})
         }
     }
 }
@@ -100,7 +101,7 @@ export const getAppointments = async (req, res) => {
     const doctors = await getDoctorsData()
 
     if (!doctors) {
-        res.status(404).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+        res.status(404).send({message: "When getting doctors something went wrong"})
     } else {
         const result = doctors
             .filter(doctor => doctor.appointments.length)
@@ -114,7 +115,7 @@ export const createAppointment = async (req, res) => {
     const doctors = await getDoctorsData()
 
     if (!doctors) {
-        res.status(404).send({message: doctorsConstants.errorMessages.GETTING_ALL_DOCTORS_ERROR})
+        res.status(404).send({message: "When getting doctors something went wrong"})
     } else {
         const newAppointmentInfo = req.body
         const {timeISO, patientName} = newAppointmentInfo;
@@ -123,10 +124,10 @@ export const createAppointment = async (req, res) => {
         const targetDoctor = doctors.find(doctor => doctor.id === id)
 
         if (!targetDoctor) {
-            res.status(400).send({message: doctorsConstants.errorMessages.GETTING_DOCTOR_ERROR})
+            res.status(400).send({message: "The doctor was not found"})
         } else {
             if (!checkIfAppointmentTimeIsAvailable(targetDoctor, timeISO)) {
-                res.status(400).send({message: doctorsConstants.errorMessages.APPOINTMENT_OCCUPIED})
+                res.status(400).send({message: "Specified time is occupied. Try to choose another time"})
             } else {
                 console.log(`${targetDoctor.appointments}`)
                 console.log(`${timeISO}`)
