@@ -3,14 +3,21 @@ import {getDoctorsData} from "./helpers/getDoctorsData.js";
 import {updateDoctorsData} from "./helpers/updateDoctorsData.js";
 import {createDoctor} from "./helpers/createDoctor.js";
 import {changeDoctorData} from "./helpers/changeDoctorData.js";
+import {sortByAppointments} from "./helpers/sortByAppointments.js";
 
 export const getDoctors = async (req, res) => {
     const doctors = await getDoctorsData();
+    const sort = req.query.sort;
 
     if (!doctors) {
         res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
-        res.status(200).send(doctors);
+        if(!sort) {
+            res.status(200).send(doctors);
+        } else {
+            const sortedDoctors = await sortByAppointments(doctors, sort)
+            res.status(200).send(sortedDoctors);
+        }
     }
 }
 
