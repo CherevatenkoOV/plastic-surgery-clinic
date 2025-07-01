@@ -54,15 +54,16 @@ export const putDoctor = async (req, res) => {
 }
 
 export const updateDoctorById = async (req, res) => {
+    const id = req.params.id;
     const newDoctorData = req.body;
-    const updatedDoctor = await changeDoctorData(newDoctorData)
+    const updatedDoctor = await changeDoctorData(newDoctorData, id)
     const doctors = await getDoctorsData();
 
     if (!doctors) {
         res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
         const updatedDoctors = doctors.map(doctor => {
-            if(doctor.id === newDoctorData.id) {
+            if(doctor.id === id) {
                 return {
                     ...doctor,
                     ...updatedDoctor

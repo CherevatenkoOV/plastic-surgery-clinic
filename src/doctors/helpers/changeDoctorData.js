@@ -1,15 +1,9 @@
 import {getDoctorDataById} from "./getDoctorDataById.js";
 
-export const changeDoctorData = async (newDoctorData) => {
-    const id = newDoctorData.id;
+export const changeDoctorData = async (newDoctorData, id) => {
     const targetDoctor = await getDoctorDataById(id);
-    const updatedDoctor = {
-        id,
-    ...targetDoctor,
-    ...newDoctorData
+    return {
+        ...targetDoctor,
+        ...newDoctorData
     }
-
-    // console.log(updatedDoctor)
-
-    return updatedDoctor
 }

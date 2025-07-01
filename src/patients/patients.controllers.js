@@ -2,6 +2,7 @@ import {getPatientsData} from "./helpers/getPatientsData.js";
 import {patientsConstants} from "./patientsConstants.js";
 import {updatePatientsData} from "./helpers/updatePatientsData.js";
 import {createPatient} from "./helpers/createPatient.js";
+import {changePatientData} from "./helpers/changePatientData.js";
 
 export const getPatients = async (req, res) => {
     const patients = await getPatientsData()
@@ -51,6 +52,32 @@ export const putPatient = async (req, res) => {
         }
     }
 }
+
+export const updatePatientById = async (req, res) => {
+    const id = req.params.id;
+    const newPatientData = req.body;
+    const updatedPatient = await changePatientData(newPatientData, id)
+    const patients = await getPatientsData();
+
+    if (!patients) {
+        res.status(400).send({message: "When getting patients something went wrong"})
+    } else {
+        const updatedPatients = patients.map(patient => {
+            if(patient.id === id) {
+
+                return {
+                    ...patient,
+                    ...updatedPatient
+                }
+            }
+            return patient;
+        })
+        await updatePatientsData(updatedPatients)
+
+        res.status(200).send({message: `Patient ${updatedPatient.name} was updated successfully.`})
+    }
+}
+
 
 export const deletePatientById = async (req, res) => {
     const id = req.params.id;
