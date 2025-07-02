@@ -7,5 +7,5 @@ export async function updateDoctorsData(doctors) {
         doctorsConstants.paths.DATA_PATH,
         doctorsDataJSON,
         {encoding: 'utf-8'},
-        ).catch(e => console.log(e.message))
+    ).catch(e => console.log(e.message))
 }

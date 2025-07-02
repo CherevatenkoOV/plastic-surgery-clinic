@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs/promises";
 import {patientsConstants} from "../patientsConstants.js";
 
 export async function updatePatientsData(patients) {
@@ -6,12 +6,7 @@ export async function updatePatientsData(patients) {
     fs.writeFile(
         patientsConstants.paths.DATA_PATH,
         patientsDataJSON,
-        {encoding: 'utf-8'},
-        err => {
-            if (err) {
-                console.log(`Something went wrong with updatePatientsData: ${err.message}`)
-            } else {
-                console.log("Data is updated")
-            }
-        })
+        {encoding: 'utf-8'}
+    ).catch(err => console.log(`Something went wrong with updatePatientsData: ${err.message}`))
+
 }
