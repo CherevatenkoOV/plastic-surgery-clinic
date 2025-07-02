@@ -48,7 +48,7 @@ export const putPatient = async (req, res) => {
             patients.push(newPatient);
             await updatePatientsData(patients);
 
-            res.status(200).send({message: "New patient was created successful."})
+            res.status(200).send({message: "New patient was created successfully."})
         }
     }
 }

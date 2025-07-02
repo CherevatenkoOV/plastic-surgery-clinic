@@ -55,7 +55,7 @@ export const putDoctor = async (req, res) => {
             doctors.push(newDoctor);
             await updateDoctorsData(doctors);
 
-            res.status(200).send({message: "New doctor was created successfulyy."})
+            res.status(200).send({message: "New doctor was created successfully."})
         }
     }
 }

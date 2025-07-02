@@ -21,13 +21,17 @@ export const createDoctor = async (newDoctorData) => {
             }
 
             const id = uuid;
+            const createdAt = new Date().toISOString();
+            const updatedAt = new Date().toISOString();
 
             return {
                 id,
                 name,
                 specialization,
                 schedule: [],
-                appointments: []
+                appointments: [],
+                createdAt,
+                updatedAt
             }
         }
     }

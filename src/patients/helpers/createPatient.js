@@ -22,13 +22,18 @@ export const createPatient = async (newPatientData) => {
 
             const id = uuid;
 
+            const createdAt = new Date().toISOString();
+            const updatedAt = new Date().toISOString();
+
             return {
                 id,
                 name,
                 phone,
                 doctor,
                 appointment,
-                procedureType
+                procedureType,
+                createdAt,
+                updatedAt
             }
         }
 
