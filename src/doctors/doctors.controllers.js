@@ -4,6 +4,7 @@ import {updateDoctorsData} from "./helpers/updateDoctorsData.js";
 import {createDoctor} from "./helpers/createDoctor.js";
 import {changeDoctorData} from "./helpers/changeDoctorData.js";
 import {sortByAppointments} from "./helpers/sortByAppointments.js";
+import {getAppointmentsByDoctorId} from "./helpers/getAppointmentsByDoctorId.js";
 
 export const getDoctors = async (req, res) => {
     const doctors = await getDoctorsData();
@@ -93,15 +94,22 @@ export const deleteDoctorById = async (req, res) => {
     } else {
         const targetDoctor = doctors.find(doctor => doctor.id === id);
         if (!targetDoctor) {
-            // БЫЛО:
-            // res.status(200).send({message: "Doctor was deleted successfuly."})
-            // СТАЛО:
             res.status(200).send({message: "Doctor was deleted successfuly."})
         } else {
             const updatedDoctors = doctors.filter(doctor => doctor.id !== id)
             await updateDoctorsData(updatedDoctors);
             res.status(200).send({messages: "Doctor was deleted successfuly."})
         }
+    }
+}
+
+export const getDoctorAppointments = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const doctorAppointments = await getAppointmentsByDoctorId(id)
+        return res.status(200).send(doctorAppointments)
+    } catch(err) {
+        return res.status(400).send({message: err.message})
     }
 }
 

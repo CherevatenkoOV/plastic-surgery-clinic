@@ -1,7 +1,16 @@
 import express from 'express';
-import {deletePatientById, getPatientById, getPatients, putPatient, updatePatientById} from "./patients.controllers.js";
+import {
+    deletePatientById,
+    getPatientAppointments,
+    getPatientById,
+    getPatients,
+    putPatient,
+    updatePatientById
+} from "./patients.controllers.js";
 
 const router = express.Router();
+
+router.get('/:id/appointments', getPatientAppointments)
 
 router.get('/', getPatients)
 

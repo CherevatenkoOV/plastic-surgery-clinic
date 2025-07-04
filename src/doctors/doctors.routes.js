@@ -5,11 +5,12 @@ import {
     deleteDoctorById,
     getAppointments,
     getDoctorById,
-    getDoctors, updateDoctorById
+    getDoctors, updateDoctorById, getDoctorAppointments
 } from "./doctors.controllers.js";
 
 const router = express.Router();
 
+router.get('/:id/appointments', getDoctorAppointments)
 
 router.get('/appointments', getAppointments)
 

@@ -3,9 +3,13 @@
     "id": "c7c4cbaa-e34a-4e78-9a75-b42099c3bc30",
     "name": "Alessia Ferri",
     "phone": "+393471112233",
-    "doctor": "John Smith",
-    "appointment": "2025-06-03T10:00:00+02:00",
-    "procedureType": "rhinoplasty",
+    "appointments": [
+      {
+        "doctorName": "John Smith",
+        "procedureType": "rhinoplasty",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -13,9 +17,13 @@
     "id": "01fd6306-7306-4d02-bf4c-df99114d03b9",
     "name": "Marco Bianchi",
     "phone": "+393472223344",
-    "doctor": "Rafaello Esposito",
-    "appointment": "2025-06-03T15:00:00+02:00",
-    "procedureType": "facelift",
+    "appointments": [
+      {
+        "doctorName": "Rafaello Esposito",
+        "procedureType": "facelift",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -24,8 +32,13 @@
     "name": "Giulia Romano",
     "phone": "+393473334455",
     "doctor": "Domenico Laezza",
-    "appointment": "2025-06-04T15:00:00+02:00",
-    "procedureType": "eyelid surgery",
+    "appointments": [
+      {
+        "doctorName": "Domenico Laezza",
+        "procedureType": "eyelid surgery",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -33,9 +46,13 @@
     "id": "7901fbd5-23ff-47aa-9251-7f54b73ff92b",
     "name": "Leonardo Gallo",
     "phone": "+393474445566",
-    "doctor": "Carmine Gallo",
-    "appointment": "2025-06-05T11:00:00+02:00",
-    "procedureType": "scar revision",
+    "appointments": [
+      {
+        "doctorName": "Carmine Gallo",
+        "procedureType": "scar revision",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -43,9 +60,13 @@
     "id": "2e378275-4977-4668-8988-7d4ec6f08b2e",
     "name": "Sofia Conti",
     "phone": "+393475556677",
-    "doctor": "Francesco Core",
-    "appointment": "2025-06-06T09:00:00+02:00",
-    "procedureType": "hair transplant",
+    "appointments": [
+      {
+        "doctorName": "Sofia Conti",
+        "procedureType": "hair transplant",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -53,9 +74,13 @@
     "id": "4d734b14-547d-476b-a44f-54de69b202a0",
     "name": "Mattia Ricci",
     "phone": "+393476667788",
-    "doctor": "Luigi Centomani",
-    "appointment": "2025-06-07T09:30:00+02:00",
-    "procedureType": "liposuction",
+    "appointments": [
+      {
+        "doctorName": "Luigi Centomani",
+        "procedureType": "liposuction",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -63,9 +88,13 @@
     "id": "d738ddf5-0603-4ad7-8056-c1de1c9311c5",
     "name": "Chiara Greco",
     "phone": "+393477778899",
-    "doctor": "Antonio Morelli",
-    "appointment": "2025-06-08T13:00:00+02:00",
-    "procedureType": "reconstructive nose surgery",
+    "appointments": [
+      {
+        "doctorName": "Antonio Morelli",
+        "procedureType": "reconstructive nose surgery",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -73,9 +102,13 @@
     "id": "02d574b4-cdad-4f1a-9c0c-d348deba6c6c",
     "name": "Andrea Fontana",
     "phone": "+393478889900",
-    "doctor": "John Smith",
-    "appointment": "2025-06-09T08:30:00+02:00",
-    "procedureType": "botox",
+    "appointments": [
+      {
+        "doctorName": "Andrea Fontana",
+        "procedureType": "botox",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -83,9 +116,13 @@
     "id": "c175812d-efb8-4e76-b328-0f9be54b04a7",
     "name": "Elena De Luca",
     "phone": "+393479990011",
-    "doctor": "Rafaello Esposito",
-    "appointment": "2025-06-09T10:30:00+02:00",
-    "procedureType": "scar revision",
+    "appointments": [
+      {
+        "doctorName": "Rafaello Esposito",
+        "procedureType": "scar revision",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -93,9 +130,13 @@
     "id": "4f19c594-bc89-4b5a-85e9-9e7d2b6d1a7b",
     "name": "Nicolo Marino",
     "phone": "+393480101112",
-    "doctor": "Domenico Laezza",
-    "appointment": "2025-06-10T14:30:00+02:00",
-    "procedureType": "microsurgery",
+    "appointments": [
+      {
+        "doctorName": "Domenico Laezza",
+        "procedureType": "microsurgery",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -103,9 +144,13 @@
     "id": "f0a53f02-bb2c-456c-84b1-fcd16b21f3e1",
     "name": "Martina Vitale",
     "phone": "+393481212223",
-    "doctor": "Carmine Gallo",
-    "appointment": "2025-06-11T11:00:00+02:00",
-    "procedureType": "pediatric cleft surgery",
+    "appointments": [
+      {
+        "doctorName": "Carmine Gallo",
+        "procedureType": "pediatric cleft surgery",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -113,9 +158,13 @@
     "id": "8e90e7f4-ecf5-4d64-a00e-6a9c4b9e20de",
     "name": "Riccardo Lombardi",
     "phone": "+393482323334",
-    "doctor": "Francesco Core",
-    "appointment": "2025-06-11T12:00:00+02:00",
-    "procedureType": "hair transplant",
+    "appointments": [
+      {
+        "doctorName": "Francesco Core",
+        "procedureType": "hair transplant",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -123,9 +172,13 @@
     "id": "590bc6d2-d1a7-4c0e-a016-d41f3d780ef1",
     "name": "Tommaso Marchetti",
     "phone": "+393484545656",
-    "doctor": "Antonio Morelli",
-    "appointment": "2025-06-12T14:00:00+02:00",
-    "procedureType": "scar revision",
+    "appointments": [
+      {
+        "doctorName": "Antonio Morelli",
+        "procedureType": "scar revision",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -133,9 +186,13 @@
     "id": "9374b84f-cb6f-4971-9500-49ef4139fc13",
     "name": "Beatrice Neri",
     "phone": "+393485656767",
-    "doctor": "John Smith",
-    "appointment": "2025-06-13T09:00:00+02:00",
-    "procedureType": "chin augmentation",
+    "appointments": [
+      {
+        "doctorName": "John Smith",
+        "procedureType": "chin augmentation",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -143,9 +200,13 @@
     "id": "d03585ef-94a0-4fee-9a29-83462378af53",
     "name": "Giovanni Cletter",
     "phone": "+391212121293",
-    "doctor": "Antonio Morelli",
-    "appointment": "2025-07-09T11:00:00+02:00",
-    "procedureType": "rhinoplasty",
+    "appointments": [
+      {
+        "doctorName": "Antonio Morelli",
+        "procedureType": "rhinoplasty",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -153,9 +214,13 @@
     "id": "f9dec161-c81b-4c5a-bbf8-5a580336c05e",
     "name": "Nino Neapolitano",
     "phone": "+391212121293",
-    "doctor": "Antonio Morelli",
-    "appointment": "2025-07-09T11:00:00+02:00",
-    "procedureType": "rhinoplasty",
+    "appointments": [
+      {
+        "doctorName": "Antonio Morelli",
+        "procedureType": "rhinoplasty",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
@@ -163,9 +228,13 @@
     "id": "9c2e4703-506b-4afa-9fcc-7f8a4821a3ad",
     "name": "Salvatore Russo",
     "phone": "+391212121293",
-    "doctor": "John Smith",
-    "appointment": "2025-07-09T11:00:00+02:00",
-    "procedureType": "facelift",
+    "appointments": [
+      {
+        "doctorName": "John Smith",
+        "procedureType": "facelift",
+        "timeISO": "2025-06-15T19:30:00.000Z"
+      }
+    ],
     "createdAt": "2025-07-02T19:52:34.303Z",
     "updatedAt": "2025-07-02T19:52:34.306Z"
   }
