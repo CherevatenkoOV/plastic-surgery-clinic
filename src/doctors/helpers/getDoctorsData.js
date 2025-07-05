@@ -8,7 +8,7 @@ export const getDoctorsData = async () => {
         doctorsConstants.paths.DATA_PATH,
         {encoding: "utf-8"}
     )
-        .catch(e => console.log(`Something went wrong with getDoctorsData: ${e.message}`))
+        .catch(err => {throw new Error(err.message)})
 
     return JSON.parse(doctorsDataJSON)
 

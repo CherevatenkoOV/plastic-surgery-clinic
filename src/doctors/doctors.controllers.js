@@ -5,6 +5,7 @@ import {createDoctor} from "./helpers/createDoctor.js";
 import {changeDoctorData} from "./helpers/changeDoctorData.js";
 import {sortByAppointments} from "./helpers/sortByAppointments.js";
 import {getAppointmentsByDoctorId} from "./helpers/getAppointmentsByDoctorId.js";
+import {createDoctorAppointment} from "./helpers/createDoctorAppointment.js";
 
 export const getDoctors = async (req, res) => {
     const doctors = await getDoctorsData();
@@ -13,7 +14,7 @@ export const getDoctors = async (req, res) => {
     if (!doctors) {
         res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
-        if(!sort) {
+        if (!sort) {
             res.status(200).send(doctors);
         } else {
             const sortedDoctors = await sortByAppointments(doctors, sort)
@@ -71,7 +72,7 @@ export const updateDoctorById = async (req, res) => {
         res.status(400).send({message: "When getting doctors something went wrong"})
     } else {
         const updatedDoctors = doctors.map(doctor => {
-            if(doctor.id === id) {
+            if (doctor.id === id) {
                 return {
                     ...doctor,
                     ...updatedDoctor
@@ -81,7 +82,7 @@ export const updateDoctorById = async (req, res) => {
         })
         await updateDoctorsData(updatedDoctors)
 
-        res.status(200).send({message:"Doctor was updated successfuly."})
+        res.status(200).send({message: "Doctor was updated successfuly."})
     }
 }
 
@@ -108,7 +109,7 @@ export const getDoctorAppointments = async (req, res) => {
     try {
         const doctorAppointments = await getAppointmentsByDoctorId(id)
         return res.status(200).send(doctorAppointments)
-    } catch(err) {
+    } catch (err) {
         return res.status(400).send({message: err.message})
     }
 }
@@ -128,33 +129,18 @@ export const getAppointments = async (req, res) => {
 }
 
 export const createAppointment = async (req, res) => {
-    const doctors = await getDoctorsData()
+    const id = req.params.id
+    const newAppointmentInfo = req.body
+    const {timeISO, patientName} = newAppointmentInfo;
 
-    if (!doctors) {
-        res.status(404).send({message: "When getting doctors something went wrong"})
-    } else {
-        const newAppointmentInfo = req.body
-        const {timeISO, patientName} = newAppointmentInfo;
-
-        const id = req.params.id
-        const targetDoctor = doctors.find(doctor => doctor.id === id)
-
-        if (!targetDoctor) {
-            res.status(400).send({message: "The doctor was not found"})
-        } else {
-            if (!checkIfAppointmentTimeIsAvailable(targetDoctor, timeISO)) {
-                res.status(400).send({message: "Specified time is occupied. Try to choose another time"})
-            } else {
-                console.log(`${targetDoctor.appointments}`)
-                console.log(`${timeISO}`)
-                targetDoctor.appointments.push(newAppointmentInfo)
-                await updateDoctorsData(doctors)
-
-                res.status(201).send({
-                    message: `The appointment to doctor ${targetDoctor.name} was created. Patient: ${patientName}. Time: ${new Date(timeISO).toLocaleTimeString("en-US")}`
-                })
-            }
-        }
-
+    try {
+        const targetDoctor = await createDoctorAppointment(id, newAppointmentInfo)
+        res.status(201).send({
+            message: `The appointment to doctor ${targetDoctor.name} was created. Patient: ${patientName}. Time: ${timeISO}`
+        })
+    } catch (err) {
+        res.status(400).send({
+            message: err.message
+        })
     }
 }
