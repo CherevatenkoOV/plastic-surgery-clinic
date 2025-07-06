@@ -7,19 +7,20 @@ import {
     putPatient,
     updatePatientById
 } from "./patients.controllers.js";
+import {tryCatch} from "../utils/tryCatch.js";
 
 const router = express.Router();
 
-router.get('/:id/appointments', getPatientAppointments)
+router.get('/:id/appointments', tryCatch(getPatientAppointments))
 
-router.get('/', getPatients)
+router.get('/', tryCatch(getPatients))
 
-router.get('/:id', getPatientById)
+router.get('/:id', tryCatch(getPatientById))
 
-router.put('/', putPatient)
+router.put('/', tryCatch(putPatient))
 
-router.patch('/:id', updatePatientById)
+router.patch('/:id', tryCatch(updatePatientById))
 
-router.delete('/:id', deletePatientById)
+router.delete('/:id', tryCatch(deletePatientById))
 
 export default router;

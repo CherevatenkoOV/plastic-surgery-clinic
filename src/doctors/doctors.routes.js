@@ -3,27 +3,28 @@ import {
     createAppointment,
     putDoctor,
     deleteDoctorById,
-    getAppointments,
+    getAllAppointments,
     getDoctorById,
     getDoctors, updateDoctorById, getDoctorAppointments
 } from "./doctors.controllers.js";
+import {tryCatch} from "../utils/tryCatch.js";
 
 const router = express.Router();
 
-router.get('/:id/appointments', getDoctorAppointments)
+router.get('/:id/appointments', tryCatch(getDoctorAppointments))
 
-router.get('/appointments', getAppointments)
+router.get('/all-appointments', tryCatch(getAllAppointments))
 
-router.get('/', getDoctors)
+router.get('/', tryCatch(getDoctors))
 
-router.get('/:id', getDoctorById)
+router.get('/:id', tryCatch(getDoctorById))
 
-router.put('/', putDoctor)
+router.put('/', tryCatch(putDoctor))
 
-router.patch('/:id', updateDoctorById)
+router.patch('/:id', tryCatch(updateDoctorById))
 
-router.put('/:id', createAppointment)
+router.put('/:id', tryCatch(createAppointment))
 
-router.delete('/:id', deleteDoctorById)
+router.delete('/:id', tryCatch(deleteDoctorById))
 
 export default router;

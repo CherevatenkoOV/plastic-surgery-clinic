@@ -1,13 +1,6 @@
-import {getPatientsData} from "./getPatientsData.js";
+import {getPatientDataById} from "./getPatientDataById.js";
 
-export const getAppointmentsByPatientId = async (patientId) => {
-    const patients = await getPatientsData();
-    console.log(patients)
-    if(!patients) {
-        throw new Error("When getting patients something went wrong")
-    } else {
-        const patient = patients.find(patient => patient.id === patientId);
-        console.log(patient)
+export const getAppointmentsByPatientId = async (patientId, patients) => {
+        const patient = getPatientDataById(patientId, patients);
         return patient.appointments;
-    }
 }

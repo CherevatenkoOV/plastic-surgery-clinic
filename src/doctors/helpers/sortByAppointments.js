@@ -1,19 +1,20 @@
-export const sortByAppointments = async (doctors, order) => {
-    if (!doctors) {
-        throw new Error("When getting doctors something went wrong")
+export const sortByAppointments = async (doctors, sortOrder) => {
+    if(!sortOrder) {
+        throw new Error("The sort order was not specified")
     } else {
-        if (order === 'asc') {
+        if (sortOrder === 'asc') {
             doctors.sort((doc1, doc2) => doc1.appointments.length - doc2.appointments.length)
             return doctors;
 
-        } else if (order === 'desc') {
+        } else if (sortOrder === 'desc') {
             doctors.sort((doc1, doc2) => doc2.appointments.length - doc1.appointments.length)
             return doctors;
 
         } else {
-            throw new Error("the sort order is specified incorrectly")
+            throw new Error("The sort order is specified incorrectly")
         }
     }
+
 }
 
 

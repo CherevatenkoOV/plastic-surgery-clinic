@@ -1,13 +1,10 @@
 import crypto from "node:crypto";
-import {getPatientsData} from "./getPatientsData.js";
 
-export const createPatient = async (newPatientData) => {
+export const createPatientData = async (newPatientData, patients) => {
     const {name, phone, doctor, appointment, procedureType} = newPatientData;
 
-    const patients = await getPatientsData();
-
-    if (!patients) {
-        throw new Error("When getting patients something went wrong")
+    if (!newPatientData) {
+        throw new Error("The data of new patient is empty")
     } else {
         const patientIsExist = !!patients.find(patient => patient.name === name);
 
@@ -21,7 +18,6 @@ export const createPatient = async (newPatientData) => {
             }
 
             const id = uuid;
-
             const createdAt = new Date().toISOString();
             const updatedAt = new Date().toISOString();
 
@@ -36,6 +32,5 @@ export const createPatient = async (newPatientData) => {
                 updatedAt
             }
         }
-
     }
 }

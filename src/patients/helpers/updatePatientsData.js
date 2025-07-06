@@ -1,12 +1,30 @@
 import fs from "node:fs/promises";
 import {patientsConstants} from "../patientsConstants.js";
 
-export async function updatePatientsData(patients) {
-    const patientsDataJSON = JSON.stringify(patients)
+export async function updatePatientsData(patients, updatedPatient = null) {
+    let patientsDataJSON;
+
+    if(!updatedPatient) {
+        patientsDataJSON = JSON.stringify(patients);
+    } else {
+        const updatedPatients = patients.map(patient => {
+            if (patient.id === updatedPatient.id) {
+
+                return {
+                    ...patient,
+                    ...updatedPatient
+                }
+            }
+            return patient;
+        })
+        patientsDataJSON = JSON.stringify(updatedPatients);
+    }
+
     fs.writeFile(
         patientsConstants.paths.DATA_PATH,
         patientsDataJSON,
         {encoding: 'utf-8'}
-    ).catch(err => console.log(`Something went wrong with updatePatientsData: ${err.message}`))
-
+    ).catch(err => {
+        throw new Error("Something went wrong with updating patients data.")
+    })
 }

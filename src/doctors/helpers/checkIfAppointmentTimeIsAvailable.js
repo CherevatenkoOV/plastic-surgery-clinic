@@ -1,6 +1,6 @@
 export function checkIfAppointmentTimeIsAvailable(doctor, newAppointmentTimeISO){
         for (const appointment of doctor.appointments) {
-            if (appointment.timeISO === newAppointmentTimeISO) {
+            if (appointment && appointment.timeISO === newAppointmentTimeISO) {
                 return false;
             }
         }

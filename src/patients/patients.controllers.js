@@ -1,108 +1,67 @@
 import {getPatientsData} from "./helpers/getPatientsData.js";
 import {updatePatientsData} from "./helpers/updatePatientsData.js";
-import {createPatient} from "./helpers/createPatient.js";
+import {createPatientData} from "./helpers/createPatientData.js";
 import {changePatientData} from "./helpers/changePatientData.js";
 import {getAppointmentsByPatientId} from "./helpers/getAppointmentsByPatientId.js";
+import {getPatientDataById} from "./helpers/getPatientDataById.js";
+import {deletePatientData} from "./helpers/deletePatientData.js";
 
 export const getPatients = async (req, res) => {
     const patients = await getPatientsData()
 
-    if (!patients) {
-        res.status(400).send({message: "When getting patients something went wrong"})
-    } else {
-        res.status(200).send(patients)
-    }
+    return res.status(200).send(patients)
 }
 
 export const getPatientById = async (req, res) => {
-    const id = req.params.id
-    const patients = await getPatientsData()
+    const patientId = req.params.id
+    const patients = await getPatientsData();
+    const targetPatient = await getPatientDataById(patientId, patients);
 
-    if (!patients) {
-        res.status(400).send({message: "When getting patients something went wrong"})
-    } else {
-        const targetPatient = patients.find(patient => patient.id === id)
-
-        if (!targetPatient) {
-            res.status(400).send({message: "The patient was not found"})
-        } else {
-            res.status(200).send(targetPatient)
-        }
-    }
+    return res.status(200).send(targetPatient)
 }
 
 export const putPatient = async (req, res) => {
     const newPatientData = req.body;
+    const patients = await getPatientsData();
+    const newPatient = await createPatientData(newPatientData, patients)
 
-    if (!newPatientData) {
-        res.status(400).send({message: "Something went wrong with request body of new patient."})
-    } else {
-        const patients = await getPatientsData();
+    patients.push(newPatient);
+    await updatePatientsData(patients);
 
-        if (!patients) {
-            res.status(400).send({message: "When getting patients something went wrong"})
-        } else {
-            const newPatient = await createPatient(newPatientData)
-                .catch(err => res.status(400).send({message: err.message}))
-
-            patients.push(newPatient);
-            await updatePatientsData(patients);
-
-            res.status(200).send({message: "New patient was created successfully."})
-        }
-    }
+    return res.status(200).send({message: "New patient was created successfully."})
 }
 
 export const updatePatientById = async (req, res) => {
-    const id = req.params.id;
+    const patientId = req.params.id;
     const newPatientData = req.body;
-    const updatedPatient = await changePatientData(newPatientData, id)
     const patients = await getPatientsData();
+    const updatedPatient = await changePatientData(patientId, newPatientData, patients)
 
-    if (!patients) {
-        res.status(400).send({message: "When getting patients something went wrong"})
-    } else {
-        const updatedPatients = patients.map(patient => {
-            if (patient.id === id) {
+    await updatePatientsData(patients, updatedPatient)
 
-                return {
-                    ...patient,
-                    ...updatedPatient
-                }
-            }
-            return patient;
-        })
-        await updatePatientsData(updatedPatients)
-
-        res.status(200).send({message: `Patient ${updatedPatient.name} was updated successfully.`})
-    }
+    return res.status(200).send({message: `Patient ${updatedPatient.name} was updated successfully.`})
 }
 
 
 export const deletePatientById = async (req, res) => {
-    const id = req.params.id;
+    const patientId = req.params.id;
     const patients = await getPatientsData();
+    const targetPatient = await getPatientDataById(patientId, patients);
+    const updatedPatients = await deletePatientData(targetPatient, patients)
 
-    if (!patients) {
-        res.status(400).send({message: "When getting patients something went wrong"})
-    } else {
-        const targetPatient = patients.find(patient => patient.id === id);
-        if (!targetPatient) {
-            res.status(400).send({message: "The patient was not found"})
-        } else {
-            const updatedPatients = patients.filter(patient => patient.id !== id)
-            await updatePatientsData(updatedPatients);
-            res.status(200).send(`Patient ${targetPatient.name} was successfully removed`)
-        }
-    }
+    await updatePatientsData(updatedPatients);
+
+    return res.status(200).send(`Patient ${targetPatient.name} was successfully removed`)
 }
 
 export const getPatientAppointments = async (req, res) => {
-    const id = req.params.id;
-    try {
-        const patientAppointments = await getAppointmentsByPatientId(id);
-        return res.status(200).send(patientAppointments)
-    } catch (err) {
-        return res.status(400).send({message: err.message})
+    const patientId = req.params.id;
+    const patients = await getPatientsData();
+    const patientAppointments = await getAppointmentsByPatientId(patientId, patients)
+
+    if (!patientAppointments.length) {
+        return res.status(200).send("The appointment list for specified patient is empty")
     }
+
+    return res.status(200).send(patientAppointments)
 }

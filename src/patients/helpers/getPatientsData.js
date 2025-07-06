@@ -6,7 +6,16 @@ export const getPatientsData = async () => {
         patientsConstants.paths.DATA_PATH,
         {encoding: "utf-8"}
     )
-        .catch(e => console.log(`Something went wrong with getPatientsData: ${e.message}`))
+        .catch(err => {
+            throw new Error("Something went wrong while reading patients.json")
+        })
 
-    return JSON.parse(patientsDataJSON)
+    const patientsObj = JSON.parse(patientsDataJSON);
+
+    if(!patientsObj){
+        throw new Error("Something went wrong while parsing patients.json to JavaScript object")
+    } else {
+        return patientsObj
+    }
+
 }

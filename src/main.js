@@ -1,16 +1,19 @@
 import express from 'express'
 import {doctorsRoutes} from "./doctors/index.js"
 import {patientsRoutes} from "./patients/index.js";
+import {errorHandler} from "./middleware/errorHandler.js";
 
-const main = express()
+const app = express()
 const PORT = process.env.PORT
 
-main.use(express.json())
+app.use(express.json())
 
-main.use('/doctors', doctorsRoutes)
-main.use('/patients', patientsRoutes)
+app.use('/doctors', doctorsRoutes)
+app.use('/patients', patientsRoutes)
 
-main.listen(PORT, () => {
+app.use(errorHandler)
+
+app.listen(PORT, () => {
     console.log(`Response: ${PORT}`)
 })
 
