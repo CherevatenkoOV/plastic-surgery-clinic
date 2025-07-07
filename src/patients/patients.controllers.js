@@ -39,7 +39,7 @@ export const updatePatientById = async (req, res) => {
 
     await updatePatientsData(patients, updatedPatient)
 
-    return res.status(200).send({message: `Patient ${updatedPatient.name} was updated successfully.`})
+    return res.status(200).send({message: `Patient ${updatedPatient.firstName} ${updatedPatient.lastName} was updated successfully.`})
 }
 
 
@@ -51,7 +51,7 @@ export const deletePatientById = async (req, res) => {
 
     await updatePatientsData(updatedPatients);
 
-    return res.status(200).send(`Patient ${targetPatient.name} was successfully removed`)
+    return res.status(200).send(`Patient ${updatedPatient.firstName} ${updatedPatient.lastName} was successfully removed`)
 }
 
 export const getPatientAppointments = async (req, res) => {

@@ -1,9 +1,9 @@
-
 [
   {
     "id": "8f14e45f-ea6b-4b8e-9d03-2f64c6d3cbb1",
-    "name": "John Smith",
-    "specialization": "surgery",
+    "firstName": "John",
+    "lastName": "Smith",
+    "specialization": "microsurgery",
     "schedule": [
       {
         "_day": 1,
@@ -74,7 +74,8 @@
   },
   {
     "id": "5a105e8b-9d40-4a61-8b12-d9d54e8a64bf",
-    "name": "Domenico Laezza",
+    "firstName": "Domenico",
+    "lastName": "Laezza",
     "specialization": "microsurgery",
     "schedule": [
       {
@@ -129,7 +130,8 @@
   },
   {
     "id": "6f4922f4-6a16-4a3b-9c12-95b5b4a7f1bc",
-    "name": "Carmine Gallo",
+    "firstName": "Carmine",
+    "lastName": "Gallo",
     "specialization": "pediatric",
     "schedule": [
       {
@@ -193,7 +195,8 @@
   },
   {
     "id": "7c5aba41-60ef-43a8-9a1c-32811e14a7b0",
-    "name": "Francesco Core",
+    "firstName": "Francesco",
+    "lastName": "Core",
     "specialization": "transplantation",
     "schedule": [
       {
@@ -244,7 +247,8 @@
   },
   {
     "id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
-    "name": "Luigi Centomani",
+    "firstName": "Luigi",
+    "lastName": "Centomani",
     "specialization": "aesthetic",
     "schedule": [
       {
@@ -297,7 +301,8 @@
   },
   {
     "id": "c9f0f895-7e61-4e94-bb26-cff59d12a401",
-    "name": "Antonio Morelli",
+    "firstName": "Antonio",
+    "lastName": "Morelli",
     "specialization": "reconstructive",
     "schedule": [
       {
@@ -350,7 +355,8 @@
   },
   {
     "id": "187a1a16-ba58-4159-94aa-8b0084c685c8",
-    "name": "Armando Laezza",
+    "firstName": "Armando",
+    "lastName": "Laezza",
     "specialization": "reconstruction",
     "schedule": [],
     "appointments": [],
@@ -359,7 +365,8 @@
   },
   {
     "id": "d549b181-ed9d-422b-b43d-5e44cb592af8",
-    "name": "Amerigo Vespuci",
+    "firstName": "Amerigo",
+    "lastName": "Vespuci",
     "specialization": "facelift ",
     "schedule": [],
     "appointments": [],
@@ -368,7 +375,8 @@
   },
   {
     "id": "e9452837-d283-45b6-8242-f771680ee34b",
-    "name": "Amerigo Core",
+    "firstName": "Amerigo",
+    "lastName": "Core",
     "specialization": "rhinoplasty ",
     "schedule": [],
     "appointments": [],
