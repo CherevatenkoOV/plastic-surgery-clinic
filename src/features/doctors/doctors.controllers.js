@@ -3,11 +3,10 @@ import {updateDoctorsData} from "./helpers/updateDoctorsData.js";
 import {createDoctorData} from "./helpers/createDoctorData.js";
 import {changeDoctorData} from "./helpers/changeDoctorData.js";
 import {sortByAppointments} from "./helpers/sortByAppointments.js";
-import {getAppointmentsByDoctorId} from "./helpers/getAppointmentsByDoctorId.js";
 import {createDoctorAppointment} from "./helpers/createDoctorAppointment.js";
 import {getDoctorDataById} from "./helpers/getDoctorDataById.js";
 import {deleteDoctorData} from "./helpers/deleteDoctorData.js";
-import {getAllDoctorsAppointments} from "./helpers/getAllDoctorsAppointments.js";
+import {getDoctorsAppointments} from "./helpers/getDoctorsAppointments.js";
 
 export const getDoctors = async (req, res) => {
     const doctors = await getDoctorsData();
@@ -59,23 +58,16 @@ export const deleteDoctorById = async (req, res) => {
     return res.status(200).send({messages: "Doctor was deleted successfuly."})
 }
 
-export const getDoctorAppointments = async (req, res) => {
-    const doctorId = req.params.id;
-    const doctors = await getDoctorsData();
-    const doctorAppointments = await getAppointmentsByDoctorId(doctorId, doctors)
-
-    if (!doctorAppointments.length) {
-        return res.status(200).send("The appointment list for specified doctor is empty")
-    }
-
-    return res.status(200).send(doctorAppointments)
-}
-
-export const getAllAppointments = async (req, res) => {
+export const getAppointments = async (req, res) => {
+    const doctorId = req.query.id;
     const doctors = await getDoctorsData()
-    const allDoctorsAppointments = await getAllDoctorsAppointments(doctors)
-
-    return res.status(200).send(allDoctorsAppointments)
+    if(!doctorId) {
+        const allDoctorsAppointments = await getDoctorsAppointments(doctors)
+        return res.status(200).send(allDoctorsAppointments)
+    } else {
+        const targetDoctor = await getDoctorDataById(doctorId, doctors)
+        return res.status(200).send(targetDoctor.appointments)
+    }
 }
 
 export const createAppointment = async (req, res) => {

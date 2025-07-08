@@ -2,9 +2,9 @@ import {getPatientsData} from "./helpers/getPatientsData.js";
 import {updatePatientsData} from "./helpers/updatePatientsData.js";
 import {createPatientData} from "./helpers/createPatientData.js";
 import {changePatientData} from "./helpers/changePatientData.js";
-import {getAppointmentsByPatientId} from "./helpers/getAppointmentsByPatientId.js";
 import {getPatientDataById} from "./helpers/getPatientDataById.js";
 import {deletePatientData} from "./helpers/deletePatientData.js";
+import {getPatientsAppointments} from "./helpers/getPatientsAppointments.js";
 
 export const getPatients = async (req, res) => {
     const patients = await getPatientsData()
@@ -54,14 +54,14 @@ export const deletePatientById = async (req, res) => {
     return res.status(200).send(`Patient ${updatedPatient.firstName} ${updatedPatient.lastName} was successfully removed`)
 }
 
-export const getPatientAppointments = async (req, res) => {
-    const patientId = req.params.id;
+export const getAppointments = async (req, res) => {
+    const patientId = req.query.id;
     const patients = await getPatientsData();
-    const patientAppointments = await getAppointmentsByPatientId(patientId, patients)
-
-    if (!patientAppointments.length) {
-        return res.status(200).send("The appointment list for specified patient is empty")
+    if(!patientId) {
+        const allPatientsAppointments = await getPatientsAppointments(patients)
+        return res.status(200).send(allPatientsAppointments)
+    } else {
+        const targetPatient = await getPatientDataById(patientId, patients)
+        return res.status(200).send(targetPatient.appointments)
     }
-
-    return res.status(200).send(patientAppointments)
 }

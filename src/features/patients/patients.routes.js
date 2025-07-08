@@ -1,7 +1,6 @@
 import express from 'express';
 import {
-    deletePatientById,
-    getPatientAppointments,
+    deletePatientById, getAppointments,
     getPatientById,
     getPatients,
     putPatient,
@@ -13,9 +12,9 @@ import {createPatientSchema, patientIdSchema, updatePatientSchema} from "./patie
 
 const router = express.Router();
 
-router.get('/:id/appointments',
-    validateRequest(patientIdSchema, 'params'),
-    tryCatch(getPatientAppointments)
+router.get('/appointments',
+    validateRequest(patientIdSchema, 'query.id'),
+    tryCatch(getAppointments)
 )
 
 router.get('/', tryCatch(getPatients))
