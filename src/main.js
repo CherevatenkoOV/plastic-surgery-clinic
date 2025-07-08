@@ -1,7 +1,7 @@
 import express from 'express'
-import {doctorsRoutes} from "./doctors/index.js"
-import {patientsRoutes} from "./patients/index.js";
-import {errorHandler} from "./middleware/errorHandler.js";
+import {doctorsRoutes} from "./features/doctors/index.js"
+import {patientsRoutes} from "./features/patients/index.js";
+import {errorHandler} from "./shared/middleware/errorHandler.js";
 
 const app = express()
 const PORT = process.env.PORT

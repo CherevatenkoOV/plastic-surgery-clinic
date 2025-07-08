@@ -1,12 +1,16 @@
 import crypto from 'node:crypto';
 
 export const createDoctorData = async (newDoctorData, doctors) => {
-    const {name, specialization} = newDoctorData;
+    const {firstName, lastName, specialization} = newDoctorData;
 
-    if(!newDoctorData) {
+    if (!newDoctorData) {
         throw new Error("The data of new doctor is empty")
     } else {
-        const doctorIsExist = !!doctors.find(doctor => doctor.name === name)
+        const doctorIsExist = !!doctors.find(doctor => (
+            doctor.firstName === firstName
+            &&
+            doctor.lastName === lastName
+        ))
 
         if (doctorIsExist) {
             throw new Error("The doctor with the specified name already exists")
@@ -23,7 +27,8 @@ export const createDoctorData = async (newDoctorData, doctors) => {
 
             return {
                 id,
-                name,
+                firstName,
+                lastName,
                 specialization,
                 schedule: [],
                 appointments: [],
