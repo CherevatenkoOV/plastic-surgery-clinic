@@ -7,13 +7,18 @@ import {createDoctorAppointment} from "./helpers/createDoctorAppointment.js";
 import {getDoctorDataById} from "./helpers/getDoctorDataById.js";
 import {deleteDoctorData} from "./helpers/deleteDoctorData.js";
 import {getDoctorsAppointments} from "./helpers/getDoctorsAppointments.js";
+import {handleSearchQuery} from "./helpers/handleSearchQuery.js";
 
 export const getDoctors = async (req, res) => {
     const doctors = await getDoctorsData();
-    const sortOrder = req.query.sort;
-    const sortedDoctors = await sortByAppointments(doctors, sortOrder)
+    const queryParams = req.query;
 
-    return res.status(200).send(sortedDoctors);
+    if (!Object.keys(queryParams).length) {
+        return res.status(200).send(doctors);
+    } else {
+        const handledData = await handleSearchQuery(queryParams, doctors);
+        return res.status(200).send(handledData)
+    }
 }
 
 export const getDoctorById = async (req, res) => {
@@ -61,7 +66,7 @@ export const deleteDoctorById = async (req, res) => {
 export const getAppointments = async (req, res) => {
     const doctorId = req.query.id;
     const doctors = await getDoctorsData()
-    if(!doctorId) {
+    if (!doctorId) {
         const allDoctorsAppointments = await getDoctorsAppointments(doctors)
         return res.status(200).send(allDoctorsAppointments)
     } else {

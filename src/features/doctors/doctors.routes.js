@@ -9,7 +9,13 @@ import {
 } from "./doctors.controllers.js";
 import {tryCatch} from "../../shared/utils/tryCatch.js";
 import {validateRequest} from "../../shared/middleware/validateRequest.js";
-import {createAppointmentSchema, createDoctorSchema, doctorIdSchema, updateDoctorSchema} from "./doctors.validation.js";
+import {
+    createAppointmentSchema,
+    createDoctorSchema,
+    doctorIdSchema,
+    searchDoctorSchema,
+    updateDoctorSchema
+} from "./doctors.validation.js";
 
 const router = express.Router();
 
@@ -17,7 +23,9 @@ router.get('/appointments',
     validateRequest(doctorIdSchema, 'query.id'),
     tryCatch(getAppointments))
 
-router.get('/', tryCatch(getDoctors))
+router.get('/',
+    validateRequest(searchDoctorSchema, 'query'),
+    tryCatch(getDoctors))
 
 router.get('/:id',
     validateRequest(doctorIdSchema, 'params'),

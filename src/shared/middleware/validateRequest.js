@@ -6,7 +6,7 @@ export const validateRequest = (schema, property = 'body') => {
         })
 
         if (!error) {
-            req[property] = value;
+            Object.assign(req[property], value);
             return next();
         }
 

@@ -136,7 +136,7 @@
     "id": "6f4922f4-6a16-4a3b-9c12-95b5b4a7f1bc",
     "firstName": "Carmine",
     "lastName": "Gallo",
-    "specialization": "cosmetologist ",
+    "specialization": "cosmetologist",
     "schedule": [
       {
         "_day": 1,
@@ -254,7 +254,7 @@
   {
     "id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
     "firstName": "Luigi",
-    "lastName": "Centomani",
+    "lastName": "Gallo",
     "specialization": "breast surgeon",
     "schedule": [
       {

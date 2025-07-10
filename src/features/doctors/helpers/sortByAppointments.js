@@ -1,4 +1,4 @@
-export const sortByAppointments = async (doctors, sortOrder) => {
+export const sortByAppointments = async (sortOrder, doctors) => {
     if(!sortOrder) {
         throw new Error("The sort order was not specified")
     } else {

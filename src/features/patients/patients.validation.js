@@ -30,3 +30,8 @@ export const updatePatientSchema = Joi.object({
             timeISO: timeISO
         })),
 })
+
+export const searchPatientSchema = Joi.object({
+    firstName: name,
+    lastName: name
+})

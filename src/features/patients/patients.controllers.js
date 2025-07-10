@@ -5,11 +5,19 @@ import {changePatientData} from "./helpers/changePatientData.js";
 import {getPatientDataById} from "./helpers/getPatientDataById.js";
 import {deletePatientData} from "./helpers/deletePatientData.js";
 import {getPatientsAppointments} from "./helpers/getPatientsAppointments.js";
+import {handleSearchQuery} from "./helpers/handleSearchQuery.js";
 
 export const getPatients = async (req, res) => {
     const patients = await getPatientsData()
+    const queryParams = req.query;
+    console.log(queryParams)
 
-    return res.status(200).send(patients)
+    if(!Object.keys(queryParams).length) {
+        return res.status(200).send(patients)
+    } else {
+        const handledData = await handleSearchQuery(queryParams, patients)
+        return res.status(200).send(handledData)
+    }
 }
 
 export const getPatientById = async (req, res) => {

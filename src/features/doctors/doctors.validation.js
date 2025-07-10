@@ -37,3 +37,10 @@ export const createAppointmentSchema = Joi.object({
     patientLastName: name.required()
 })
 
+export const searchDoctorSchema = Joi.object({
+    firstName: name,
+    lastName: name,
+    specialization: specialization,
+    sortOrder: Joi.string().min(3).max(4)
+})
+
