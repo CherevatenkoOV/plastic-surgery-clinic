@@ -7,7 +7,6 @@ import {
     getDoctorById,
     getDoctors, updateDoctorById
 } from "./doctors.controllers.ts";
-import {tryCatch} from "../../shared/utils/tryCatch.js";
 import {validateRequest} from "../../shared/middleware/validateRequest.js";
 import {
     createAppointmentSchema,
@@ -21,36 +20,38 @@ const router = express.Router();
 
 router.get('/appointments',
     validateRequest(doctorIdSchema, 'query'),
-    tryCatch(getAppointments))
+    getAppointments
+)
 
 router.get('/',
     validateRequest(searchDoctorSchema, 'query'),
-    tryCatch(getDoctors))
+    getDoctors)
 
 router.get('/:id',
     validateRequest(doctorIdSchema, 'params'),
-    tryCatch(getDoctorById)
+    getDoctorById
 )
 
 router.put('/',
     validateRequest(createDoctorSchema, 'body'),
-    tryCatch(putDoctor)
+    putDoctor
 )
 
 router.patch('/:id',
     validateRequest(doctorIdSchema, 'params'),
     validateRequest(updateDoctorSchema, 'body'),
-    tryCatch(updateDoctorById)
+    updateDoctorById
 )
 
 router.put('/:id',
     validateRequest(doctorIdSchema, 'params'),
     validateRequest(createAppointmentSchema, 'body'),
-    tryCatch(createAppointment)
+    createAppointment
 )
 
 router.delete('/:id',
     validateRequest(doctorIdSchema, 'params'),
-    tryCatch(deleteDoctorById))
+    deleteDoctorById
+)
 
 export default router;

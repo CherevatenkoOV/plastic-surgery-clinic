@@ -6,7 +6,6 @@ import {
     putPatient,
     updatePatientById
 } from "./patients.controllers.ts";
-import {tryCatch} from "../../shared/utils/tryCatch.js";
 import {validateRequest} from "../../shared/middleware/validateRequest.js";
 import {createPatientSchema, patientIdSchema, searchPatientSchema, updatePatientSchema} from "./patients.validation.js";
 
@@ -14,30 +13,33 @@ const router: Router = express.Router();
 
 router.get('/appointments',
     validateRequest(patientIdSchema, 'query'),
-    tryCatch(getAppointments)
+    getAppointments
 )
 
 router.get('/',
     validateRequest(searchPatientSchema, 'query'),
-    tryCatch(getPatients))
+    getPatients
+)
 
 router.get('/:id',
     validateRequest(patientIdSchema, 'params'),
-    tryCatch(getPatientById)
+    getPatientById
 )
 
 router.put('/',
     validateRequest(createPatientSchema, 'body'),
-    tryCatch(putPatient)
+    putPatient
 )
 
 router.patch('/:id',
     validateRequest(patientIdSchema, 'params'),
     validateRequest(updatePatientSchema, 'body'),
-    tryCatch(updatePatientById))
+    updatePatientById
+)
 
 router.delete('/:id',
     validateRequest(patientIdSchema, 'params'),
-    tryCatch(deletePatientById))
+    deletePatientById
+)
 
 export default router;
