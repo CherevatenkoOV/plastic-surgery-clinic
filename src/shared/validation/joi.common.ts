@@ -11,6 +11,8 @@ export const phone = Joi.string().pattern(/^\+?[0-9\s\-()]{7,20}$/)
 
 export const specialization = Joi.string().min(5).trim().lowercase();
 
+// TODO
+// put into doctors.validation
 export const schedule = Joi.array().length(7).items(
     Joi.object({
         _day: Joi.number().min(0).max(6),

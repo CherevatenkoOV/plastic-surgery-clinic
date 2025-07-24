@@ -1,0 +1,11 @@
+import express from 'express';
+import { putDoctor, deleteDoctorById, getDoctorById, getDoctors, updateDoctorById } from "./doctors.controllers.js";
+import { validateRequest } from "../shared/middleware/validateRequest.js";
+import { createDoctorSchema, doctorIdSchema, searchDoctorSchema, updateDoctorSchema } from "./doctors.validation.js";
+const router = express.Router();
+router.get('/', validateRequest(searchDoctorSchema, 'query'), getDoctors);
+router.get('/:id', validateRequest(doctorIdSchema, 'params'), getDoctorById);
+router.put('/', validateRequest(createDoctorSchema, 'body'), putDoctor);
+router.patch('/:id', validateRequest(doctorIdSchema, 'params'), validateRequest(updateDoctorSchema, 'body'), updateDoctorById);
+router.delete('/:id', validateRequest(doctorIdSchema, 'params'), deleteDoctorById);
+export default router;

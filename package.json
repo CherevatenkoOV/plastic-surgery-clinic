@@ -4,9 +4,10 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "kill": "taskkill /F /IM node.exe",
     "start": "nodemon --env-file=.env dist/main.js",
-    "build": "tsc && nodemon --env-file=.env dist/main.js"
+    "build": "tsc",
+    "rebuild": "npm run build && npm run start"
   },
   "keywords": [],
   "author": "",
