@@ -1,7 +1,7 @@
 import express, {Application} from 'express'
 import {doctorsRoutes} from "./doctors/index.js"
 import {patientsRoutes} from "./patients/index.js";
-import {errorHandler} from "./shared/middleware/errorHandler.js";
+import {errorHandler} from "./shared/middleware/error-handler.js";
 import {appointmentsRoutes} from "./appointments/index.js";
 
 const app: Application = express()
