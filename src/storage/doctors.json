@@ -1,1 +1,314 @@
-[{"id":"5a105e8b-9d40-4a61-8b12-d9d54e8a64bf","firstName":"Domenico","lastName":"Laezza","specialization":"plastic surgeon","schedule":[{"_day":1,"day":"Monday","isAvailable":true,"start":"14:00:00","end":"18:00:00"},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"08:00:00","end":"12:00:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"14:00:00","end":"18:00:00"},{"_day":4,"day":"Thursday","isAvailable":false},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":0,"day":"Sunday","isAvailable":true,"start":"08:00:00","end":"14:00:00"}],"createdAt":"2025-06-15T19:30:00.000Z","updatedAt":"2025-06-15T19:30:00.000Z"},{"id":"6f4922f4-6a16-4a3b-9c12-95b5b4a7f1bc","firstName":"Carmine","lastName":"Gallo","specialization":"cosmetologist","schedule":[{"_day":1,"day":"Monday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"08:00:00","end":"12:00:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"14:00:00","end":"18:00:00"},{"_day":4,"day":"Thursday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":false},{"_day":0,"day":"Sunday","isAvailable":true,"start":"08:00:00","end":"14:00:00"}],"createdAt":"2025-06-15T19:30:00.000Z","updatedAt":"2025-06-15T19:30:00.000Z"},{"id":"7c5aba41-60ef-43a8-9a1c-32811e14a7b0","firstName":"Francesco","lastName":"Core","specialization":"dermatologist","schedule":[{"_day":1,"day":"Monday","isAvailable":false},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"08:00:00","end":"12:00:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":4,"day":"Thursday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":false},{"_day":0,"day":"Sunday","isAvailable":false}],"createdAt":"2025-06-15T19:30:00.000Z","updatedAt":"2025-06-15T19:30:00.000Z"},{"id":"9bf31c7f-28d6-4d27-b8ae-4d1211e3e847","firstName":"Luigi","lastName":"Gallo","specialization":"breast surgeon","schedule":[{"_day":1,"day":"Monday","isAvailable":false},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"08:00:00","end":"12:00:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":4,"day":"Thursday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":0,"day":"Sunday","isAvailable":false}],"createdAt":"2025-06-15T19:30:00.000Z","updatedAt":"2025-06-15T19:30:00.000Z"},{"id":"c9f0f895-7e61-4e94-bb26-cff59d12a401","firstName":"Antonio","lastName":"Morelli","specialization":"intimate surgeon","schedule":[{"_day":1,"day":"Monday","isAvailable":false},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":4,"day":"Thursday","isAvailable":false},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":0,"day":"Sunday","isAvailable":true,"start":"08:00:00","end":"14:00:00"}],"createdAt":"2025-06-15T19:30:00.000Z","updatedAt":"2025-06-15T19:30:00.000Z"},{"id":"187a1a16-ba58-4159-94aa-8b0084c685c8","firstName":"Armando","lastName":"Laezza","specialization":"oculoplastic surgeon","schedule":[],"createdAt":"2025-06-15T19:30:00.000Z","updatedAt":"2025-06-15T19:30:00.000Z"},{"id":"d549b181-ed9d-422b-b43d-5e44cb592af8","firstName":"Amerigo","lastName":"Vespuci","specialization":"ear surgeon","schedule":[],"createdAt":"2025-07-02T19:48:15.278Z","updatedAt":"2025-07-02T19:48:15.280Z"},{"id":"e9452837-d283-45b6-8242-f771680ee34b","firstName":"Amerigo","lastName":"Core","specialization":"rhinoplasty","schedule":[],"createdAt":"2025-07-02T19:50:22.823Z","updatedAt":"2025-07-02T19:50:22.823Z"},{"id":"4d785407-36fb-4f56-aac4-7e930150b90f","firstName":"Paul","lastName":"Core","specialization":"rhinoplasty","schedule":[],"createdAt":"2025-07-07T19:59:29.103Z","updatedAt":"2025-07-07T19:59:29.104Z"},{"id":"763b7fbf-1ce4-46a8-ad49-544e3600c44a","firstName":"Maria","lastName":"Rosaria","specialization":"facelift","schedule":[],"createdAt":"2025-08-02T10:42:46.719Z","updatedAt":"2025-08-02T10:42:46.719Z"}]
+[
+  {
+    "id": "5a105e8b-9d40-4a61-8b12-d9d54e8a64bf",
+    "firstName": "Domenico",
+    "lastName": "Laezza",
+    "specialization": "plastic surgeon",
+    "schedule": [
+      {
+        "_day": 1,
+        "day": "Monday",
+        "isAvailable": true,
+        "start": "14:00:00",
+        "end": "18:00:00"
+      },
+      {
+        "_day": 2,
+        "day": "Tuesday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "12:00:00:00"
+      },
+      {
+        "_day": 3,
+        "day": "Wednesday",
+        "isAvailable": true,
+        "start": "14:00:00",
+        "end": "18:00:00"
+      },
+      {
+        "_day": 4,
+        "day": "Thursday",
+        "isAvailable": false
+      },
+      {
+        "_day": 5,
+        "day": "Friday",
+        "isAvailable": false
+      },
+      {
+        "_day": 6,
+        "day": "Saturday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 0,
+        "day": "Sunday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      }
+    ],
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "6f4922f4-6a16-4a3b-9c12-95b5b4a7f1bc",
+    "firstName": "Carmine",
+    "lastName": "Gallo",
+    "specialization": "cosmetologist",
+    "schedule": [
+      {
+        "_day": 1,
+        "day": "Monday",
+        "isAvailable": true,
+        "start": "10:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 2,
+        "day": "Tuesday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "12:00:00:00"
+      },
+      {
+        "_day": 3,
+        "day": "Wednesday",
+        "isAvailable": true,
+        "start": "14:00:00",
+        "end": "18:00:00"
+      },
+      {
+        "_day": 4,
+        "day": "Thursday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 5,
+        "day": "Friday",
+        "isAvailable": false
+      },
+      {
+        "_day": 6,
+        "day": "Saturday",
+        "isAvailable": false
+      },
+      {
+        "_day": 0,
+        "day": "Sunday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      }
+    ],
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "7c5aba41-60ef-43a8-9a1c-32811e14a7b0",
+    "firstName": "Francesco",
+    "lastName": "Core",
+    "specialization": "dermatologist",
+    "schedule": [
+      {
+        "_day": 1,
+        "day": "Monday",
+        "isAvailable": false
+      },
+      {
+        "_day": 2,
+        "day": "Tuesday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "12:00:00:00"
+      },
+      {
+        "_day": 3,
+        "day": "Wednesday",
+        "isAvailable": true,
+        "start": "10:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 4,
+        "day": "Thursday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 5,
+        "day": "Friday",
+        "isAvailable": false
+      },
+      {
+        "_day": 6,
+        "day": "Saturday",
+        "isAvailable": false
+      },
+      {
+        "_day": 0,
+        "day": "Sunday",
+        "isAvailable": false
+      }
+    ],
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
+    "firstName": "Luigi",
+    "lastName": "Gallo",
+    "specialization": "breast surgeon",
+    "schedule": [
+      {
+        "_day": 1,
+        "day": "Monday",
+        "isAvailable": false
+      },
+      {
+        "_day": 2,
+        "day": "Tuesday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "12:00:00:00"
+      },
+      {
+        "_day": 3,
+        "day": "Wednesday",
+        "isAvailable": true,
+        "start": "10:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 4,
+        "day": "Thursday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 5,
+        "day": "Friday",
+        "isAvailable": false
+      },
+      {
+        "_day": 6,
+        "day": "Saturday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 0,
+        "day": "Sunday",
+        "isAvailable": false
+      }
+    ],
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "c9f0f895-7e61-4e94-bb26-cff59d12a401",
+    "firstName": "Antonio",
+    "lastName": "Morelli",
+    "specialization": "intimate surgeon",
+    "schedule": [
+      {
+        "_day": 1,
+        "day": "Monday",
+        "isAvailable": false
+      },
+      {
+        "_day": 2,
+        "day": "Tuesday",
+        "isAvailable": true,
+        "start": "10:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 3,
+        "day": "Wednesday",
+        "isAvailable": true,
+        "start": "10:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 4,
+        "day": "Thursday",
+        "isAvailable": false
+      },
+      {
+        "_day": 5,
+        "day": "Friday",
+        "isAvailable": false
+      },
+      {
+        "_day": 6,
+        "day": "Saturday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      },
+      {
+        "_day": 0,
+        "day": "Sunday",
+        "isAvailable": true,
+        "start": "08:00:00",
+        "end": "14:00:00"
+      }
+    ],
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "187a1a16-ba58-4159-94aa-8b0084c685c8",
+    "firstName": "Armando",
+    "lastName": "Laezza",
+    "specialization": "oculoplastic surgeon",
+    "schedule": [],
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "d549b181-ed9d-422b-b43d-5e44cb592af8",
+    "firstName": "Amerigo",
+    "lastName": "Vespuci",
+    "specialization": "ear surgeon",
+    "schedule": [],
+    "createdAt": "2025-07-02T19:48:15.278Z",
+    "updatedAt": "2025-07-02T19:48:15.280Z"
+  },
+  {
+    "id": "e9452837-d283-45b6-8242-f771680ee34b",
+    "firstName": "Amerigo",
+    "lastName": "Core",
+    "specialization": "rhinoplasty",
+    "schedule": [],
+    "createdAt": "2025-07-02T19:50:22.823Z",
+    "updatedAt": "2025-07-02T19:50:22.823Z"
+  },
+  {
+    "id": "4d785407-36fb-4f56-aac4-7e930150b90f",
+    "firstName": "Paul",
+    "lastName": "Core",
+    "specialization": "rhinoplasty",
+    "schedule": [],
+    "createdAt": "2025-07-07T19:59:29.103Z",
+    "updatedAt": "2025-07-07T19:59:29.104Z"
+  },
+  {
+    "id": "763b7fbf-1ce4-46a8-ad49-544e3600c44a",
+    "firstName": "Maria",
+    "lastName": "Rosaria",
+    "specialization": "facelift",
+    "schedule": [],
+    "createdAt": "2025-08-02T10:42:46.719Z",
+    "updatedAt": "2025-08-02T10:42:46.719Z"
+  }
+]

@@ -30,8 +30,9 @@ export class Service {
         if (!isAvailable) throw new Error("Specified time to specified doctor is occupied. Try to choose another time")
 
         const id = randomUUID();
-        const createdAt = new Date().toISOString();
-        const updatedAt = new Date().toISOString();
+        const now = new Date().toISOString();
+        const createdAt = now;
+        const updatedAt = now;
 
         const newAppointment = {
             id,
