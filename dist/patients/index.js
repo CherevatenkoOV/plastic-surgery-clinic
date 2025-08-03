@@ -1,2 +1,3 @@
-import router from "./patients.routes.js";
+import router from "./patients-router.js";
 export { router as patientsRoutes };
+//# sourceMappingURL=index.js.map

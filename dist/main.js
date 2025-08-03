@@ -1,7 +1,7 @@
 import express from 'express';
 import { doctorsRoutes } from "./doctors/index.js";
 import { patientsRoutes } from "./patients/index.js";
-import { errorHandler } from "./shared/middleware/errorHandler.js";
+import { errorHandler } from "./shared/middleware/error-handler.js";
 import { appointmentsRoutes } from "./appointments/index.js";
 const app = express();
 const PORT = process.env.PORT;
@@ -13,3 +13,4 @@ app.use(errorHandler);
 app.listen(PORT, () => {
     console.log(`Response: ${PORT}`);
 });
+//# sourceMappingURL=main.js.map
