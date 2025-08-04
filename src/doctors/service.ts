@@ -23,8 +23,9 @@ export class Service {
 
         if (existingDoctor) return existingDoctor;
         const id = randomUUID();
-        const createdAt = new Date().toISOString();
-        const updatedAt = new Date().toISOString();
+        const now = new Date().toISOString();
+        const createdAt = now;
+        const updatedAt = now;
 
         const newDoctor = {
             id,

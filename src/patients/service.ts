@@ -2,7 +2,6 @@ import {Request} from "express";
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {CreatePatientBody, Patient, PatientsParams, PatientsQuery, UpdatePatientBody} from "./types.js";
-import {CreateDoctorBody, Doctor, DoctorsParams, UpdateDoctorBody} from "../doctors/types.js";
 import {randomUUID} from "node:crypto";
 
 export class Service {
@@ -27,8 +26,9 @@ export class Service {
             return existingPatient;
         } else {
             const id = randomUUID();
-            const createdAt = new Date().toISOString();
-            const updatedAt = new Date().toISOString();
+            const now = new Date().toISOString();
+            const createdAt = now;
+            const updatedAt = now;
 
             const newPatient = {
                 id,
