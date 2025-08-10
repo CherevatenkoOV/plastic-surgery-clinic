@@ -47,6 +47,29 @@ export class User {
         return {accessToken, refreshToken}
     }
 
+    public toJSON() {
+        return {
+            id: this.id,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
+        }
+    }
+
+    public toStorageObject() {
+        return {
+            id: this.id,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+            password: this.password,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
+        }
+    }
+
     get id() {
         return this._id
     }

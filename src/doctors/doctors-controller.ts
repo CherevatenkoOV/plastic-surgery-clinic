@@ -3,7 +3,7 @@ import {CreateDoctorBody, Doctor, DoctorsParams, DoctorsQuery, UpdateDoctorBody}
 import {Service} from "./service.js";
 
 
-export const getAll = async (req: Request<{}, unknown, unknown, DoctorsQuery>, res: Response<Doctor[]>): Promise<void> => {
+export const getAll = async (req: Request<DoctorsParams, unknown, unknown, DoctorsQuery>, res: Response<Doctor[]>): Promise<void> => {
     const doctors = await Service.getDoctors(req)
     res.status(200).send(doctors)
 }
@@ -13,7 +13,7 @@ export const getById = async (req: Request<DoctorsParams>, res: Response<Doctor>
     res.status(200).send(doctor)
 }
 
-export const create = async (req: Request<{}, unknown, CreateDoctorBody>, res: Response<Doctor>): Promise<void> => {
+export const create = async (req: Request<DoctorsParams, unknown, CreateDoctorBody>, res: Response<Doctor>): Promise<void> => {
     const doctor =await Service.createDoctor(req)
     res.status(200).send(doctor)
 }

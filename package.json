@@ -7,7 +7,7 @@
     "kill": "taskkill /F /IM node.exe",
     "start": "nodemon --env-file=.env dist/main.js",
     "build": "tsc",
-    "rebuild": "npm run build && npm run start"
+    "restart": "npm run build && npm run start"
   },
   "keywords": [],
   "author": "",

@@ -11,7 +11,6 @@ import {
 } from "./types.js";
 import {paths} from "../shared/paths.js";
 import {checkAppointmentTime} from "./helpers/check-appointment-time.js";
-import {timeISO} from "../shared/validation/joi-common.js";
 
 export class Service {
     static async getAppointments(req: Request<AppointmentsParams, unknown, unknown, AppointmentsQuery>): Promise<Appointment[]> {
