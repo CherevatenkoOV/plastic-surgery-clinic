@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {
-    CreateUserBody,
+    CreateUserBody, Credentials,
     UpdateUserBody,
     User as UserType,
     UserByIdData,
@@ -9,8 +9,10 @@ import {
     UsersData,
     UsersParams
 } from "./types.js";
-import {Request} from "express";
+import {Request, Response} from "express";
 import {User as UserEntity} from "./user-model.js";
+import {id} from "../shared/validation/joi-common.js";
+import bcrypt from "bcrypt";
 
 
 export class Service {
@@ -20,7 +22,7 @@ export class Service {
     }
 
     static async getUserById(req: Request<UsersParams>): Promise<UserPublic | undefined> {
-        const user = await ServiceHelper.getUserDataById(req.params.id);
+        const user = await ServiceHelper.getUserDataBy({id: req.params.id});
         return user.publicUser
     }
 
@@ -43,6 +45,19 @@ export class Service {
         )
 
         return registeredUser.toJSON();
+    }
+
+    static async loginUser(req: Request<{}, unknown, Credentials>) {
+        const {email, password} = req.body;
+        // ??????????????????????????????????
+        // const users: UsersData = await ServiceHelper.getUsersData()
+        const {fullUsers, publicUsers} = await ServiceHelper.getUsersData()
+        const user = await ServiceHelper.getUserDataBy({email}, users)
+
+        if(!await bcrypt.compare(password, user.fullUser!.password)) throw new Error("Wrong password")
+        // ??????????????????????????????????????
+        const tokens = UserEntity.login({email, password}, users.fullUsers)
+
     }
 
     static async updateUser(req: Request<UsersParams, unknown, UpdateUserBody>): Promise<UserPublic> {
@@ -71,6 +86,7 @@ export class Service {
                 JSON.stringify(users.fullUsers),
                 {encoding: 'utf-8'},
             )
+
 
             const {id, firstName, lastName, email, createdAt, updatedAt} = updatedUser;
 
@@ -105,12 +121,25 @@ export class ServiceHelper {
         }
     }
 
-    static async getUserDataById(id: string, usersData?: UsersData): Promise<UserByIdData> {
+    static async getUserDataBy(
+        filter: { id?: string, email?: string },
+        usersData?: UsersData
+    ): Promise<UserByIdData> {
         const users: UsersData = usersData ?? await this.getUsersData();
-        const fullUser: UserType | undefined = users.fullUsers.find((user: UserType) => user.id === id)
-        const publicUser: UserPublic | undefined = users.publicUsers.find((user: UserPublic) => user.id === id)
 
-        if (!fullUser || !publicUser) throw new Error("The specified user was not found")
+// переписать на if
+        const fullUser: UserType | undefined = users.fullUsers.find((user: UserType) =>
+            filter.id ? user.id === filter.id :
+                filter.email ? user.email === filter.email :
+                    undefined
+        )
+
+        const publicUser: UserPublic | undefined = users.publicUsers.find((user: UserPublic) =>
+            filter.id ? user.id === filter.id :
+                filter.email ? user.email === filter.email : undefined
+        )
+
+        if (!fullUser && !publicUser) throw new Error("The specified user was not found")
 
         return {
             fullUser: fullUser, publicUser

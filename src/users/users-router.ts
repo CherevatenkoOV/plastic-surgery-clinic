@@ -1,5 +1,5 @@
 import express, {Router} from "express";
-import {getAll, getById, create, remove, update} from "./users.controller.js";
+import {getAll, getById, create, remove, update, login} from "./users.controller.js";
 
 const router: Router = express.Router();
 
@@ -8,6 +8,8 @@ router.get('/', getAll)
 router.get('/:id', getById)
 
 router.put('/register', create)
+
+router.post('/login', login)
 
 router.patch('/:id', update)
 

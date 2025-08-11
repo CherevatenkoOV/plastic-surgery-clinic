@@ -6,17 +6,17 @@ import {Credentials, Token, UserCreationProps} from "./types.js";
 
 export class User {
     readonly _id: string;
-    private _firstName: string;
+    // private _firstName: string;
     private _lastName: string;
     private _email: string;
     private _password: string;
     readonly _createdAt: string;
     private _updatedAt: string;
 
-    constructor(firstName: string, lastName: string, email: string, password: string) {
+    constructor(public firstName: string, lastName: string, email: string, password: string) {
         const now = new Date().toISOString()
         this._id = randomUUID()
-        this._firstName = firstName;
+        // this._firstName = firstName;
         this._lastName = lastName;
         this._email = email;
         this._password = password;
@@ -26,11 +26,12 @@ export class User {
 
     public static async register(userData: UserCreationProps): Promise<User> {
         const {firstName, lastName, email, password} = userData;
-        const hashedPassword: string = await bcrypt.hash(password, 10)
+        const saltNumber = 10;
+        const hashedPassword: string = await bcrypt.hash(password, saltNumber)
         return new User(firstName, lastName, email, hashedPassword);
     }
 
-    public static async login(users: User[], credentials: Credentials): Promise<Token> {
+    public static async login(credentials: Credentials, users: User[]): Promise<Token> {
         const user = users.find(user => user.email === credentials.email)
         if(!user) throw new Error("The user with specified email was not found")
 
@@ -74,15 +75,15 @@ export class User {
         return this._id
     }
 
-    get firstName() {
-        return this._firstName
-    }
-
-    set firstName(firstName: string) {
-        if (firstName.length < 3) throw new Error("Specified first name is too short")
-        this._firstName = firstName
-        this.setUpdatedAt()
-    }
+    // get firstName() {
+    //     return this._firstName
+    // }
+    //
+    // set firstName(firstName: string) {
+    //     if (firstName.length < 3) throw new Error("Specified first name is too short")
+    //     this._firstName = firstName
+    //     this.setUpdatedAt()
+    // }
 
     get lastName() {
         return this._lastName

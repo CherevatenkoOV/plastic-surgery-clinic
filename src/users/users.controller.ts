@@ -3,7 +3,7 @@ import {
     UsersParams,
     CreateUserBody,
     User,
-    UpdateUserBody, UserPublic
+    UpdateUserBody, UserPublic, Credentials
 } from "./types.js";
 import {Service} from "./service.js";
 
@@ -21,6 +21,10 @@ export const getById = async (req: Request<UsersParams>, res: Response<UserPubli
 export const create = async (req: Request<{}, unknown, CreateUserBody>, res: Response<UserPublic>): Promise<void> => {
     const newUser = await Service.createUser(req);
     res.status(201).send(newUser)
+}
+
+export const login = async (req: Request<{}, unknown, Credentials>, res: Response<{ message: string }>): Promise<void> => {
+
 }
 
 export const update = async (req: Request<UsersParams, unknown, UpdateUserBody>, res: Response<UserPublic>): Promise<void> => {
