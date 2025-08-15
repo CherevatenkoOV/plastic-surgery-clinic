@@ -34,11 +34,11 @@ export type CreateUserBody = Pick<User, 'firstName' | 'lastName' | 'email' | 'pa
 
 export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'email' | 'password'>>;
 
-export interface UserCreationProps {
-    firstName: string;
-    lastName: string;
+export interface ChangePasswordBody {
     email: string;
-    password: string;
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
 }
 
 export type UserCredentials = Pick<User, 'email' | 'password'>

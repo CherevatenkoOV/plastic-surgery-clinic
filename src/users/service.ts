@@ -2,9 +2,11 @@ import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {
     AuthTokens,
+    ChangePasswordBody,
     CreateUserBody,
     UpdateUserBody,
-    User as UserType, UserCredentials,
+    User as UserType,
+    UserCredentials,
     UserData,
     UserPublic,
     UsersData,
@@ -14,9 +16,6 @@ import {Request} from "express";
 import bcrypt from "bcrypt";
 import {randomUUID} from "node:crypto";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import {id} from "../shared/validation/joi-common.js";
-import {string} from "joi";
-import {login} from "./users-controller.js";
 
 
 export class Service {
@@ -87,10 +86,34 @@ export class Service {
 
         const passwordMatch: boolean = await bcrypt.compare(password, user.fullUser!.password)
         if (!passwordMatch) throw new Error("Wrong password")
+
         const tokens = ServiceHelper.generateTokens({id: user.fullUser!.id})
         await ServiceHelper.saveRefreshToken(user.fullUser!.id, tokens.refreshToken)
 
         return tokens
+    }
+
+    static async changePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
+        const {email, oldPassword, newPassword, confirmPassword} = req.body;
+
+        const users: UsersData = await ServiceHelper.getAllData()
+        const user: UserData = await ServiceHelper.getDataBy({email}, users)
+
+        const currentPasswordIsCorrect = bcrypt.compare(user.fullUser!.password, oldPassword)
+        if(!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
+
+        if(oldPassword === newPassword) throw new Error("You have entered your current password in the \"new password\" field. ")
+
+        if(newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
+
+        const saltNumber = 10;
+        user.fullUser!.password = await bcrypt.hash(newPassword, saltNumber);
+
+        await fs.writeFile(
+            paths.USERS,
+            JSON.stringify(users.fullUsers),
+            {encoding: 'utf-8'})
+
     }
 
     static async update(req: Request<UsersParams, unknown, UpdateUserBody>): Promise<UserPublic> {

@@ -1,4 +1,3 @@
-import {Doctor} from "../doctors/types.js";
 
 export interface Patient {
     id: string;
@@ -12,17 +11,6 @@ export interface Patient {
 export type CreatePatientBody = Omit<Patient, "id" | "createdAt" | "updatedAt">;
 
 export type UpdatePatientBody = Partial<Omit<Patient, "id" | "createdAt" | "updatedAt">>;
-
-// export interface NewPatientData {
-//     id: string;
-//     firstName: string;
-//     lastName: string;
-//     phone: string;
-//     doctor: string;
-//     procedureType: string;
-//     createdAt: string;
-//     updatedAt: string;
-// }
 
 export interface PatientsQuery  {
     firstName?: string;

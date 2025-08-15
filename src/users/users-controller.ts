@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {
     UsersParams,
     CreateUserBody,
-    UpdateUserBody, UserPublic, UserCredentials, AuthTokens
+    UpdateUserBody, UserPublic, UserCredentials, AuthTokens, ChangePasswordBody
 } from "./types.js";
 import {Service} from "./service.js";
 
@@ -31,6 +31,12 @@ export const login = async (req: Request<{}, unknown, UserCredentials>, res: Res
     const tokens = await Service.login(req)
 
     res.status(201).send(tokens)
+}
+
+export const changePassword = async (req: Request<{}, unknown, ChangePasswordBody>, res: Response<{ message: string }>): Promise<void> => {
+    await Service.changePassword(req)
+
+    res.status(200).send({message: "Password was changed successfully"})
 }
 
 export const update = async (req: Request<UsersParams, unknown, UpdateUserBody>, res: Response<UserPublic>): Promise<void> => {
