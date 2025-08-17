@@ -9,13 +9,6 @@ export interface User {
     updatedAt: string;
 }
 
-export interface UserCreation {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-}
-
 export interface UsersData {
     fullUsers: User[];
     publicUsers: UserPublic[]
@@ -39,6 +32,20 @@ export interface ChangePasswordBody {
     oldPassword: string;
     newPassword: string;
     confirmPassword: string;
+}
+
+export interface RequestResetPasswordBody {
+    email: string;
+}
+
+export interface ResetPasswordBody {
+    newPassword: string;
+    confirmPassword: string;
+}
+
+export interface ResetPasswordQuery {
+    id: string;
+    token: string;
 }
 
 export type UserCredentials = Pick<User, 'email' | 'password'>

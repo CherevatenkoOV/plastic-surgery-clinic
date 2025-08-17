@@ -4,10 +4,10 @@
     "firstName": "Savino",
     "lastName": "Laezza",
     "email": "s.laezza@gmail.com",
-    "password": "$2b$10$C33BH.u.PijaJP6esSeWHO8pYYZz.c//4tKSF9cZe3UhLje/oeAie",
+    "password": "$2b$10$Ku5dijTvIki28/R70DCsROzokFO.sm6muv7nHO1z8MXqiRJ3uIghG",
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-08-15T07:31:49.195Z",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMTA1ZThiLTlkNDAtNGE2MS04YjEyLWQ5ZDU0ZThhNjRiZiIsImlhdCI6MTc1NTI4MjQyOSwiZXhwIjoxNzU3ODc0NDI5fQ.8GcwFI-BjGQzzZKx1PFOuBnh06tbaE3a1tXMPg7Jj84"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMTA1ZThiLTlkNDAtNGE2MS04YjEyLWQ5ZDU0ZThhNjRiZiIsImlhdCI6MTc1NTQzNDczMCwiZXhwIjoxNzU4MDI2NzMwfQ.28lS7zpRTt1Jv_SWnHqjCPjEiqpNuKuFYBLMvmarNPA"
   },
   {
     "id": "6f4922f4-6a16-4a3b-9c12-95b5b4a7f1bc",
