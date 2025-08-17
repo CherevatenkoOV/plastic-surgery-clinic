@@ -2,21 +2,24 @@ import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {
     AuthTokens,
+    ChangePasswordBody,
     CreateUserBody,
+    RequestResetPasswordBody,
+    ResetPasswordBody,
+    ResetPasswordQuery,
     UpdateUserBody,
-    User as UserType, UserCredentials,
+    User as UserType,
+    UserCredentials,
     UserData,
     UserPublic,
     UsersData,
     UsersParams
 } from "./types.js";
-import {Request} from "express";
+import e, {Request} from "express";
 import bcrypt from "bcrypt";
 import {randomUUID} from "node:crypto";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import {id} from "../shared/validation/joi-common.js";
-import {string} from "joi";
-import {login} from "./users-controller.js";
+import nodemailer from 'nodemailer';
 
 
 export class Service {
@@ -41,8 +44,9 @@ export class Service {
 
         if (alreadyExist) throw new Error('User with specified email already exists.')
 
-        const saltNumber = 10;
-        const hashedPassword: string = await bcrypt.hash(password, saltNumber)
+        const saltRounds = process.env!.BCRYPT_SALT_ROUNDS;
+        if (!saltRounds) throw new Error("Salt rounds was not found")
+        const hashedPassword: string = await bcrypt.hash(password, saltRounds)
 
         const id = randomUUID();
         const tokens = ServiceHelper.generateTokens({id})
@@ -87,10 +91,109 @@ export class Service {
 
         const passwordMatch: boolean = await bcrypt.compare(password, user.fullUser!.password)
         if (!passwordMatch) throw new Error("Wrong password")
+
         const tokens = ServiceHelper.generateTokens({id: user.fullUser!.id})
         await ServiceHelper.saveRefreshToken(user.fullUser!.id, tokens.refreshToken)
 
         return tokens
+    }
+
+    static async changePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
+        const {email, oldPassword, newPassword, confirmPassword} = req.body;
+
+        const users: UsersData = await ServiceHelper.getAllData()
+        const user: UserData = await ServiceHelper.getDataBy({email}, users)
+
+        const currentPasswordIsCorrect = bcrypt.compare(oldPassword, user.fullUser!.password)
+        if (!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
+
+        if (oldPassword === newPassword) throw new Error("You have entered your current password in the \"new password\" field. ")
+
+        if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
+
+        const salt = Number(process.env!.BCRYPT_SALT_ROUNDS);
+        if (!salt) throw new Error("Salt was not found")
+        user.fullUser!.password = await bcrypt.hash(newPassword, salt)
+
+        await fs.writeFile(
+            paths.USERS,
+            JSON.stringify(users.fullUsers),
+            {encoding: 'utf-8'})
+
+    }
+
+    static async requestResetPassword(req: Request<{}, unknown, RequestResetPasswordBody>): Promise<void> {
+        const {email} = req.body;
+        const user = await ServiceHelper.getDataBy({email: email})
+
+        const secret = process.env.RESET_PASSWORD_JWT + user.fullUser!.password
+        const token = jwt.sign({id: user.fullUser!.id}, secret, { expiresIn: '15m' })
+
+        const resetURL = `${process.env.API_URL}:${process.env.PORT}/users/reset-password?id=${user.fullUser!.id}&token=${token}`
+
+        const transporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            secure: false,
+            auth: {
+                user: `${process.env.MAIL_USER}`,
+                pass: `${process.env.MAIL_PASS}`
+            },
+            tls: {
+                rejectUnauthorized: false,
+            },
+        });
+
+        const mailOptions = {
+            to: user.fullUser!.email,
+            from: process.env.MAIL_USER,
+            subject: 'Password Reset Request',
+            text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+          Please click on the following link, or paste this into your browser to complete the process:\n\n
+          ${resetURL}\n\n
+          If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+        }
+
+        const info = await transporter.sendMail(mailOptions)
+
+        // for tests
+        console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+
+    static async resetPassword(req: Request<{}, unknown, ResetPasswordBody, ResetPasswordQuery>): Promise<void> {
+        try {
+            const {id, token} = req.query;
+            const {newPassword, confirmPassword} = req.body;
+
+            if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
+            const users = await ServiceHelper.getAllData()
+            console.log(id)
+            const user = await ServiceHelper.getDataBy({id}, users)
+
+
+            const secret = process.env.RESET_PASSWORD_JWT + user.fullUser!.password
+            console.log(token)
+            console.log(secret)
+
+            try {
+                jwt.verify(token, secret)
+            } catch (e) {
+                throw new Error("Wrong token.")
+            }
+
+            const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS)
+            if (!saltRounds) throw new Error("Salt rounds not found")
+            user.fullUser!.password = await bcrypt.hash(newPassword, saltRounds);
+
+            await fs.writeFile(
+                paths.USERS,
+                JSON.stringify(users.fullUsers),
+                {encoding: 'utf-8'}
+            )
+        } catch(e: any) {
+            console.log(e.message)
+        }
+
     }
 
     static async update(req: Request<UsersParams, unknown, UpdateUserBody>): Promise<UserPublic> {
