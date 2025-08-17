@@ -5,7 +5,7 @@ import {paths} from "../shared/paths.js";
 import {randomUUID} from "node:crypto";
 
 export class Service {
-    static async getDoctors(req: Request<DoctorsParams, unknown, unknown, DoctorsQuery>): Promise<Doctor[]> {
+    static async getDoctors(req: Request<{}, unknown, unknown, DoctorsQuery>): Promise<Doctor[]> {
         return await ServiceHelper.getDoctorsData(req.query);
     }
 
@@ -13,7 +13,7 @@ export class Service {
         return await ServiceHelper.getDoctorDataById(req.params.id)
     }
 
-    static async createDoctor(req: Request<DoctorsParams, unknown, CreateDoctorBody>): Promise<Doctor> {
+    static async createDoctor(req: Request<{}, unknown, CreateDoctorBody>): Promise<Doctor> {
         const doctors = await ServiceHelper.getDoctorsData();
 
         const existingDoctor = doctors.find((doctor: Doctor) => (
@@ -23,8 +23,9 @@ export class Service {
 
         if (existingDoctor) return existingDoctor;
         const id = randomUUID();
-        const createdAt = new Date().toISOString();
-        const updatedAt = new Date().toISOString();
+        const now = new Date().toISOString();
+        const createdAt = now;
+        const updatedAt = now;
 
         const newDoctor = {
             id,
