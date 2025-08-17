@@ -1,9 +1,18 @@
+export enum UserRole {
+    DOCTORS="doctors",
+    PATIENTS="patients",
+    ADMIN="admin"
+}
+
+
+
 export interface User {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
     password: string;
+    role?: UserRole;
     refreshToken?: string;
     createdAt: string;
     updatedAt: string;
@@ -54,3 +63,4 @@ export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
 }
+
