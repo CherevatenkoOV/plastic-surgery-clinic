@@ -4,7 +4,7 @@
     "firstName": "Savino",
     "lastName": "Laezza",
     "email": "s.laezza@gmail.com",
-    "password": "$2b$10$Ku5dijTvIki28/R70DCsROzokFO.sm6muv7nHO1z8MXqiRJ3uIghG",
+    "password": "$2b$10$LPplXtp6ImQGnpFsORtFJuuyK7tNL0lghhUdui7nKEoYtEyGrS10u",
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-08-15T07:31:49.195Z",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMTA1ZThiLTlkNDAtNGE2MS04YjEyLWQ5ZDU0ZThhNjRiZiIsImlhdCI6MTc1NTQzNDczMCwiZXhwIjoxNzU4MDI2NzMwfQ.28lS7zpRTt1Jv_SWnHqjCPjEiqpNuKuFYBLMvmarNPA"
@@ -37,13 +37,13 @@
     "updatedAt": "2025-06-15T19:30:00.000Z"
   },
   {
-    "_id": "e1e66c8f-ec15-401c-9b8b-fdd654e87567",
-    "_firstName": "Robin",
-    "_lastName": "Kennedy",
-    "_email": "r.kennedy@gmail.com",
-    "_password": "12345678",
-    "_createdAt": "2025-08-09T16:57:30.378Z",
-    "_updatedAt": "2025-08-09T16:57:30.378Z"
+    "id": "e1e66c8f-ec15-401c-9b8b-fdd654e87567",
+    "firstName": "Robin",
+    "lastName": "Kennedy",
+    "email": "r.kennedy@gmail.com",
+    "password": "12345678",
+    "createdAt": "2025-08-09T16:57:30.378Z",
+    "updatedAt": "2025-08-09T16:57:30.378Z"
   },
   {
     "id": "b8a189c3-a3a2-40b5-bc5a-df99a02ba065",
