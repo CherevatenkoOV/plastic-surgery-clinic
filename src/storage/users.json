@@ -1,5 +1,15 @@
 [
   {
+    "id": "63545c5b-e1ea-4800-9390-c12abb32925c",
+    "firstName": "Barack",
+    "lastName": "Obama",
+    "email": "b.obama@gmail.com",
+    "password": "$2b$10$LPplXtp6ImQGnpFsORtFJuuyK7tNL0lghhUdui7nKEoYtEyGrS10u",
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-08-15T07:31:49.195Z",
+    "role": "admin"
+  },
+  {
     "id": "5a105e8b-9d40-4a61-8b12-d9d54e8a64bf",
     "firstName": "Savino",
     "lastName": "Laezza",
@@ -7,6 +17,7 @@
     "password": "$2b$10$LPplXtp6ImQGnpFsORtFJuuyK7tNL0lghhUdui7nKEoYtEyGrS10u",
     "createdAt": "2025-06-15T19:30:00.000Z",
     "updatedAt": "2025-08-15T07:31:49.195Z",
+    "role": "doctor",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhMTA1ZThiLTlkNDAtNGE2MS04YjEyLWQ5ZDU0ZThhNjRiZiIsImlhdCI6MTc1NTQzNDczMCwiZXhwIjoxNzU4MDI2NzMwfQ.28lS7zpRTt1Jv_SWnHqjCPjEiqpNuKuFYBLMvmarNPA"
   },
   {
@@ -16,7 +27,8 @@
     "email": "c.gallo@gmail.com",
     "password": "$2b$10$lXqbNNLg/rsjQQiOBcU8heVJUAV1C1SHHVuf7tdQbuNaBmEomEHLi",
     "createdAt": "2025-06-15T19:30:00.000Z",
-    "updatedAt": "2025-06-15T19:30:00.000Z"
+    "updatedAt": "2025-06-15T19:30:00.000Z",
+    "role": "doctor"
   },
   {
     "id": "7c5aba41-60ef-43a8-9a1c-32811e14a7b0",
@@ -25,7 +37,8 @@
     "email": "f.core@gmail.com",
     "password": "$2b$10$lXqbNNLg/rsjQQiOBcU8heVJUAV1C1SHHVuf7tdQbuNaBmEomEHLi",
     "createdAt": "2025-06-15T19:30:00.000Z",
-    "updatedAt": "2025-06-15T19:30:00.000Z"
+    "updatedAt": "2025-06-15T19:30:00.000Z",
+    "role": "doctor"
   },
   {
     "id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
@@ -34,7 +47,8 @@
     "email": "l.Gallo@gmail.com",
     "password": "$2b$10$lXqbNNLg/rsjQQiOBcU8heVJUAV1C1SHHVuf7tdQbuNaBmEomEHLi",
     "createdAt": "2025-06-15T19:30:00.000Z",
-    "updatedAt": "2025-06-15T19:30:00.000Z"
+    "updatedAt": "2025-06-15T19:30:00.000Z",
+    "role": "doctor"
   },
   {
     "id": "e1e66c8f-ec15-401c-9b8b-fdd654e87567",
@@ -43,7 +57,8 @@
     "email": "r.kennedy@gmail.com",
     "password": "12345678",
     "createdAt": "2025-08-09T16:57:30.378Z",
-    "updatedAt": "2025-08-09T16:57:30.378Z"
+    "updatedAt": "2025-08-09T16:57:30.378Z",
+    "role": "doctor"
   },
   {
     "id": "b8a189c3-a3a2-40b5-bc5a-df99a02ba065",
@@ -52,7 +67,8 @@
     "email": "r.kennedy@gmail.com",
     "password": "12345678",
     "createdAt": "2025-08-10T06:10:22.979Z",
-    "updatedAt": "2025-08-10T06:10:22.979Z"
+    "updatedAt": "2025-08-10T06:10:22.979Z",
+    "role": "doctor"
   },
   {
     "id": "d068bf3a-b931-4d28-83ec-b1d9e25afb4a",
@@ -61,7 +77,8 @@
     "email": "a.macrony@gmail.com",
     "password": "12345678",
     "createdAt": "2025-08-10T06:12:25.042Z",
-    "updatedAt": "2025-08-10T06:12:25.042Z"
+    "updatedAt": "2025-08-10T06:12:25.042Z",
+    "role": "doctor"
   },
   {
     "id": "d8d18d3b-475d-4aa8-9815-c8ae90840395",
@@ -70,7 +87,8 @@
     "email": "d.morano@gmail.com",
     "password": "$2b$10$t3YI.UljGUtBWxN0Eb9KIOC3bfCGKwQ7xFa7/dqPVS5peSuI7qKHy",
     "createdAt": "2025-08-10T07:04:44.802Z",
-    "updatedAt": "2025-08-10T07:04:44.802Z"
+    "updatedAt": "2025-08-10T07:04:44.802Z",
+    "role": "patient"
   },
   {
     "id": "d767d553-49a9-42fd-b9f6-a6e874afd8b0",
@@ -79,7 +97,8 @@
     "email": "v.armani@gmail.com",
     "password": "$2b$10$ZfL8zeqsa5pDb83KN483y.jt0dNwFK2KKyNqDHhcUmmaqdw7g.2iC",
     "createdAt": "2025-08-10T07:15:12.775Z",
-    "updatedAt": "2025-08-10T07:15:12.775Z"
+    "updatedAt": "2025-08-10T07:15:12.775Z",
+    "role": "patient"
   },
   {
     "id": "ab61ab9b-2c59-41a2-b405-3fd93cd478bf",
@@ -88,7 +107,8 @@
     "email": "g.pesca@gmail.com",
     "password": "$2b$10$p7zKuiCAGy4yIHc3wopbJ.qwH3o6ttfr78JOBiBvoE1k76WpmVqoO",
     "createdAt": "2025-08-12T15:08:42.808Z",
-    "updatedAt": "2025-08-12T15:08:42.808Z"
+    "updatedAt": "2025-08-12T15:08:42.808Z",
+    "role": "patient"
   },
   {
     "id": "e2e34cd8-88c3-47e4-8e90-19471ec8ec7c",
@@ -98,7 +118,8 @@
     "password": "$2b$10$lyzcxpHJrCkvKf3DC8MtiuKFJPn0kt71RpVAXmInPL2d9noa2YMXu",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyZTM0Y2Q4LTg4YzMtNDdlNC04ZTkwLTE5NDcxZWM4ZWM3YyIsImlhdCI6MTc1NTE4MzgyNiwiZXhwIjoxNzU3Nzc1ODI2fQ.Ppv8APlitC8JSd65k-C46xhnmzWmgGb_b3vf1WkZXTY",
     "createdAt": "2025-08-14T15:03:46.322Z",
-    "updatedAt": "2025-08-14T15:03:46.322Z"
+    "updatedAt": "2025-08-14T15:03:46.322Z",
+    "role": "patient"
   },
   {
     "id": "61b13af4-05c1-4788-b607-443c71ffe597",
@@ -108,6 +129,7 @@
     "password": "$2b$10$OIYKrNiFDfvI1tZ22n433eHuNV563wjilYkDw0pYK3pnvIHvgH3gC",
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxYjEzYWY0LTA1YzEtNDc4OC1iNjA3LTQ0M2M3MWZmZTU5NyIsImlhdCI6MTc1NTI4MjQwNywiZXhwIjoxNzU3ODc0NDA3fQ.eeLrwxSDq0KnzoFYpux2a7ALFpo5mM3qB8HFQDJyeMI",
     "createdAt": "2025-08-15T18:26:47.279Z",
-    "updatedAt": "2025-08-15T18:26:47.279Z"
+    "updatedAt": "2025-08-15T18:26:47.279Z",
+    "role": "patient"
   }
 ]
