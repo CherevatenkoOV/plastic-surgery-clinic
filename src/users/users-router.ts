@@ -7,23 +7,26 @@ import {
     remove,
     changePassword,
     update,
-    requestResetPassword, resetPassword
+    requestResetPassword, resetPassword, logout
 } from "./users-controller.js";
-import {checkAuthentification} from "../shared/middleware/checkAuthentification.js";
+import {authenticate} from "../shared/middleware/authenticate.js";
+import {authorize} from "../shared/middleware/authorize.js";
+import {Role} from "../shared/roles.js";
 
 const router: Router = express.Router();
 
-router.get('/', getAll)
-router.get('/:id', getById)
+router.get('/', authenticate, authorize(Role.ADMIN), getAll)
+router.get('/:id', authenticate, authorize(Role.ADMIN), getById)
 
 router.post('/register', register)
 router.post('/login', login)
-router.post('/request-reset-password', requestResetPassword)
+router.post('/logout', authenticate, authorize(Role.ADMIN), logout)
+router.post('/request-reset-password', authenticate, authorize(Role.ADMIN), requestResetPassword)
 
-router.patch('/change-password', checkAuthentification, changePassword)
+router.patch('/change-password', authenticate, authorize(Role.ADMIN), changePassword)
 router.patch('/reset-password', resetPassword)
-router.patch('/:id', update)
+router.patch('/:id', authenticate, authorize(Role.ADMIN), update)
 
-router.delete('/:id', remove)
+router.delete('/:id', authenticate, authorize(Role.ADMIN), remove)
 
 export default router;

@@ -92,10 +92,25 @@ export class Service {
         const passwordMatch: boolean = await bcrypt.compare(password, user.fullUser!.password)
         if (!passwordMatch) throw new Error("Wrong password")
 
-        const tokens = ServiceHelper.generateTokens({id: user.fullUser!.id})
+        const tokens = ServiceHelper.generateTokens({id: user.fullUser!.id, role: user.fullUser!.role})
         await ServiceHelper.saveRefreshToken(user.fullUser!.id, tokens.refreshToken)
 
         return tokens
+    }
+
+    static async logout(req: Request): Promise<void> {
+        const id = req.body.user.id;
+        const users: UsersData = await ServiceHelper.getAllData()
+        const user: UserData = await ServiceHelper.getDataBy({id}, users)
+
+        delete user.fullUser?.refreshToken;
+
+        await fs.writeFile(
+            paths.USERS,
+            JSON.stringify(users.fullUsers),
+            {encoding: 'utf-8'}
+        )
+
     }
 
     static async changePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
@@ -118,17 +133,18 @@ export class Service {
         await fs.writeFile(
             paths.USERS,
             JSON.stringify(users.fullUsers),
-            {encoding: 'utf-8'})
+            {encoding: 'utf-8'}
+        )
 
     }
 
-    static async requestResetPassword(req: Request<{}, unknown, RequestResetPasswordBody>): Promise<void> {
+    static async requestResetPassword(req: Request<{}, unknown, RequestResetPasswordBody>): Promise<string> {
         const {email} = req.body;
         const user = await ServiceHelper.getDataBy({email: email})
 
         const secret = process.env.RESET_PASSWORD_JWT + user.fullUser!.password
         const token = jwt.sign({id: user.fullUser!.id}, secret, { expiresIn: '15m' })
-
+        // id можно убрать, оставить token
         const resetURL = `${process.env.API_URL}:${process.env.PORT}/users/reset-password?id=${user.fullUser!.id}&token=${token}`
 
         const transporter = nodemailer.createTransport({
@@ -153,28 +169,30 @@ export class Service {
           ${resetURL}\n\n
           If you did not request this, please ignore this email and your password will remain unchanged.\n`,
         }
-
+        // убрать await - оптимизация времени
         const info = await transporter.sendMail(mailOptions)
 
         // for tests
         console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
+
+        return token;
     }
 
     static async resetPassword(req: Request<{}, unknown, ResetPasswordBody, ResetPasswordQuery>): Promise<void> {
         try {
+            // id берем из токена, в query Только токен
             const {id, token} = req.query;
             const {newPassword, confirmPassword} = req.body;
-
+                // была в предыдущем методе
             if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
             const users = await ServiceHelper.getAllData()
-            console.log(id)
             const user = await ServiceHelper.getDataBy({id}, users)
 
 
             const secret = process.env.RESET_PASSWORD_JWT + user.fullUser!.password
             console.log(token)
             console.log(secret)
-
+            // проверка токена должна выполняться раньше
             try {
                 jwt.verify(token, secret)
             } catch (e) {

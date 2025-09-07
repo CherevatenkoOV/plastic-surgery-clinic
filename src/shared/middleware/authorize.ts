@@ -1,15 +1,11 @@
 import {Request, Response, NextFunction} from "express";
 import {Role} from "../roles.js";
 
-export const checkRole = (role: Role) => {
+export const authorize = (role: Role) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        const user = req.body.user;
-        // JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
-
+        const user = req.user;
         console.log(user)
-        if(role === Role.DOCTOR) {
-            res.redirect(``)
-        }
+        if(user!.role !== role) return res.status(401).send({message: "Access denied. Your account does not have the required permissions."})
         next()
     }
 }

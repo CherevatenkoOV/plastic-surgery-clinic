@@ -16,6 +16,7 @@ import {Service} from "./service.js";
 
 export const getAll = async (req: Request, res: Response<UserPublic[]>): Promise<void> => {
     const users = await Service.getAll();
+    console.log(users)
     res.status(200).send(users)
 }
 
@@ -37,6 +38,11 @@ export const register = async (req: Request<{}, unknown, CreateUserBody>, res: R
 export const login = async (req: Request<{}, unknown, UserCredentials>, res: Response<AuthTokens>): Promise<void> => {
     const tokens = await Service.login(req)
     res.status(201).send(tokens)
+}
+
+export const logout = async(req: Request, res: Response): Promise<void> => {
+    await Service.logout(req);
+    res.status(200)
 }
 
 export const changePassword = async (req: Request<{}, unknown, ChangePasswordBody>, res: Response<{ message: string }>): Promise<void> => {

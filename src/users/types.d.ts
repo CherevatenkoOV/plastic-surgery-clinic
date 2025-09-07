@@ -1,10 +1,3 @@
-export enum UserRole {
-    DOCTORS="doctors",
-    PATIENTS="patients",
-    ADMIN="admin"
-}
-
-
 
 export interface User {
     id: string;
