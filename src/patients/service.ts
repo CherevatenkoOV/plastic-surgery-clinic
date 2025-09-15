@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {CreatePatientBody, Patient, PatientsParams, PatientsQuery, UpdatePatientBody} from "./types.js";
 import {randomUUID} from "node:crypto";
+import {id} from "../shared/validation/joi-common.js";
 
 export class Service {
     static async getPatients(req: Request<{}, unknown, unknown, PatientsQuery>): Promise<Patient[]> {
@@ -22,9 +23,8 @@ export class Service {
             || patient.phone === req.body.phone
         ))
 
-        if (existingPatient) {
-            return existingPatient;
-        } else {
+        if (existingPatient) return existingPatient;
+
             const id = randomUUID();
             const now = new Date().toISOString();
             const createdAt = now;
@@ -39,9 +39,6 @@ export class Service {
                 updatedAt
             }
 
-            const existingPatient = patients.find((patient: Patient) => patient.id === id)
-            if (existingPatient) return existingPatient;
-
             patients.push(newPatient);
 
             await fs.writeFile(
@@ -50,7 +47,7 @@ export class Service {
                 {encoding: 'utf-8'},
             )
             return newPatient;
-        }
+
     }
 
     static async updatePatient(req: Request<PatientsParams, unknown, UpdatePatientBody>): Promise<Patient> {

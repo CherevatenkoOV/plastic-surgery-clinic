@@ -11,6 +11,8 @@ export interface User {
     updatedAt: string;
 }
 
+export type UserItem = Pick<User, 'id', 'firstName', 'lastName', 'createdAt', 'updatedAt'>
+
 export interface UsersData {
     fullUsers: User[];
     publicUsers: UserPublic[]
@@ -25,35 +27,8 @@ export type UserPublic = Omit<User, 'password'>
 
 export type UsersParams = Pick<User, 'id'>
 
-export type CreateUserBody = Pick<User, 'firstName' | 'lastName' | 'email' | 'password'>;
+export type CreateUserData = Pick<User, 'firstName' | 'lastName'>;
 
 export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'email' | 'password'>>;
 
-export interface ChangePasswordBody {
-    email: string;
-    oldPassword: string;
-    newPassword: string;
-    confirmPassword: string;
-}
-
-export interface RequestResetPasswordBody {
-    email: string;
-}
-
-export interface ResetPasswordBody {
-    newPassword: string;
-    confirmPassword: string;
-}
-
-export interface ResetPasswordQuery {
-    id: string;
-    token: string;
-}
-
-export type UserCredentials = Pick<User, 'email' | 'password'>
-
-export interface AuthTokens {
-    accessToken: string;
-    refreshToken: string;
-}
 
