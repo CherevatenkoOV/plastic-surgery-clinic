@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {UpdateDoctorBody} from "./types.js";
+import {DoctorInviteToken, UpdateDoctorBody} from "./types.js";
 import {Service} from "./service.js";
 import {AllInfoUser} from "../users/types.js";
 import {Appointment} from "../appointments/types.js";
@@ -28,5 +28,10 @@ export const remove = async (req: Request, res: Response<void>): Promise<void> =
 export const getAppointments = async (req: Request, res: Response<Appointment[]>): Promise<void> => {
     const appointments = await Service.getAppointments(req)
     res.status(200).send(appointments)
+}
+
+export const inviteDoctor = async (req: Request, res: Response<DoctorInviteToken>): Promise<void> => {
+    await Service.sendInviteDoctor(req)
+    res.status(200).send()
 }
 

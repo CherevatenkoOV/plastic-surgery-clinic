@@ -13,12 +13,26 @@ import {
 
 export const register = async (req: Request<{}, unknown, FullRegisterInfo>, res: Response<{message: string}>): Promise<void> => {
     const tokens = await Service.register(req);
+
+    if(tokens == null) {res.status(201).send({message: "Your request for registration was created. Wait for email."})
+    } else {
+        res.cookie('refreshToken', tokens.refreshToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        })
+        res.status(201).send({message: "New user was registered successfully"})
+    }
+}
+
+export const registerByToken = async (req: Request<{token: string}, unknown, FullRegisterInfo>, res: Response<{message: string}>): Promise<void> => {
+    const tokens = await Service.registerByToken(req);
     res.cookie('refreshToken', tokens.refreshToken, {
         secure: true,
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000
     })
-    res.status(201).send({message: "New user was registered successfully"})
+    res.status(201).send({message: "New user was registered successfully with using invite token"})
 }
 
 export const login = async (req: Request<{}, unknown, Credentials>, res: Response<AuthTokens>): Promise<void> => {
