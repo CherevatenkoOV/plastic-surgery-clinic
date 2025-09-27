@@ -1,22 +1,26 @@
+import {Doctor} from "../doctors/types.js";
+import {UpdateUserData} from "../users/types.js";
 
 export interface Patient {
-    id: string;
-    firstName: string;
-    lastName: string;
-    phone: string;
-    createdAt: string;
-    updatedAt: string;
+    userId: string;
+    phone: string | null;
 }
 
-export type CreatePatientBody = Omit<Patient, "id" | "createdAt" | "updatedAt">;
+export type CreatePatientBody = Omit<Patient, "userId">;
 
-export type UpdatePatientBody = Partial<Omit<Patient, "id" | "createdAt" | "updatedAt">>;
+export type UpdatePatientData = Partial<Omit<Patient, "userId">>
 
-export interface PatientsQuery  {
+export type UpdatePatientBody = UpdatePatientData & UpdateUserData;
+
+
+export interface PatientsQuery {
     firstName?: string;
     lastName?: string;
 }
 
+// NOTE: presumably should by Partial, because of Admin, which can update/delete patient by params, not by token->id
 export interface PatientsParams {
     id: string;
 }
+
+

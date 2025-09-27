@@ -1,28 +1,34 @@
 [
   {
-    "id": "e9452837-d283-45b6-8242-f771680ee34b",
     "userId": "d8d18d3b-475d-4aa8-9815-c8ae90840395",
     "phone": "+399458845221"
   },
   {
-    "id": "4d785407-36fb-4f56-aac4-7e930150b90f",
     "userId": "d767d553-49a9-42fd-b9f6-a6e874afd8b0",
     "phone": "+393595519872"
   },
   {
-    "id": "763b7fbf-1ce4-46a8-ad49-544e3600c44a",
     "userId": "ab61ab9b-2c59-41a2-b405-3fd93cd478bf",
     "phone": "+397787748992"
   },
   {
-    "id": "01fd6306-7306-4d02-bf4c-df99114d03b9",
     "userId": "e2e34cd8-88c3-47e4-8e90-19471ec8ec7c",
     "phone": "+395526998440"
   },
   {
-    "id": "4b38c2a2-7335-4d06-8f96-8d4cb5e86cce",
     "userId": "61b13af4-05c1-4788-b607-443c71ffe597",
     "phone": "+397885523663"
+  },
+  {
+    "userId": "0b90e4f9-f4a9-4279-9a4a-8387589789bb",
+    "phone": null
+  },
+  {
+    "userId": "2c50667e-d22f-4ee0-9f8a-aaad566c1e55",
+    "phone": null
+  },
+  {
+    "userId": "e78259b1-4cd0-4486-acc1-084c139879b8",
+    "phone": null
   }
-
 ]

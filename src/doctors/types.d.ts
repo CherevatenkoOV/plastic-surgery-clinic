@@ -1,3 +1,11 @@
+import {UpdateUserData} from "../users/types.js";
+
+// NOTE: refactored
+export interface Doctor {
+    userId: string;
+    specialization: string | null;
+    schedule: ScheduleItem[] | [];
+}
 
 export interface ScheduleItem {
     _day: string;
@@ -7,27 +15,20 @@ export interface ScheduleItem {
     end: string;
 }
 
+// NOTE: refactored
+export type CreateDoctorBody = Omit<Doctor, "userId">;
 
-export interface Doctor {
-    id: string;
-    firstName: string;
-    lastName: string;
-    specialization: string;
-    schedule: ScheduleItem[];
-    createdAt: string;
-    updatedAt: string;
-}
+export type UpdateDoctorData = Partial<Omit<Doctor, "userId">>
 
-export type CreateDoctorBody = Omit<Doctor, "id" | "createdAt" | "updatedAt">;
+export type UpdateDoctorBody = UpdateDoctorData & UpdateUserData
 
-export type UpdateDoctorBody = Partial<Omit<Doctor, "id" | "createdAt" | "updatedAt">>
 
 export interface DoctorsQuery {
-    firstName?: string;
-    lastName?: string;
     specialization?: string;
 }
 
 export interface DoctorsParams {
-    id: string
+    id: string;
 }
+
+

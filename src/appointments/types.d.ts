@@ -23,6 +23,7 @@ export interface AppointmentsParams {
     id: string
 }
 
+
 export interface Options {
     type: "create" | "update" | "delete";
 }
