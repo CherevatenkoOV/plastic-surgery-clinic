@@ -14,7 +14,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         if (err) { // @ts-ignore
             return res.sendStatus(403)
         }
-
+        // @ts-ignore
         req.user = decoded as {id: string, role: string};
         next();
     })

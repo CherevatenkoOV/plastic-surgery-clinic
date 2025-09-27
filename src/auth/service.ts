@@ -26,22 +26,20 @@ import {id} from "../shared/validation/joi-common.js";
 
 export class Service {
     // DONE
-    static async register(req: Request<{}, unknown, FullRegisterInfo>): Promise<AuthTokens> {
+    static async register(req: Request<{}, unknown, FullRegisterInfo>): Promise<AuthTokens | null> {
         const {firstName, lastName, role, email, password} = req.body;
+
+        if(role === Role.DOCTOR) return null
 
         if (await ServiceHelper.checkEmailExists(email)) throw new Error("User with specified email already exists.")
 
         const profile = await UserServiceHelper.createUserData({firstName, lastName, role})
-        const credentials = await ServiceHelper.createAuthItemData({userId: profile.id, email, password})
+        await ServiceHelper.createAuthItemData({userId: profile.id, email, password})
 
         switch (role) {
             case Role.DOCTOR:
-                const {specialization, schedule} = req.body as CreateDoctorBody
-               await DoctorServiceHelper.createDoctorData({
-                    userId: profile.id,
-                    specialization,
-                    schedule
-                })
+                //  Some logic for creating request for new doctor.
+                // Could be sending the request-email to the admin email
                 break;
 
             case Role.PATIENT:
@@ -55,6 +53,36 @@ export class Service {
             default:
                 throw new Error(`Unknown role: ${role}`)
         }
+
+        return ServiceHelper.generateTokens({id: profile.id});
+    }
+
+    static async registerByToken(req: Request<{token: string}, unknown, FullRegisterInfo>): Promise<AuthTokens> {
+        const token = req.params.token;
+
+        const secret: string = process.env.RESET_PASSWORD_JWT as string;
+        let email;
+        try {
+            const decoded = jwt.verify(token, secret) as { email: string };
+            email = decoded.email;
+        } catch (e) {
+            throw new Error("Wrong token.")
+        }
+
+
+        const {firstName, lastName, role, password} = req.body;
+
+        if (await ServiceHelper.checkEmailExists(email)) throw new Error("User with specified email already exists.")
+
+        const profile = await UserServiceHelper.createUserData({firstName, lastName, role})
+        await ServiceHelper.createAuthItemData({userId: profile.id, email, password})
+
+        const {specialization, schedule} = req.body as CreateDoctorBody
+        await DoctorServiceHelper.createDoctorData({
+            userId: profile.id,
+            specialization: specialization ?? null,
+            schedule: schedule ?? null
+        })
 
         return ServiceHelper.generateTokens({id: profile.id});
     }
@@ -219,7 +247,7 @@ export class ServiceHelper {
         }
 
         const authItems = await ServiceHelper.getAllData();
-        if(authItems.find(c => c.email === email)) throw new Error ("Credentials with specified email already exists")
+        if (authItems.find(c => c.email === email)) throw new Error("Credentials with specified email already exists")
 
         authItems.push(authItem)
         await fs.writeFile(
@@ -252,7 +280,6 @@ export class ServiceHelper {
         }
 
     }
-
 
 
     static generateTokens(payload: JwtPayload) {

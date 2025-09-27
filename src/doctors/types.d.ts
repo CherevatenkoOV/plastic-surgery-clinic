@@ -31,4 +31,7 @@ export interface DoctorsParams {
     id: string;
 }
 
+export interface DoctorInviteToken {
+    inviteToken: string;
+}
 

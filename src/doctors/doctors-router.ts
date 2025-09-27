@@ -1,5 +1,5 @@
 import express, {Router} from 'express';
-import {getAll, getAppointments, getById, remove, update} from "./doctors-controller.js";
+import {getAll, getAppointments, getById, inviteDoctor, remove, update} from "./doctors-controller.js";
 import {validateRequest} from "../shared/middleware/validate-request.js";
 import {doctorIdSchema, searchDoctorSchema, updateDoctorSchema} from "./validation.js";
 import {authorize} from "../shared/middleware/authorize.js";
@@ -63,6 +63,10 @@ router.get('/me/appointments',
     getAppointments
 )
 
-
+router.post('/invite',
+    authenticate,
+    authorize([Role.ADMIN]),
+    inviteDoctor
+)
 
 export default router;

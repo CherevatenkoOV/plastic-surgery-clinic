@@ -110,5 +110,13 @@
     "role": "doctor",
     "createdAt": "2025-09-27T07:07:26.888Z",
     "updatedAt": "2025-09-27T07:07:26.888Z"
+  },
+  {
+    "id": "9c95ddce-f9de-4d24-87c5-a31d3d6d2a0f",
+    "firstName": "Armando",
+    "lastName": "Criscolo",
+    "role": "doctor",
+    "createdAt": "2025-09-27T13:16:01.786Z",
+    "updatedAt": "2025-09-27T13:16:01.786Z"
   }
 ]
