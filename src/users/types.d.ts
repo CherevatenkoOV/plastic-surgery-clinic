@@ -1,34 +1,40 @@
+import {CreateDoctorBody, DoctorsQuery} from "../doctors/types.js";
+import {CreatePatientBody} from "../patients/types.js";
+import {Doctor} from "../doctors/types.js";
+import {Patient} from "../patients/types.js";
 
 export interface User {
     id: string;
     firstName: string;
     lastName: string;
-    email: string;
-    password: string;
-    role?: UserRole;
-    refreshToken?: string;
+    role: UserRole;
     createdAt: string;
     updatedAt: string;
 }
 
-export type UserItem = Pick<User, 'id', 'firstName', 'lastName', 'createdAt', 'updatedAt'>
-
-export interface UsersData {
-    fullUsers: User[];
-    publicUsers: UserPublic[]
-}
-
-export interface UserData {
-    fullUser: User | undefined;
-    publicUser: UserPublic | undefined
-}
-
-export type UserPublic = Omit<User, 'password'>
+export type PublicUser = Pick<User, 'id', 'firstName', 'lastName', 'role'>
 
 export type UsersParams = Pick<User, 'id'>
 
-export type CreateUserData = Pick<User, 'firstName' | 'lastName'>;
+export type UsersQuery = Pick<User, 'firstName' | 'lastName'>
 
-export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'email' | 'password'>>;
+export interface AllInfoUser {
+    profile: User,
+    roleData: Doctor | Patient | null
+}
+
+export type AllInfoUsersQuery = DoctorsQuery & UsersQuery
+
+export type CreateUserData = Pick<User, 'firstName' | 'lastName' | 'role'>;
+
+export type UpdateUserData = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>;
+
+export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>
+
+export type RoleData = Doctor | Patient;
+
+export type CreateRoleData =
+    | {specialization: string} & Partial<CreateDoctorBody>
+    | Partial<CreatePatientBody>;
 
 

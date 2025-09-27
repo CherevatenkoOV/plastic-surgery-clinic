@@ -1,6 +1,13 @@
-import {CreateUserData} from "../users/types.js";
+import {CreateUserData, CreateRoleData} from "../users/types.js";
 
-export interface AuthRegisterBody extends Pick<CreateUserData, 'firstName' | 'lastName'>{
+export interface AuthItem {
+    userId: string;
+    email: string;
+    password: string;
+    refreshToken?: string;
+}
+
+export interface AuthRegisterBody{
     email: string;
     password: string;
 }
@@ -28,7 +35,11 @@ export interface ResetPasswordQuery {
 
 export type Credentials = Pick<AuthItem, 'email' | 'password'>
 
+export type CreateCredentials = Credentials & {userId: string};
+
 export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
 }
+
+export type FullRegisterInfo = AuthRegisterBody & CreateUserData & CreateRoleData

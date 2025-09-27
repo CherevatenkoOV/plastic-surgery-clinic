@@ -1,24 +1,24 @@
 import {Request, Response} from "express";
 import {
-    UserPublic
+    User
 } from "../users/types.js";
 import {Service} from "./service.js";
 import {
     AuthTokens,
-    ChangePasswordBody, AuthRegisterBody,
+    ChangePasswordBody,
     RequestResetPasswordBody,
     ResetPasswordBody,
-    ResetPasswordQuery, Credentials
+    ResetPasswordQuery, Credentials, FullRegisterInfo
 } from "./types.js";
 
-export const register = async (req: Request<{}, unknown, AuthRegisterBody>, res: Response<UserPublic>): Promise<void> => {
-    const newUser = await Service.register(req);
-    res.cookie('refreshToken', newUser.tokens.refreshToken, {
+export const register = async (req: Request<{}, unknown, FullRegisterInfo>, res: Response<{message: string}>): Promise<void> => {
+    const tokens = await Service.register(req);
+    res.cookie('refreshToken', tokens.refreshToken, {
         secure: true,
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000
     })
-    res.status(201).send(newUser.userData)
+    res.status(201).send({message: "New user was registered successfully"})
 }
 
 export const login = async (req: Request<{}, unknown, Credentials>, res: Response<AuthTokens>): Promise<void> => {
