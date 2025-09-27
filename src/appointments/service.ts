@@ -14,12 +14,12 @@ import {checkAppointmentTime} from "./helpers/check-appointment-time.js";
 import {timeISO} from "../shared/validation/joi-common.js";
 
 export class Service {
-    static async getAppointments(req: Request<AppointmentsParams, unknown, unknown, AppointmentsQuery>): Promise<Appointment[]> {
+    static async getAppointments(req: Request): Promise<Appointment[]> {
         return await ServiceHelper.getAppointmentsData(req.query);
     }
 
-    static async getAppointmentById(req: Request<AppointmentsParams>): Promise<Appointment | undefined> {
-        return await ServiceHelper.getAppointmentDataById(req.params.id);
+    static async getAppointmentById(req: Request): Promise<Appointment | undefined> {
+        return await ServiceHelper.getAppointmentDataById(req.params.id as string);
     }
 
     static async createAppointment(req: Request<{}, unknown, CreateAppointmentBody>): Promise<Appointment> {
@@ -30,8 +30,9 @@ export class Service {
         if (!isAvailable) throw new Error("Specified time to specified doctor is occupied. Try to choose another time")
 
         const id = randomUUID();
-        const createdAt = new Date().toISOString();
-        const updatedAt = new Date().toISOString();
+        const now = new Date().toISOString();
+        const createdAt = now;
+        const updatedAt = now;
 
         const newAppointment = {
             id,
@@ -108,7 +109,7 @@ export class Service {
 
 }
 
-class ServiceHelper {
+export class ServiceHelper {
 
     static async getAppointmentsData(query?: AppointmentsQuery): Promise<Appointment[]> {
 

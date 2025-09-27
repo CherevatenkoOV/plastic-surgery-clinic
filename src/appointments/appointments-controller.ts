@@ -1,6 +1,5 @@
 import {Request, Response} from "express";
 import {
-    AppointmentsQuery,
     AppointmentsParams,
     CreateAppointmentBody,
     Appointment,
@@ -9,12 +8,12 @@ import {
 import {Service} from "./service.js";
 
 
-export const getAll = async (req: Request<AppointmentsParams, unknown, unknown, AppointmentsQuery>, res: Response<Appointment[]>): Promise<void> => {
+export const getAll = async (req: Request, res: Response<Appointment[]>): Promise<void> => {
     const appointments = await Service.getAppointments(req);
     res.status(200).send(appointments)
 }
 
-export const getById = async (req: Request<AppointmentsParams>, res: Response<Appointment | undefined>): Promise<void> => {
+export const getById = async (req: Request, res: Response<Appointment | undefined>): Promise<void> => {
     const appointment = await Service.getAppointmentById(req)
     res.status(200).send(appointment)
 }
@@ -33,4 +32,6 @@ export const remove = async (req: Request<AppointmentsParams>, res: Response<voi
     await Service.deleteAppointment(req)
     res.status(204).send()
 }
+
+
 

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "63545c5b-e1ea-4800-9390-c12abb32925c",
+    "firstName": "Barack",
+    "lastName": "Obama",
+    "role": "admin",
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-08-15T07:31:49.195Z"
+  },
+  {
+    "id": "7c5aba41-60ef-43a8-9a1c-32811e14a7b0",
+    "firstName": "Francesco",
+    "lastName": "Core",
+    "role": "doctor",
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
+    "firstName": "Luigi",
+    "lastName": "Gallo",
+    "role": "doctor",
+    "createdAt": "2025-06-15T19:30:00.000Z",
+    "updatedAt": "2025-06-15T19:30:00.000Z"
+  },
+  {
+    "id": "e1e66c8f-ec15-401c-9b8b-fdd654e87567",
+    "firstName": "Robin",
+    "lastName": "Kennedy",
+    "role": "doctor",
+    "createdAt": "2025-08-09T16:57:30.378Z",
+    "updatedAt": "2025-08-09T16:57:30.378Z"
+  },
+  {
+    "id": "b8a189c3-a3a2-40b5-bc5a-df99a02ba065",
+    "firstName": "Robin",
+    "lastName": "Kennedy",
+    "role": "doctor",
+    "createdAt": "2025-08-10T06:10:22.979Z",
+    "updatedAt": "2025-08-10T06:10:22.979Z"
+  },
+  {
+    "id": "d068bf3a-b931-4d28-83ec-b1d9e25afb4a",
+    "firstName": "Angelo",
+    "lastName": "Macrony",
+    "role": "doctor",
+    "createdAt": "2025-08-10T06:12:25.042Z",
+    "updatedAt": "2025-08-10T06:12:25.042Z"
+  },
+  {
+    "id": "d8d18d3b-475d-4aa8-9815-c8ae90840395",
+    "firstName": "Davide",
+    "lastName": "Morano",
+    "role": "patient",
+    "createdAt": "2025-08-10T07:04:44.802Z",
+    "updatedAt": "2025-08-10T07:04:44.802Z"
+  },
+  {
+    "id": "d767d553-49a9-42fd-b9f6-a6e874afd8b0",
+    "firstName": "Vittorio",
+    "lastName": "Armani",
+    "role": "patient",
+    "createdAt": "2025-08-10T07:15:12.775Z",
+    "updatedAt": "2025-08-10T07:15:12.775Z"
+  },
+  {
+    "id": "ab61ab9b-2c59-41a2-b405-3fd93cd478bf",
+    "firstName": "Giogrgio",
+    "lastName": "Pesca",
+    "role": "patient",
+    "createdAt": "2025-08-12T15:08:42.808Z",
+    "updatedAt": "2025-08-12T15:08:42.808Z"
+  },
+  {
+    "id": "e2e34cd8-88c3-47e4-8e90-19471ec8ec7c",
+    "firstName": "Armando",
+    "lastName": "Debole",
+    "role": "patient",
+    "createdAt": "2025-08-14T15:03:46.322Z",
+    "updatedAt": "2025-08-14T15:03:46.322Z"
+  },
+  {
+    "id": "61b13af4-05c1-4788-b607-443c71ffe597",
+    "firstName": "Rafaello",
+    "lastName": "Blue",
+    "role": "patient",
+    "createdAt": "2025-08-15T18:26:47.279Z",
+    "updatedAt": "2025-08-15T18:26:47.279Z"
+  },
+  {
+    "id": "0b90e4f9-f4a9-4279-9a4a-8387589789bb",
+    "firstName": "Ricco",
+    "lastName": "Mirkop",
+    "role": "patient",
+    "createdAt": "2025-09-15T18:39:56.783Z",
+    "updatedAt": "2025-09-26T11:30:22.871Z"
+  },
+  {
+    "id": "e78259b1-4cd0-4486-acc1-084c139879b8",
+    "firstName": "Willy",
+    "lastName": "White",
+    "role": "patient",
+    "createdAt": "2025-09-26T11:58:28.052Z",
+    "updatedAt": "2025-09-26T12:00:24.858Z"
+  },
+  {
+    "id": "13082df5-c9eb-4f7d-ae84-7a3b2eaca136",
+    "firstName": "Django",
+    "lastName": "Freeman",
+    "role": "doctor",
+    "createdAt": "2025-09-27T07:07:26.888Z",
+    "updatedAt": "2025-09-27T07:07:26.888Z"
+  },
+  {
+    "id": "9c95ddce-f9de-4d24-87c5-a31d3d6d2a0f",
+    "firstName": "Armando",
+    "lastName": "Criscolo",
+    "role": "doctor",
+    "createdAt": "2025-09-27T13:16:01.786Z",
+    "updatedAt": "2025-09-27T13:16:01.786Z"
+  }
+]

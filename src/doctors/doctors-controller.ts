@@ -1,30 +1,37 @@
 import {Request, Response} from "express";
-import {CreateDoctorBody, Doctor, DoctorsParams, DoctorsQuery, UpdateDoctorBody} from "./types.js";
+import {DoctorInviteToken, UpdateDoctorBody} from "./types.js";
 import {Service} from "./service.js";
+import {AllInfoUser} from "../users/types.js";
+import {Appointment} from "../appointments/types.js";
 
 
-export const getAll = async (req: Request<{}, unknown, unknown, DoctorsQuery>, res: Response<Doctor[]>): Promise<void> => {
+export const getAll = async (req: Request, res: Response<AllInfoUser[]>): Promise<void> => {
     const doctors = await Service.getDoctors(req)
     res.status(200).send(doctors)
 }
 
-export const getById = async (req: Request<DoctorsParams>, res: Response<Doctor>): Promise<void> => {
+export const getById = async (req: Request, res: Response<AllInfoUser | undefined>): Promise<void> => {
     const doctor = await Service.getDoctorById(req)
     res.status(200).send(doctor)
 }
 
-export const create = async (req: Request<{}, unknown, CreateDoctorBody>, res: Response<Doctor>): Promise<void> => {
-    const doctor =await Service.createDoctor(req)
-    res.status(200).send(doctor)
-}
-
-export const update = async (req: Request<DoctorsParams, unknown, UpdateDoctorBody>, res: Response<Doctor>): Promise<void> => {
+export const update = async (req: Request<{}, unknown, UpdateDoctorBody>, res: Response<AllInfoUser>): Promise<void> => {
     const updatedDoctor = await Service.updateDoctor(req)
     res.status(200).send(updatedDoctor)
 }
 
-export const remove = async (req: Request<DoctorsParams>, res: Response<void>): Promise<void> => {
+export const remove = async (req: Request, res: Response<void>): Promise<void> => {
     await Service.deleteDoctor(req)
     res.status(204).send()
+}
+
+export const getAppointments = async (req: Request, res: Response<Appointment[]>): Promise<void> => {
+    const appointments = await Service.getAppointments(req)
+    res.status(200).send(appointments)
+}
+
+export const inviteDoctor = async (req: Request, res: Response<DoctorInviteToken>): Promise<void> => {
+    await Service.sendInviteDoctor(req)
+    res.status(200).send()
 }
 
