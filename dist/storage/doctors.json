@@ -96,7 +96,6 @@
         ]
     },
     {
-        "id": "c9f0f895-7e61-4e94-bb26-cff59d12a401",
         "userId": "e1e66c8f-ec15-401c-9b8b-fdd654e87567",
         "specialization": "intimate surgeon",
         "schedule": [
@@ -146,13 +145,11 @@
         ]
     },
     {
-        "id": "187a1a16-ba58-4159-94aa-8b0084c685c8",
         "userId": "b8a189c3-a3a2-40b5-bc5a-df99a02ba065",
         "specialization": "oculoplastic surgeon",
         "schedule": []
     },
     {
-        "id": "d549b181-ed9d-422b-b43d-5e44cb592af8",
         "userId": "d068bf3a-b931-4d28-83ec-b1d9e25afb4a",
         "specialization": "ear surgeon",
         "schedule": []

@@ -65,7 +65,7 @@ export class Service {
         const secret: string = process.env.RESET_PASSWORD_JWT as string
 
         const token = jwt.sign({email}, secret, {expiresIn: '15m'})
-        const registrationLink = `${process.env.API_URL}:${process.env.PORT}/auth/register/${token}`
+        const registrationLink = `${process.env.API_URL}:${process.env.PORT}/auth/register/doctor/${token}`
 
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",

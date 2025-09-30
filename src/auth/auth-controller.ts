@@ -1,14 +1,10 @@
 import {Request, Response} from "express";
-import {
-    User
-} from "../users/types.js";
 import {Service} from "./service.js";
 import {
     AuthTokens,
     ChangePasswordBody,
-    RequestResetPasswordBody,
     ResetPasswordBody,
-    ResetPasswordQuery, Credentials, FullRegisterInfo
+    Credentials, FullRegisterInfo, RecoverPasswordParams, RecoverPasswordBody
 } from "./types.js";
 
 export const register = async (req: Request<{}, unknown, FullRegisterInfo>, res: Response<{message: string}>): Promise<void> => {
@@ -45,23 +41,24 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     res.sendStatus(200)
 }
 
-export const changePassword = async (req: Request<{}, unknown, ChangePasswordBody>, res: Response<{
+export const updatePassword = async (req: Request<{}, unknown, ChangePasswordBody>, res: Response<{
     message: string
 }>): Promise<void> => {
-    await Service.changePassword(req)
+    await Service.updatePassword(req)
     res.status(200).send({message: "Password was changed successfully"})
 }
 
-export const requestResetPassword = async (req: Request<{}, unknown, RequestResetPasswordBody>, res: Response<{
-    message: string
-}>): Promise<void> => {
-    await Service.requestResetPassword(req)
-    res.status(200).send({message: "Link for changing password was sent to email"})
-}
-
-export const resetPassword = async (req: Request<{}, unknown, ResetPasswordBody, ResetPasswordQuery>, res: Response<{
+export const resetPassword = async (req: Request<{}, unknown, ResetPasswordBody>, res: Response<{
     message: string
 }>): Promise<void> => {
     await Service.resetPassword(req)
-    res.status(200).send({message: "Password was changed successfully"})
+    res.status(200).send({message: "Link for changing password was sent to email"})
+}
+
+export const recoverPassword = async (req: Request<RecoverPasswordParams, unknown, RecoverPasswordBody>, res: Response<{
+    message: string
+}>): Promise<void> => {
+    await Service.recoverPassword(req)
+    res.status(200).send({message: "New password was set successfully"})
+
 }

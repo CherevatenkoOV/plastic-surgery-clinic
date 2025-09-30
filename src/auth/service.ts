@@ -13,19 +13,14 @@ import {
     ChangePasswordBody,
     CreateCredentials,
     Credentials,
-    FullRegisterInfo,
-    RequestResetPasswordBody,
+    FullRegisterInfo, RecoverPasswordBody, RecoverPasswordParams,
     ResetPasswordBody,
-    ResetPasswordQuery
 } from "./types.js";
 import {CreateDoctorBody} from "../doctors/types.js";
 import {CreatePatientBody} from "../patients/types.js";
 import {Role} from "../shared/roles.js";
-import {User} from "../users/types.js";
-import {id} from "../shared/validation/joi-common.js";
 
 export class Service {
-    // DONE
     static async register(req: Request<{}, unknown, FullRegisterInfo>): Promise<AuthTokens | null> {
         const {firstName, lastName, role, email, password} = req.body;
 
@@ -118,21 +113,27 @@ export class Service {
         )
     }
 
-    static async changePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
-        const {email, oldPassword, newPassword, confirmPassword} = req.body;
-
+    static async recoverPassword(req: Request<RecoverPasswordParams, unknown, RecoverPasswordBody>): Promise<void> {
+        const {resetToken} = req.params;
         const authItems: AuthItem[] = await ServiceHelper.getAllData()
-        const authItem: AuthItem = await ServiceHelper.getDataBy({email}, authItems)
 
-        const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, authItem.password)
-        if (!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
+        const secret: string = process.env.RESET_PASSWORD_JWT as string;
+        let email;
+        try {
+            const decoded = jwt.verify(resetToken, secret) as { email: string };
+            email = decoded.email;
+        } catch (e) {
+            throw new Error("Wrong token.")
+        }
 
-        if (oldPassword === newPassword) throw new Error("You have entered your current password in the \"new password\" field. ")
+        const authItem: AuthItem = await ServiceHelper.getDataBy({email: email}, authItems)
 
+        const {newPassword, confirmPassword} = req.body;
         if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
 
-        const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
-        authItem.password = await bcrypt.hash(newPassword, salt)
+        const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS)
+        if (!saltRounds) throw new Error("Salt rounds not found")
+        authItem.password = await bcrypt.hash(newPassword, saltRounds);
 
         await fs.writeFile(
             paths.AUTH,
@@ -141,7 +142,30 @@ export class Service {
         )
     }
 
-    static async requestResetPassword(req: Request<{}, unknown, RequestResetPasswordBody>): Promise<string> {
+        static async updatePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
+            const {email, oldPassword, newPassword, confirmPassword} = req.body;
+
+            const authItems: AuthItem[] = await ServiceHelper.getAllData()
+            const authItem: AuthItem = await ServiceHelper.getDataBy({email}, authItems)
+
+            const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, authItem.password)
+            if (!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
+
+            if (oldPassword === newPassword) throw new Error("You have entered your current password in the \"new password\" field. ")
+
+            if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
+
+            const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
+            authItem.password = await bcrypt.hash(newPassword, salt)
+
+            await fs.writeFile(
+                paths.AUTH,
+                JSON.stringify(authItems),
+                {encoding: 'utf-8'}
+            )
+        }
+
+    static async resetPassword(req: Request<{}, unknown, ResetPasswordBody>): Promise<string> {
         const {email} = req.body;
 
         const authItem: AuthItem = await ServiceHelper.getDataBy({email})
@@ -149,12 +173,12 @@ export class Service {
         const secret: string = process.env.RESET_PASSWORD_JWT as string
 
         const token = jwt.sign({email}, secret, {expiresIn: '15m'})
-        const resetURL = `${process.env.API_URL}:${process.env.PORT}/auth/reset-password?token=${token}`
+        const resetURL = `${process.env.API_URL}:${process.env.PORT}/auth/recover/${token}`
 
         const transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false,
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
             auth: {
                 user: `${process.env.MAIL_USER}`,
                 pass: `${process.env.MAIL_PASS}`
@@ -185,35 +209,6 @@ export class Service {
 
         return token;
     }
-
-    static async resetPassword(req: Request<{}, unknown, ResetPasswordBody, ResetPasswordQuery>): Promise<void> {
-        const {token} = req.query;
-        const authItems: AuthItem[] = await ServiceHelper.getAllData()
-
-        const secret: string = process.env.RESET_PASSWORD_JWT as string;
-        let email;
-        try {
-            const decoded = jwt.verify(token, secret) as { email: string };
-            email = decoded.email;
-        } catch (e) {
-            throw new Error("Wrong token.")
-        }
-
-        const authItem: AuthItem = await ServiceHelper.getDataBy({email: email}, authItems)
-
-        const {newPassword, confirmPassword} = req.body;
-        if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
-
-        const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS)
-        if (!saltRounds) throw new Error("Salt rounds not found")
-        authItem.password = await bcrypt.hash(newPassword, saltRounds);
-
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(authItems),
-            {encoding: 'utf-8'}
-        )
-    }
 }
 
 export class ServiceHelper {
@@ -236,7 +231,7 @@ export class ServiceHelper {
 
     static async createAuthItemData(credentialsData: CreateCredentials) {
         const {userId, email, password} = credentialsData;
-        // XXX: could be the error here, check it
+
         const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
         const hashedPassword: string = await bcrypt.hash(password, salt)
 
