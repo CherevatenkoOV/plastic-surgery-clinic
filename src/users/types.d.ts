@@ -1,5 +1,5 @@
 import {CreateDoctorBody, DoctorsQuery} from "../doctors/types.js";
-import {CreatePatientBody} from "../patients/types.js";
+import {CreatePatientBody, PatientsQuery} from "../patients/types.js";
 import {Doctor} from "../doctors/types.js";
 import {Patient} from "../patients/types.js";
 
@@ -10,7 +10,14 @@ export interface User {
     role: UserRole;
     createdAt: string;
     updatedAt: string;
+    auth: {
+        email: string;
+        password: string;
+        refreshToken?: string;
+    }
 }
+
+export type UserWithoutAuth = Partial<User, "auth">
 
 export type PublicUser = Pick<User, 'id', 'firstName', 'lastName', 'role'>
 
@@ -20,10 +27,12 @@ export type UsersQuery = Pick<User, 'firstName' | 'lastName'>
 
 export interface AllInfoUser {
     profile: User,
-    roleData: Doctor | Patient | null
+    roleData: Doctor | Patient | undefined
 }
 
-export type AllInfoUsersQuery = DoctorsQuery & UsersQuery
+export type AllInfoUsersQuery =
+    | DoctorsQuery & UsersQuery
+    | UsersQuery
 
 export type CreateUserData = Pick<User, 'firstName' | 'lastName' | 'role'>;
 
@@ -34,7 +43,13 @@ export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'role
 export type RoleData = Doctor | Patient;
 
 export type CreateRoleData =
-    | {specialization: string} & Partial<CreateDoctorBody>
+    | { specialization: string } & Partial<CreateDoctorBody>
     | Partial<CreatePatientBody>;
+
+export type UserFilter =
+    | { id: string }
+    | { email: string }
+
+
 
 

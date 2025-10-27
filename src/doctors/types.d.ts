@@ -1,6 +1,5 @@
 import {UpdateUserData} from "../users/types.js";
 
-// NOTE: refactored
 export interface Doctor {
     userId: string;
     specialization: string | null;
@@ -15,7 +14,6 @@ export interface ScheduleItem {
     end: string;
 }
 
-// NOTE: refactored
 export type CreateDoctorBody = Omit<Doctor, "userId">;
 
 export type UpdateDoctorData = Partial<Omit<Doctor, "userId">>
@@ -28,10 +26,12 @@ export interface DoctorsQuery {
 }
 
 export interface DoctorsParams {
-    id: string;
+    id?: string;
 }
 
 export interface DoctorInviteToken {
     inviteToken: string;
 }
+
+export type DoctorFilter = Pick<Doctor, "userId">
 

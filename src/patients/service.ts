@@ -1,39 +1,40 @@
 import {Request} from "express";
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
-import {Patient, PatientsParams, UpdatePatientBody, UpdatePatientData} from "./types.js";
+import {Patient, PatientFilter, PatientsParams, UpdatePatientBody, UpdatePatientData} from "./types.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js";
-import {ServiceHelper as AuthServiceHelper} from "../auth/service.js"
 import {Role} from "../shared/roles.js";
 import {AllInfoUser, AllInfoUsersQuery, User} from "../users/types.js";
 import {Appointment} from "../appointments/types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js";
+import {Doctor} from "../doctors/types.js";
 
 export class Service {
+    static async get(req: Request): Promise<AllInfoUser[]> {
+        const id = req.params.id
+        const loggedUser = req.user!;
 
-    // DONE
-    static async getPatients(req: Request): Promise<AllInfoUser[]> {
-        return await UserServiceHelper.getAllInfoUsers(Role.PATIENT, req.query)
-    }
-
-    // DONE
-    static async getPatientById(req: Request): Promise<AllInfoUser> {
-        const loggedUser = req.user;
-        let user;
-
-        if(loggedUser!.role === Role.PATIENT) {
-            user = await UserServiceHelper.getAllInfoUserById(req.user!.id)
-        } else {
-            user = await UserServiceHelper.getAllInfoUserById(req.params.id!)
+        if (!id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.DOCTOR)) {
+            return await UserServiceHelper.getFullInfo(Role.PATIENT, undefined, req.query as AllInfoUsersQuery)
         }
 
-        if (!user) throw new Error("User (patient) was not found")
-        return user;
+        if (!id && req.url === '/me') {
+            return await UserServiceHelper.getFullInfo(Role.PATIENT, {id: loggedUser.id}, req.query as AllInfoUsersQuery)
+        }
+
+        if (id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.DOCTOR)) {
+            return await UserServiceHelper.getFullInfo(Role.PATIENT, {id: id}, req.query as AllInfoUsersQuery)
+        }
+
+        throw new Error("Current user doesn't have the access to requested information.")
     }
 
-    // DONE
-    static async updatePatient(req: Request<{}, unknown, UpdatePatientBody>): Promise<AllInfoUser> {
-        const userId = req.user!.id;
+    static async updatePatient(req: Request<PatientsParams, unknown, UpdatePatientBody>): Promise<AllInfoUser> {
+        const userId = req.params.id ?? req.user!.id;
+
+        const [user]  = await UserServiceHelper.getBasicInfo({id: userId})
+        if (user!.role !== Role.PATIENT) throw new Error("The specified ID does not belong to the patient. Please check the ID.")
+
         const {firstName, lastName, phone} = req.body;
 
         const updatedUser = await UserServiceHelper.updateUserData(userId, {firstName, lastName})
@@ -45,12 +46,14 @@ export class Service {
         };
     }
 
-    // DONE
     static async deletePatient(req: Request): Promise<void> {
-        const userId = req.user!.id;
+        const userId = req.params.id ?? req.user!.id;
+
+        const [user]  = await UserServiceHelper.getBasicInfo({id: userId})
+        if (user!.role !== Role.PATIENT) throw new Error("The specified ID does not belong to the patient. Please check the ID.")
+
         await ServiceHelper.deletePatientData(userId)
         await UserServiceHelper.deleteUserData(userId)
-        await AuthServiceHelper.deleteAuthItemData(userId)
     }
 
     static async getAppointments(req: Request): Promise<Appointment[] | undefined> {
@@ -61,10 +64,15 @@ export class Service {
 }
 
 export class ServiceHelper {
-    //DONE
-    static async getPatientsData(): Promise<Patient[]> {
+    static async getPatientsData(filter?: PatientFilter): Promise<Patient[]> {
         const patientsData = await fs.readFile(paths.PATIENTS, {encoding: "utf-8"})
-        return JSON.parse(patientsData)
+        const patients = JSON.parse(patientsData)
+
+        if (filter) {
+            if ('userId' in filter) return patients.filter((d: Doctor) => d.userId === filter.userId)
+        }
+
+        return patients
     }
 
     static async createPatientData(patientData: Patient): Promise<Patient> {
@@ -90,7 +98,6 @@ export class ServiceHelper {
 
 
 
-    // DONE
     static async updatePatientData(userId: string, patientData: UpdatePatientData): Promise<Patient> {
         const patients = await ServiceHelper.getPatientsData();
         const targetPatient = patients.find((p: Patient) => p.userId === userId)
@@ -124,7 +131,6 @@ export class ServiceHelper {
 
 
     }
-    // DONE
     static async deletePatientData(userId: string): Promise<void> {
         const patients = await ServiceHelper.getPatientsData();
         const updatedPatients = patients.filter(patient => patient.userId !== userId)

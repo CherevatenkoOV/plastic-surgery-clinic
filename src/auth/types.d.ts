@@ -36,7 +36,6 @@ export interface RecoverPasswordParams {
 
 export type Credentials = Pick<AuthItem, 'email' | 'password'>
 
-export type CreateCredentials = Credentials & {userId: string};
 
 export interface AuthTokens {
     accessToken: string;
@@ -44,3 +43,7 @@ export interface AuthTokens {
 }
 
 export type FullRegisterInfo = AuthRegisterBody & CreateUserData & CreateRoleData
+
+export type AuthFilter =
+    | { userId: string }
+    | { email: string }

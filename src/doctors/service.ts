@@ -1,41 +1,47 @@
-import {Request, RequestHandler} from "express";
-import {Doctor, DoctorsParams, UpdateDoctorBody, UpdateDoctorData} from "./types.js";
+import {Request} from "express";
+import {
+    Doctor,
+    DoctorFilter, DoctorsParams,
+    DoctorsQuery,
+    UpdateDoctorBody,
+    UpdateDoctorData
+} from "./types.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js"
-import {ServiceHelper as AuthServiceHelper} from "../auth/service.js"
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {Role} from "../shared/roles.js";
-import {AllInfoUser} from "../users/types.js";
+import {AllInfoUser, AllInfoUsersQuery} from "../users/types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
-import {id} from "../shared/validation/joi-common.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 export class Service {
-    // DONE
-    static async getDoctors(req: Request): Promise<AllInfoUser[]> {
-        return await UserServiceHelper.getAllInfoUsers(Role.DOCTOR, req.query)
-    }
+    static async get(req: Request): Promise<AllInfoUser[]> {
+        const id = req.params.id;
+        const loggedUser = req.user!;
 
-    // DONE
-    static async getDoctorById(req: Request): Promise<AllInfoUser> {
-        const loggedUser = req.user;
-        let user;
-        console.log(loggedUser)
-        if (loggedUser!.role === Role.DOCTOR) {
-            user = await UserServiceHelper.getAllInfoUserById(req.user!.id)
-        } else {
-            user = await UserServiceHelper.getAllInfoUserById(req.params.id!)
+        if (!id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
+            return await UserServiceHelper.getFullInfo(Role.DOCTOR, undefined, req.query as AllInfoUsersQuery)
         }
 
-        if (!user) throw new Error("User was not found")
-        return user;
+        if (!id && req.url === '/me') {
+            return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: loggedUser.id}, req.query as AllInfoUsersQuery)
+        }
+
+        if (id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
+            return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: id}, req.query as AllInfoUsersQuery)
+        }
+
+        throw new Error("Current user doesn't have the access to requested information.")
     }
 
-    // DONE
-    static async updateDoctor(req: Request<{}, unknown, UpdateDoctorBody>): Promise<AllInfoUser> {
-        const userId = req.user!.id;
+    static async updateDoctor(req: Request<DoctorsParams, unknown, UpdateDoctorBody>): Promise<AllInfoUser> {
+        const userId = req.params.id ?? req.user!.id
+
+        const [user] = await UserServiceHelper.getBasicInfo({id: userId})
+        if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
+
         const {firstName, lastName, specialization, schedule} = req.body;
         const updatedUser = await UserServiceHelper.updateUserData(userId, {firstName, lastName})
         const updatedDoctor = await ServiceHelper.updateDoctorData(userId, {specialization, schedule})
@@ -46,12 +52,14 @@ export class Service {
         };
     }
 
-    // DONE
     static async deleteDoctor(req: Request): Promise<void> {
-        const userId = req.user!.id;
+        const userId = req.params.id ?? req.user!.id;
+
+        const [user] = await UserServiceHelper.getBasicInfo({id: userId})
+        if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
+
         await ServiceHelper.deleteDoctorData(userId)
         await UserServiceHelper.deleteUserData(userId)
-        await AuthServiceHelper.deleteAuthItemData(userId)
     }
 
     static async getAppointments(req: Request): Promise<Appointment[] | undefined> {
@@ -97,7 +105,6 @@ export class Service {
         const info = await transporter.sendMail(mailOptions)
 
 
-
         // for tests:
         // uncomment the line below
         console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
@@ -108,12 +115,27 @@ export class Service {
 
 
 export class ServiceHelper {
-    static async getDoctorsData(): Promise<Doctor[]> {
+    static async getDoctorsData(filter?: DoctorFilter, query?: DoctorsQuery): Promise<Doctor[]> {
         const doctorsData = await fs.readFile(paths.DOCTORS, {encoding: "utf-8"})
-        return JSON.parse(doctorsData)
+        const doctors = JSON.parse(doctorsData)
+
+        if (filter) {
+            if ('userId' in filter) return doctors.filter((d: Doctor) => d.userId === filter.userId)
+        }
+
+        if (query) {
+            let filtered = doctors;
+
+            if ('specialization' in query) {
+                filtered = filtered.filter((d: Doctor) => d.specialization === query.specialization)
+            }
+
+            return filtered
+        }
+
+        return doctors
     }
 
-    // DONE
     static async createDoctorData(doctorData: Doctor): Promise<Doctor> {
         const {userId, specialization, schedule} = doctorData;
 
@@ -136,7 +158,6 @@ export class ServiceHelper {
         return newDoctor
     }
 
-    // DONE
     static async updateDoctorData(userId: string, doctorData: UpdateDoctorData): Promise<Doctor> {
         const doctors = await ServiceHelper.getDoctorsData();
         const targetDoctor = doctors.find((d) => d.userId === userId)
@@ -168,11 +189,9 @@ export class ServiceHelper {
             )
 
             return doctor;
-
         }
     }
 
-    // DONE
     static async deleteDoctorData(userId: string): Promise<void> {
         const doctors = await ServiceHelper.getDoctorsData();
         const updatedDoctors = doctors.filter(doctor => doctor.userId !== userId)

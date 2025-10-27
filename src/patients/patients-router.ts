@@ -52,14 +52,14 @@ router.patch('/:id',
     validateRequest(patientIdSchema, 'params'),
     validateRequest(updatePatientSchema, 'body'),
     authenticate,
-    authorize([Role.ADMIN, Role.ADMIN]),
+    authorize([Role.ADMIN]),
     update
 )
 
 router.delete('/:id',
     validateRequest(patientIdSchema, 'params'),
     authenticate,
-    authorize([Role.ADMIN, Role.ADMIN]),
+    authorize([Role.ADMIN]),
     remove
 )
 

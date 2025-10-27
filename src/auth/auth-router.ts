@@ -15,10 +15,10 @@ router.post('/register/doctor/:token', registerByToken)
 router.post('/login', login)
 router.post('/logout', authenticate, logout)
 
-router.post('/reset', resetPassword) // reset
-router.patch('/recover/:resetToken', recoverPassword) // recover/:resetToken
+router.post('/reset', resetPassword)
+router.patch('/recover/:resetToken', recoverPassword)
 
-router.patch('/update-password', authenticate, updatePassword) // recover/:resetToken
+router.patch('/update-password', authenticate, updatePassword)
 
 export default router;
 
