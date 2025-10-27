@@ -18,6 +18,7 @@ export const getById = async (req: Request, res: Response<Appointment | undefine
     res.status(200).send(appointment)
 }
 
+// DONE
 export const create = async (req: Request<{}, unknown, CreateAppointmentBody>, res: Response<Appointment>): Promise<void> => {
     const newAppointment = await Service.createAppointment(req);
     res.status(201).send(newAppointment)

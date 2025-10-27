@@ -12,6 +12,11 @@ export interface AuthRegisterBody{
     password: string;
 }
 
+export interface RecoverPasswordBody {
+    newPassword: string;
+    confirmPassword: string;
+}
+
 export interface ChangePasswordBody {
     email: string;
     oldPassword: string;
@@ -19,23 +24,18 @@ export interface ChangePasswordBody {
     confirmPassword: string;
 }
 
-export interface RequestResetPasswordBody {
+
+export interface ResetPasswordBody {
     email: string;
 }
 
-export interface ResetPasswordBody {
-    newPassword: string;
-    confirmPassword: string;
-}
 
-export interface ResetPasswordQuery {
-    id: string;
-    token: string;
+export interface RecoverPasswordParams {
+    resetToken: string;
 }
 
 export type Credentials = Pick<AuthItem, 'email' | 'password'>
 
-export type CreateCredentials = Credentials & {userId: string};
 
 export interface AuthTokens {
     accessToken: string;
@@ -43,3 +43,7 @@ export interface AuthTokens {
 }
 
 export type FullRegisterInfo = AuthRegisterBody & CreateUserData & CreateRoleData
+
+export type AuthFilter =
+    | { userId: string }
+    | { email: string }

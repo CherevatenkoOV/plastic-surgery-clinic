@@ -12,15 +12,11 @@ export type UpdatePatientData = Partial<Omit<Patient, "userId">>
 
 export type UpdatePatientBody = UpdatePatientData & UpdateUserData;
 
-
-export interface PatientsQuery {
-    firstName?: string;
-    lastName?: string;
-}
-
-// NOTE: presumably should by Partial, because of Admin, which can update/delete patient by params, not by token->id
 export interface PatientsParams {
-    id: string;
+    id?: string;
 }
+
+export type PatientFilter = Pick<Patient, "userId">
+
 
 

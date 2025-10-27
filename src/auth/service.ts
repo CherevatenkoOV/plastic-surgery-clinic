@@ -1,40 +1,30 @@
 import {Request} from "express";
 import bcrypt from "bcrypt";
-import fs from "node:fs/promises";
-import {paths} from "../shared/paths.js";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js";
 import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js";
 import {ServiceHelper as PatientServiceHelper} from "../patients/service.js";
 import {
-    AuthItem,
     AuthTokens,
     ChangePasswordBody,
-    CreateCredentials,
     Credentials,
-    FullRegisterInfo,
-    RequestResetPasswordBody,
+    FullRegisterInfo, RecoverPasswordBody, RecoverPasswordParams,
     ResetPasswordBody,
-    ResetPasswordQuery
 } from "./types.js";
 import {CreateDoctorBody} from "../doctors/types.js";
 import {CreatePatientBody} from "../patients/types.js";
 import {Role} from "../shared/roles.js";
 import {User} from "../users/types.js";
-import {id} from "../shared/validation/joi-common.js";
 
 export class Service {
-    // DONE
     static async register(req: Request<{}, unknown, FullRegisterInfo>): Promise<AuthTokens | null> {
         const {firstName, lastName, role, email, password} = req.body;
 
-        if(role === Role.DOCTOR) return null
-
         if (await ServiceHelper.checkEmailExists(email)) throw new Error("User with specified email already exists.")
 
-        const profile = await UserServiceHelper.createUserData({firstName, lastName, role})
-        await ServiceHelper.createAuthItemData({userId: profile.id, email, password})
+        const user = await UserServiceHelper.createUserData({firstName, lastName, role})
+        await ServiceHelper.saveCredentials({email, password}, user)
 
         switch (role) {
             case Role.DOCTOR:
@@ -45,7 +35,7 @@ export class Service {
             case Role.PATIENT:
                 const {phone} = req.body as CreatePatientBody
                 await PatientServiceHelper.createPatientData({
-                    userId: profile.id,
+                    userId: user.id,
                     phone
                 })
                 break
@@ -54,14 +44,15 @@ export class Service {
                 throw new Error(`Unknown role: ${role}`)
         }
 
-        return ServiceHelper.generateTokens({id: profile.id});
+        return ServiceHelper.generateTokens({id: user.id});
     }
 
-    static async registerByToken(req: Request<{token: string}, unknown, FullRegisterInfo>): Promise<AuthTokens> {
+    static async registerByToken(req: Request<{ token: string }, unknown, FullRegisterInfo>): Promise<AuthTokens> {
         const token = req.params.token;
-
         const secret: string = process.env.RESET_PASSWORD_JWT as string;
+
         let email;
+
         try {
             const decoded = jwt.verify(token, secret) as { email: string };
             email = decoded.email;
@@ -69,37 +60,34 @@ export class Service {
             throw new Error("Wrong token.")
         }
 
-
         const {firstName, lastName, role, password} = req.body;
 
         if (await ServiceHelper.checkEmailExists(email)) throw new Error("User with specified email already exists.")
 
-        const profile = await UserServiceHelper.createUserData({firstName, lastName, role})
-        await ServiceHelper.createAuthItemData({userId: profile.id, email, password})
+        const user = await UserServiceHelper.createUserData({firstName, lastName, role})
+        await ServiceHelper.saveCredentials({email, password}, user)
 
         const {specialization, schedule} = req.body as CreateDoctorBody
+
         await DoctorServiceHelper.createDoctorData({
-            userId: profile.id,
+            userId: user.id,
             specialization: specialization ?? null,
             schedule: schedule ?? null
         })
 
-        return ServiceHelper.generateTokens({id: profile.id});
+        return ServiceHelper.generateTokens({id: user.id});
     }
 
     static async login(req: Request<{}, unknown, Credentials>): Promise<AuthTokens> {
         const {email, password} = req.body;
 
-        const authItem = await ServiceHelper.getDataBy({email: email})
-        const userId = authItem.userId;
+        const [user] = await UserServiceHelper.getBasicInfo({email: email})
 
-        const user = await UserServiceHelper.getDataById(userId)
-
-        const passwordMatch: boolean = await bcrypt.compare(password, authItem.password)
+        const passwordMatch: boolean = await bcrypt.compare(password, user!.auth.password)
         if (!passwordMatch) throw new Error("Wrong password")
 
-        const tokens = ServiceHelper.generateTokens({id: userId, role: user.role})
-        await ServiceHelper.saveRefreshToken(userId, tokens.refreshToken)
+        const tokens = ServiceHelper.generateTokens({id: user!.id, role: user!.role})
+        await ServiceHelper.saveRefreshToken(user!.id, tokens.refreshToken)
 
         return tokens
     }
@@ -107,24 +95,42 @@ export class Service {
     static async logout(req: Request): Promise<void> {
         const userId = req.user!.id;
 
-        const authItems: AuthItem[] = await ServiceHelper.getAllData()
-        const authItem: AuthItem = await ServiceHelper.getDataBy({id: userId}, authItems)
-        delete authItem.refreshToken;
+        const [user] = await UserServiceHelper.getBasicInfo({id: userId})
+        delete user!.auth.refreshToken;
 
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(authItems),
-            {encoding: 'utf-8'}
-        )
+        await UserServiceHelper.saveUserData(user!)
     }
 
-    static async changePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
+    static async recoverPassword(req: Request<RecoverPasswordParams, unknown, RecoverPasswordBody>): Promise<void> {
+        const {resetToken} = req.params;
+
+        const secret: string = process.env.RESET_PASSWORD_JWT as string;
+        let email;
+        try {
+            const decoded = jwt.verify(resetToken, secret) as { email: string };
+            email = decoded.email;
+        } catch (e) {
+            throw new Error("Wrong token.")
+        }
+
+        const [user] = await UserServiceHelper.getBasicInfo({email})
+
+        const {newPassword, confirmPassword} = req.body;
+        if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
+
+        const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS)
+        if (!saltRounds) throw new Error("Salt rounds not found")
+        user!.auth.password = await bcrypt.hash(newPassword, saltRounds);
+
+        await UserServiceHelper.saveUserData(user!)
+    }
+
+    static async updatePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
         const {email, oldPassword, newPassword, confirmPassword} = req.body;
 
-        const authItems: AuthItem[] = await ServiceHelper.getAllData()
-        const authItem: AuthItem = await ServiceHelper.getDataBy({email}, authItems)
+        const [user] = await UserServiceHelper.getBasicInfo({email})
 
-        const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, authItem.password)
+        const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, user!.auth.password)
         if (!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
 
         if (oldPassword === newPassword) throw new Error("You have entered your current password in the \"new password\" field. ")
@@ -132,29 +138,24 @@ export class Service {
         if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
 
         const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
-        authItem.password = await bcrypt.hash(newPassword, salt)
+        user!.auth.password = await bcrypt.hash(newPassword, salt)
 
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(authItems),
-            {encoding: 'utf-8'}
-        )
+        await UserServiceHelper.saveUserData(user!)
     }
-
-    static async requestResetPassword(req: Request<{}, unknown, RequestResetPasswordBody>): Promise<string> {
+    static async resetPassword(req: Request<{}, unknown, ResetPasswordBody>): Promise<string> {
         const {email} = req.body;
 
-        const authItem: AuthItem = await ServiceHelper.getDataBy({email})
+        const [user] = await UserServiceHelper.getBasicInfo({email})
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string
-
         const token = jwt.sign({email}, secret, {expiresIn: '15m'})
-        const resetURL = `${process.env.API_URL}:${process.env.PORT}/auth/reset-password?token=${token}`
+
+        const resetURL = `${process.env.API_URL}:${process.env.PORT}/auth/recover/${token}`
 
         const transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false,
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
             auth: {
                 user: `${process.env.MAIL_USER}`,
                 pass: `${process.env.MAIL_PASS}`
@@ -165,7 +166,7 @@ export class Service {
         });
 
         const mailOptions = {
-            to: authItem.email,
+            to: user!.auth.email,
             from: process.env.MAIL_USER,
             subject: 'Password Reset Request',
             text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
@@ -178,110 +179,41 @@ export class Service {
         // make definition of info asynchronous (add await)
         const info = await transporter.sendMail(mailOptions)
 
-
         // for tests:
         // uncomment the line below
         console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
 
         return token;
     }
-
-    static async resetPassword(req: Request<{}, unknown, ResetPasswordBody, ResetPasswordQuery>): Promise<void> {
-        const {token} = req.query;
-        const authItems: AuthItem[] = await ServiceHelper.getAllData()
-
-        const secret: string = process.env.RESET_PASSWORD_JWT as string;
-        let email;
-        try {
-            const decoded = jwt.verify(token, secret) as { email: string };
-            email = decoded.email;
-        } catch (e) {
-            throw new Error("Wrong token.")
-        }
-
-        const authItem: AuthItem = await ServiceHelper.getDataBy({email: email}, authItems)
-
-        const {newPassword, confirmPassword} = req.body;
-        if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
-
-        const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS)
-        if (!saltRounds) throw new Error("Salt rounds not found")
-        authItem.password = await bcrypt.hash(newPassword, saltRounds);
-
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(authItems),
-            {encoding: 'utf-8'}
-        )
-    }
 }
 
 export class ServiceHelper {
-    static async getAllData(): Promise<AuthItem[]> {
-        const data = await fs.readFile(paths.AUTH, {encoding: 'utf-8'})
-        return JSON.parse(data)
-    }
 
-    static async getDataBy(filter: { id?: string, email?: string }, authItemsData?: AuthItem[]): Promise<AuthItem> {
-        if (!filter.id && !filter.email) throw new Error("At least one filter field must be specified");
+    static async saveCredentials(credentialsData: Credentials, user: User) {
+        const {email, password} = credentialsData;
 
-        const authItems: AuthItem[] = authItemsData ?? await this.getAllData();
-
-        const authItem = authItems.find((authItem: AuthItem) => authItem.email === filter.email || authItem.userId === filter.id)
-
-        if (!authItem) throw new Error("Specified user was not found")
-
-        return authItem
-    }
-
-    static async createAuthItemData(credentialsData: CreateCredentials) {
-        const {userId, email, password} = credentialsData;
-        // XXX: could be the error here, check it
         const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
         const hashedPassword: string = await bcrypt.hash(password, salt)
 
-        const authItem = {
-            userId,
+        user.auth = {
             email,
             password: hashedPassword
         }
 
-        const authItems = await ServiceHelper.getAllData();
-        if (authItems.find(c => c.email === email)) throw new Error("Credentials with specified email already exists")
+        await UserServiceHelper.saveUserData(user!)
 
-        authItems.push(authItem)
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(authItems),
-            {encoding: 'utf-8'}
-        )
-
-        return authItem
-    }
-
-    static async deleteAuthItemData(userId: string): Promise<void> {
-        const authItems = await ServiceHelper.getAllData();
-        const updatedAuthItems = authItems.filter((authItem: AuthItem) => authItem.userId !== userId)
-
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(updatedAuthItems),
-            {encoding: 'utf-8'},
-        )
     }
 
     static async checkEmailExists(email: string) {
         try {
-            const authData = await fs.readFile(paths.AUTH, {encoding: "utf-8"})
-            const authItems = JSON.parse(authData)
-            return authItems.some((item: AuthItem) => item.email === email)
+                const users = await UserServiceHelper.getBasicInfo()
+            return users.some((u: User) => u.auth.email === email)
         } catch (e) {
             throw new Error(`Something went wrong with checkEmailExists function. Err: ${e}`)
         }
-
     }
 
-
+    // NOTE: CHECKED
     static generateTokens(payload: JwtPayload) {
         const accessTokenKey = process.env.ACCESS_TOKEN_SECRET;
         const refreshTokenKey = process.env.REFRESH_TOKEN_SECRET;
@@ -294,15 +226,10 @@ export class ServiceHelper {
         return {accessToken, refreshToken}
     }
 
-    static async saveRefreshToken(userId: string, refreshToken: string) {
-        const authItems = await ServiceHelper.getAllData();
-        const authItem = await ServiceHelper.getDataBy({id: userId}, authItems)
+    static async saveRefreshToken(id: string, refreshToken: string) {
+        const [user] = await UserServiceHelper.getBasicInfo({id})
 
-        authItem.refreshToken = refreshToken;
-        await fs.writeFile(
-            paths.AUTH,
-            JSON.stringify(authItems),
-            {encoding: 'utf-8'},
-        )
+        user!.auth.refreshToken = refreshToken;
+        await UserServiceHelper.saveUserData(user!)
     }
 }

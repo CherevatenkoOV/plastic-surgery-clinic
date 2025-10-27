@@ -6,14 +6,14 @@ import {Role} from "../shared/roles.js";
 
 const router: Router = express.Router();
 
-router.get('/', authenticate, authorize([Role.ADMIN]), getAll)
-router.get('/:id', authenticate, authorize([Role.ADMIN]), getById)
+router.get('/', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), getAll)
+router.get('/:id', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), getById)
 
-router.put('/', authenticate, authorize([Role.ADMIN]), create)
+router.put('/', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), create)
 
 // @ts-ignore
-router.patch('/:id',authenticate, authorize([Role.ADMIN]), update)
+router.patch('/:id',authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), update)
 // @ts-ignore
-router.delete('/:id', authenticate, authorize([Role.ADMIN]), remove)
+router.delete('/:id', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), remove)
 
 export default router;

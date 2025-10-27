@@ -1,25 +1,24 @@
 import express, {Router} from "express";
 import {
-    changePassword,
     login,
-    logout,
+    logout, recoverPassword,
     register,
     registerByToken,
-    requestResetPassword,
-    resetPassword
+    resetPassword, updatePassword
 } from "./auth-controller.js";
 import {authenticate} from "../shared/middleware/authenticate.js";
 
 const router: Router = express.Router();
 
-router.post('/register', register)
-router.post('/register/:token', registerByToken)
+router.post('/register/patient', register)
+router.post('/register/doctor/:token', registerByToken)
 router.post('/login', login)
 router.post('/logout', authenticate, logout)
-router.post('/request-reset-password', requestResetPassword)
 
-router.patch('/change-password', authenticate, changePassword)
-router.patch('/reset-password', resetPassword)
+router.post('/reset', resetPassword)
+router.patch('/recover/:resetToken', recoverPassword)
+
+router.patch('/update-password', authenticate, updatePassword)
 
 export default router;
 
