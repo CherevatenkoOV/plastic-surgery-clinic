@@ -1,17 +1,14 @@
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
-import {Request} from "express";
 import {
     AllInfoUser,
     AllInfoUsersQuery,
     CreateUserData,
     PublicUser,
     RoleData,
-    UpdateUserBody,
     UpdateUserData,
     User,
     UserFilter,
-    UsersParams,
     UserWithoutAuth
 } from "./types.js";
 import {randomUUID} from "node:crypto";
@@ -22,25 +19,20 @@ import {Doctor} from "../doctors/types.js";
 
 export class Service {
 
-    static async get(req?: Request): Promise<User[]> {
-        const id = req?.params?.id;
+    // NOTE: refactored
+    static async get(id?: string): Promise<User[]> {
         return await ServiceHelper.getBasicInfo(id ? {id} : undefined)
     }
 
-    static async update(req: Request<UsersParams, unknown, UpdateUserBody>): Promise<User> {
-        const id = req.params.id;
-        const {firstName, lastName, role} = req.body
 
-        return await ServiceHelper.updateUserData(id, {firstName, lastName, role})
+    // NOTE: refactored
+    static async update(id: string, userData: UpdateUserData): Promise<User> {
+        return await ServiceHelper.updateUserData(id, userData)
     }
 
-    static async remove(req: Request<UsersParams>): Promise<void> {
-        const id = req.params.id
-        const role = req.user!.role
 
-        if (role === Role.DOCTOR) await DoctorServiceHelper.deleteDoctorData(id)
-        if (role === Role.PATIENT) await PatientServiceHelper.deletePatientData(id)
-
+    // NOTE: refactored
+    static async remove(id: string): Promise<void> {
         await ServiceHelper.deleteUserData(id)
     }
 }

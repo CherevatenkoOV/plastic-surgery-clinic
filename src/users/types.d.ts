@@ -38,7 +38,7 @@ export type CreateUserData = Pick<User, 'firstName' | 'lastName' | 'role'>;
 
 export type UpdateUserData = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>;
 
-export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>
+export type UpdateUserData = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>
 
 export type RoleData = Doctor | Patient;
 
