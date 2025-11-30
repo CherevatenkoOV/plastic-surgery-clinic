@@ -17,7 +17,10 @@ export interface User {
     }
 }
 
-export type UserWithoutAuth = Partial<User, "auth">
+export type UserWithoutAuth = Omit<User, "auth">
+
+// NOTE: old version. remove after checking
+// export type UserWithoutAuth = Partial<User, "auth">
 
 export type PublicUser = Pick<User, 'id', 'firstName', 'lastName', 'role'>
 
@@ -25,8 +28,8 @@ export type UsersParams = Pick<User, 'id'>
 
 export type UsersQuery = Pick<User, 'firstName' | 'lastName'>
 
-export interface AllInfoUser {
-    profile: User,
+export interface FullUser {
+    profile: UserWithoutAuth,
     roleData: Doctor | Patient | undefined
 }
 

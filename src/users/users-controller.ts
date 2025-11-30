@@ -7,13 +7,13 @@ import {
 import {Service, ServiceHelper} from "./service.js";
 import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js"
 import {ServiceHelper as PatientServiceHelper} from "../patients/service.js"
-import {removeSensitiveData} from "./helpers/remove-sensitive-data.js";
+import {sanitizeUsers} from "./helpers/sanitizeUsers.js";
 import {Role} from "../shared/roles.js";
 
 // NOTE: refactored
 export const getAll = async (req: Request, res: Response<User[]>): Promise<void> => {
     const users = await Service.get();
-    const publicUsers = await removeSensitiveData(users)
+    const publicUsers = await sanitizeUsers(users)
     res.status(200).send(publicUsers)
 }
 
@@ -21,7 +21,7 @@ export const getAll = async (req: Request, res: Response<User[]>): Promise<void>
 export const getById = async (req: Request<UsersParams>, res: Response<User[]>): Promise<void> => {
     const id = req?.params?.id;
     const user = await Service.get(id)
-    const publicUser = await removeSensitiveData(user)
+    const publicUser = await sanitizeUsers(user)
     res.status(200).send(publicUser)
 }
 
@@ -38,7 +38,7 @@ export const update = async (req: Request<UsersParams, unknown, UpdateUserData>,
 
     const updatedUser = await Service.update(id, userData);
 
-    const publicUser = await removeSensitiveData(updatedUser)
+    const publicUser = await sanitizeUsers(updatedUser)
     res.status(200).send(publicUser)
 }
 // NOTE: refactored

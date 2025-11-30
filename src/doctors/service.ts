@@ -3,41 +3,56 @@ import {
     Doctor,
     DoctorFilter, DoctorsParams,
     DoctorsQuery,
-    UpdateDoctorBody,
+    UpdateDoctorDto,
     UpdateDoctorData
 } from "./types.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js"
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {Role} from "../shared/roles.js";
-import {AllInfoUser, AllInfoUsersQuery} from "../users/types.js";
+import {FullUser, AllInfoUsersQuery} from "../users/types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 export class Service {
-    static async get(req: Request): Promise<AllInfoUser[]> {
-        const id = req.params.id;
-        const loggedUser = req.user!;
 
-        if (!id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
-            return await UserServiceHelper.getFullInfo(Role.DOCTOR, undefined, req.query as AllInfoUsersQuery)
-        }
-
-        if (!id && req.url === '/me') {
-            return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: loggedUser.id}, req.query as AllInfoUsersQuery)
-        }
-
-        if (id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
-            return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: id}, req.query as AllInfoUsersQuery)
-        }
-
-        throw new Error("Current user doesn't have the access to requested information.")
+    // NOTE: refactored
+    static async getAll(): Promise<Doctor[]> {
+        return await ServiceHelper.getDoctorsData()
     }
 
-    static async updateDoctor(req: Request<DoctorsParams, unknown, UpdateDoctorBody>): Promise<AllInfoUser> {
-        const userId = req.params.id ?? req.user!.id
+    // NOTE: should return Promise<Doctor> after implementation repository pattern
+    static async getById(userId: string): Promise<Doctor[]> {
+        return await ServiceHelper.getDoctorsData({userId})
+    }
+
+    // // NOTE: should be only getting doctors data. all logic of checking roles and combination should be in controller
+    // static async get(req: Request): Promise<FullUser[]> {
+    //     const id = req.params.id;
+    //     const loggedUser = req.user!;
+    //
+    //     if (!id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
+    //         return await UserServiceHelper.getFullInfo(Role.DOCTOR, undefined, req.query as AllInfoUsersQuery)
+    //     }
+    //
+    //     if (!id && req.url === '/me') {
+    //         return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: loggedUser.id}, req.query as AllInfoUsersQuery)
+    //     }
+    //
+    //     if (id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
+    //         return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: id}, req.query as AllInfoUsersQuery)
+    //     }
+    //
+    //     throw new Error("Current user doesn't have the access to requested information.")
+    // }
+
+    static async update(id: string, doctorData: UpdateDoctorDto): Promise<FullUser> {
+        // receive doctorsData
+        // update doctorsData
+
+
 
         const [user] = await UserServiceHelper.getBasicInfo({id: userId})
         if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
@@ -51,6 +66,23 @@ export class Service {
             roleData: updatedDoctor
         };
     }
+
+    // NOTE: previous version
+    // static async updateDoctor(req: Request<DoctorsParams, unknown, UpdateDoctorBody>): Promise<FullUser> {
+    //     const userId = req.params.id ?? req.user!.id
+    //
+    //     const [user] = await UserServiceHelper.getBasicInfo({id: userId})
+    //     if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
+    //
+    //     const {firstName, lastName, specialization, schedule} = req.body;
+    //     const updatedUser = await UserServiceHelper.updateUserData(userId, {firstName, lastName})
+    //     const updatedDoctor = await ServiceHelper.updateDoctorData(userId, {specialization, schedule})
+    //
+    //     return {
+    //         profile: updatedUser,
+    //         roleData: updatedDoctor
+    //     };
+    // }
 
     static async deleteDoctor(req: Request): Promise<void> {
         const userId = req.params.id ?? req.user!.id;

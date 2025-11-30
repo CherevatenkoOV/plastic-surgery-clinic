@@ -3,29 +3,29 @@ import {
 } from "./types.js";
 import {Request, Response} from "express";
 import {Service} from "./service.js";
-import {AllInfoUser} from "../users/types.js";
+import {FullUser} from "../users/types.js";
 import {Appointment} from "../appointments/types.js";
-import {removeSensitiveData} from "../users/helpers/remove-sensitive-data.js";
+import {sanitizeUsers} from "../users/helpers/sanitizeUsers.js";
 
-export const getAll = async (req: Request, res: Response<AllInfoUser[]>): Promise<void> => {
+export const getAll = async (req: Request, res: Response<FullUser[]>): Promise<void> => {
     const patients = await Service.get(req)
 
     if (!patients.length) res.sendStatus(404)
 
-    const publicPatients = await removeSensitiveData(patients)
+    const publicPatients = await sanitizeUsers(patients)
     res.status(200).send(publicPatients)
 }
 
-export const getById = async (req: Request, res: Response<AllInfoUser | undefined>) => {
+export const getById = async (req: Request, res: Response<FullUser | undefined>) => {
     const patient = await Service.get(req)
 
     if (!patient.length) res.sendStatus(404)
 
-    const publicPatient = await removeSensitiveData(patient)
+    const publicPatient = await sanitizeUsers(patient)
     res.status(200).send(publicPatient)
 }
 
-export const update = async (req: Request<{}, unknown, UpdatePatientBody>, res: Response<AllInfoUser>): Promise<void> => {
+export const update = async (req: Request<{}, unknown, UpdatePatientBody>, res: Response<FullUser>): Promise<void> => {
     const updatedPatient = await Service.updatePatient(req)
     res.status(200).send(updatedPatient)
 }

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {
-    AllInfoUser,
+    FullUser,
     AllInfoUsersQuery,
     CreateUserData,
     PublicUser,
@@ -53,7 +53,7 @@ export class ServiceHelper {
     }
 
 
-    static async getFullInfo(role: Role, filter?: UserFilter, query?: AllInfoUsersQuery): Promise<AllInfoUser[]> {
+    static async getFullInfo(role: Role, filter?: UserFilter, query?: AllInfoUsersQuery): Promise<FullUser[]> {
         let data = await this.getBasicInfo()
         let users: User[] = Array.isArray(data) ? data : [data]
 
@@ -72,7 +72,7 @@ export class ServiceHelper {
                 throw new Error("Specified role does not exist")
         }
 
-        const allInfoUsers: AllInfoUser[] = users.map(user => {
+        const allInfoUsers: FullUser[] = users.map(user => {
                 return {
                     profile: user,
                     roleData: usersDetails.find(userDetails => user.id === userDetails.userId)
@@ -83,8 +83,8 @@ export class ServiceHelper {
         let result = allInfoUsers
 
         if (filter) {
-            if ('id' in filter) result = allInfoUsers.filter((u: AllInfoUser) => u.profile.id === filter.id)
-            if ('email' in filter) result = allInfoUsers.filter((u: AllInfoUser) => u.profile.auth.email === filter.email)
+            if ('id' in filter) result = allInfoUsers.filter((u: FullUser) => u.profile.id === filter.id)
+            if ('email' in filter) result = allInfoUsers.filter((u: FullUser) => u.profile.auth.email === filter.email)
         }
 
         if (query && Object.keys(query).length > 0) {

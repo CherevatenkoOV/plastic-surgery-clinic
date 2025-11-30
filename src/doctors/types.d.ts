@@ -18,8 +18,7 @@ export type CreateDoctorBody = Omit<Doctor, "userId">;
 
 export type UpdateDoctorData = Partial<Omit<Doctor, "userId">>
 
-export type UpdateDoctorBody = UpdateDoctorData & UpdateUserData
-
+export type UpdateDoctorDto = UpdateDoctorData & UpdateUserData
 
 export interface DoctorsQuery {
     specialization?: string;
