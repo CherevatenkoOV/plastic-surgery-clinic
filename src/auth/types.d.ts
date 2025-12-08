@@ -1,4 +1,4 @@
-import {CreateUserData, CreateRoleData} from "../users/types.js";
+import {CreateUserDto, CreateRoleData} from "../users/types.js";
 
 export interface AuthItem {
     userId: string;
@@ -42,7 +42,7 @@ export interface AuthTokens {
     refreshToken: string;
 }
 
-export type FullRegisterInfo = AuthRegisterBody & CreateUserData & CreateRoleData
+export type FullRegisterInfo = AuthRegisterBody & CreateUserDto & CreateRoleData
 
 export type AuthFilter =
     | { userId: string }

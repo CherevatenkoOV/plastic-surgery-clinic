@@ -1,98 +1,57 @@
 import {Request} from "express";
-import {
-    Doctor,
-    DoctorFilter, DoctorsParams,
-    DoctorsQuery,
-    UpdateDoctorDto,
-    UpdateDoctorData
-} from "./types.js";
-import {ServiceHelper as UserServiceHelper} from "../users/service.js"
+import {Doctor, DoctorsQueryDto, FullDoctorDto, FullDoctorFilter, UpdateDoctorData, UpdateDoctorDto} from "./types.js";
+import {Service as UserService, ServiceHelper as UserServiceHelper} from "../users/service.js"
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {Role} from "../shared/roles.js";
-import {FullUser, AllInfoUsersQuery} from "../users/types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import {mergeUsersWithRoles} from "../shared/helpers/merge-users-with-roles.js";
+import {mergeUserWithRole} from "../shared/helpers/merge-user-with-role.js";
 
 export class Service {
+    // NOTE: done
+    static async get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]> {
+        const {specialization, firstName, lastName} = filter ?? {}
 
-    // NOTE: refactored
-    static async getAll(): Promise<Doctor[]> {
-        return await ServiceHelper.getDoctorsData()
+        const doctors = await ServiceHelper.getDoctorsData({specialization})
+        const users = await UserService.get({firstName, lastName})
+        return mergeUsersWithRoles(users, doctors)
     }
 
-    // NOTE: should return Promise<Doctor> after implementation repository pattern
-    static async getById(userId: string): Promise<Doctor[]> {
-        return await ServiceHelper.getDoctorsData({userId})
+    // NOTE: done
+    static async getById(userId: string): Promise<FullDoctorDto> {
+        const doctor = await ServiceHelper.getDoctorDataById(userId)
+        const user = await UserService.getById(userId)
+        return mergeUserWithRole(user, doctor)
     }
 
-    // // NOTE: should be only getting doctors data. all logic of checking roles and combination should be in controller
-    // static async get(req: Request): Promise<FullUser[]> {
-    //     const id = req.params.id;
-    //     const loggedUser = req.user!;
-    //
-    //     if (!id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
-    //         return await UserServiceHelper.getFullInfo(Role.DOCTOR, undefined, req.query as AllInfoUsersQuery)
-    //     }
-    //
-    //     if (!id && req.url === '/me') {
-    //         return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: loggedUser.id}, req.query as AllInfoUsersQuery)
-    //     }
-    //
-    //     if (id && (loggedUser.role === Role.ADMIN || loggedUser.role === Role.PATIENT)) {
-    //         return await UserServiceHelper.getFullInfo(Role.DOCTOR, {id: id}, req.query as AllInfoUsersQuery)
-    //     }
-    //
-    //     throw new Error("Current user doesn't have the access to requested information.")
-    // }
+    // NODE: done
+    static async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
+        const {firstName, lastName, specialization, schedule} = doctorData
+        const updatedUser = await UserService.update(id, {firstName, lastName})
+        const updatedDoctor = await ServiceHelper.updateDoctorData(id, {specialization, schedule})
 
-    static async update(id: string, doctorData: UpdateDoctorDto): Promise<FullUser> {
-        // receive doctorsData
-        // update doctorsData
+        return mergeUserWithRole(updatedUser, updatedDoctor)
+    }
 
-
-
-        const [user] = await UserServiceHelper.getBasicInfo({id: userId})
-        if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
-
-        const {firstName, lastName, specialization, schedule} = req.body;
-        const updatedUser = await UserServiceHelper.updateUserData(userId, {firstName, lastName})
-        const updatedDoctor = await ServiceHelper.updateDoctorData(userId, {specialization, schedule})
-
-        return {
-            profile: updatedUser,
-            roleData: updatedDoctor
-        };
+    static async delete(id: string): Promise<void> {
+        await ServiceHelper.deleteDoctorData(id)
+        await UserServiceHelper.deleteUserData(id)
     }
 
     // NOTE: previous version
-    // static async updateDoctor(req: Request<DoctorsParams, unknown, UpdateDoctorBody>): Promise<FullUser> {
-    //     const userId = req.params.id ?? req.user!.id
+    // static async deleteDoctor(req: Request): Promise<void> {
+    //     const userId = req.params.id ?? req.user!.id;
     //
     //     const [user] = await UserServiceHelper.getBasicInfo({id: userId})
     //     if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
     //
-    //     const {firstName, lastName, specialization, schedule} = req.body;
-    //     const updatedUser = await UserServiceHelper.updateUserData(userId, {firstName, lastName})
-    //     const updatedDoctor = await ServiceHelper.updateDoctorData(userId, {specialization, schedule})
-    //
-    //     return {
-    //         profile: updatedUser,
-    //         roleData: updatedDoctor
-    //     };
+    //     await ServiceHelper.deleteDoctorData(userId)
+    //     await UserServiceHelper.deleteUserData(userId)
     // }
-
-    static async deleteDoctor(req: Request): Promise<void> {
-        const userId = req.params.id ?? req.user!.id;
-
-        const [user] = await UserServiceHelper.getBasicInfo({id: userId})
-        if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
-
-        await ServiceHelper.deleteDoctorData(userId)
-        await UserServiceHelper.deleteUserData(userId)
-    }
 
     static async getAppointments(req: Request): Promise<Appointment[] | undefined> {
         const loggedUser = req.user!;
@@ -145,28 +104,52 @@ export class Service {
     }
 }
 
-
+// NOTE: refactored
 export class ServiceHelper {
-    static async getDoctorsData(filter?: DoctorFilter, query?: DoctorsQuery): Promise<Doctor[]> {
+    static async getDoctorsData(filter?: DoctorsQueryDto): Promise<Doctor[]> {
         const doctorsData = await fs.readFile(paths.DOCTORS, {encoding: "utf-8"})
         const doctors = JSON.parse(doctorsData)
 
-        if (filter) {
-            if ('userId' in filter) return doctors.filter((d: Doctor) => d.userId === filter.userId)
-        }
+        if (!filter || Object.keys(filter).length === 0) return doctors
 
-        if (query) {
-            let filtered = doctors;
+        let filteredDoctors = doctors;
+        if (filter?.specialization) filteredDoctors = filteredDoctors.filter((d: Doctor) => d.specialization?.toLowerCase() === filter.specialization?.toLowerCase())
 
-            if ('specialization' in query) {
-                filtered = filtered.filter((d: Doctor) => d.specialization === query.specialization)
-            }
+        if (!filteredDoctors.length) throw new Error("The specified doctor were not found")
 
-            return filtered
-        }
-
-        return doctors
+        return filteredDoctors
     }
+
+    // NOTE: done
+    static async getDoctorDataById(id: string): Promise<Doctor> {
+        const doctors = await this.getDoctorsData()
+        const targetDoctor = doctors.find(d => d.userId === id)
+        if(!targetDoctor)  throw new Error("The specified doctor was not found")
+
+        return targetDoctor
+    }
+
+    // NOTE: previous version
+    // static async getDoctorsData(filter?: DoctorFilter, query?: DoctorsQuery): Promise<Doctor[]> {
+    //     const doctorsData = await fs.readFile(paths.DOCTORS, {encoding: "utf-8"})
+    //     const doctors = JSON.parse(doctorsData)
+    //
+    //     if (filter) {
+    //         if ('userId' in filter) return doctors.filter((d: Doctor) => d.userId === filter.userId)
+    //     }
+    //
+    //     if (query) {
+    //         let filtered = doctors;
+    //
+    //         if ('specialization' in query) {
+    //             filtered = filtered.filter((d: Doctor) => d.specialization === query.specialization)
+    //         }
+    //
+    //         return filtered
+    //     }
+    //
+    //     return doctors
+    // }
 
     static async createDoctorData(doctorData: Doctor): Promise<Doctor> {
         const {userId, specialization, schedule} = doctorData;

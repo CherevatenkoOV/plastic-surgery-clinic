@@ -4,13 +4,13 @@ import {paths} from "../shared/paths.js";
 import {Patient, PatientFilter, PatientsParams, UpdatePatientBody, UpdatePatientData} from "./types.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js";
 import {Role} from "../shared/roles.js";
-import {FullUser, AllInfoUsersQuery, User} from "../users/types.js";
+import {FullUserDto, AllInfoUsersQuery, User} from "../users/types.js";
 import {Appointment} from "../appointments/types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js";
 import {Doctor} from "../doctors/types.js";
 
 export class Service {
-    static async get(req: Request): Promise<FullUser[]> {
+    static async get(req: Request): Promise<FullUserDto[]> {
         const id = req.params.id
         const loggedUser = req.user!;
 
@@ -29,7 +29,7 @@ export class Service {
         throw new Error("Current user doesn't have the access to requested information.")
     }
 
-    static async updatePatient(req: Request<PatientsParams, unknown, UpdatePatientBody>): Promise<FullUser> {
+    static async updatePatient(req: Request<PatientsParams, unknown, UpdatePatientBody>): Promise<FullUserDto> {
         const userId = req.params.id ?? req.user!.id;
 
         const [user]  = await UserServiceHelper.getBasicInfo({id: userId})

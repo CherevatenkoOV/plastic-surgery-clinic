@@ -1,5 +1,15 @@
 import express, {Router} from 'express';
-import {getAll, getAppointments, getById, inviteDoctor, remove, update} from "./doctors-controller.js";
+import {
+    deleteById,
+    deleteMe,
+    getAll,
+    getAppointments,
+    getById,
+    getMe,
+    inviteDoctor,
+    updateById,
+    updateMe
+} from "./doctors-controller.js";
 import {validateRequest} from "../shared/middleware/validate-request.js";
 import {doctorIdSchema, searchDoctorSchema, updateDoctorSchema} from "./validation.js";
 import {authorize} from "../shared/middleware/authorize.js";
@@ -8,6 +18,20 @@ import {authenticate} from "../shared/middleware/authenticate.js";
 
 const router: Router = express.Router();
 
+
+router.get('/me',
+    validateRequest(doctorIdSchema, 'params'),
+    authenticate,
+    authorize([Role.DOCTOR]),
+    getMe
+)
+
+router.get('/:id',
+    authenticate,
+    authorize([Role.DOCTOR]),
+    getById
+)
+
 router.get('/',
     validateRequest(searchDoctorSchema, 'query'),
     authenticate,
@@ -15,46 +39,35 @@ router.get('/',
     getAll
 )
 
-router.get('/me',
-    validateRequest(doctorIdSchema, 'params'),
-    authenticate,
-    authorize([Role.DOCTOR]),
-    getById
-)
 router.patch('/me',
     validateRequest(doctorIdSchema, 'params'),
     validateRequest(updateDoctorSchema, 'body'),
     authenticate,
     authorize([Role.DOCTOR]),
-    update
-)
-router.delete('/me',
-    validateRequest(doctorIdSchema, 'params'),
-    authenticate,
-    authorize([Role.DOCTOR]),
-    remove
-)
-
-router.get('/:id',
-    validateRequest(doctorIdSchema, 'params'),
-    authenticate,
-    authorize([Role.ADMIN, Role.PATIENT]),
-    getById
+    updateMe
 )
 
 router.patch('/:id',
     validateRequest(doctorIdSchema, 'params'),
     validateRequest(updateDoctorSchema, 'body'),
     authenticate,
-    authorize([Role.ADMIN]),
-    update
+    authorize([Role.DOCTOR]),
+    updateById
 )
+
+router.delete('/me',
+    validateRequest(doctorIdSchema, 'params'),
+    authenticate,
+    authorize([Role.DOCTOR]),
+    deleteMe
+)
+
 
 router.delete('/:id',
     validateRequest(doctorIdSchema, 'params'),
     authenticate,
     authorize([Role.ADMIN]),
-    remove
+    deleteById
 )
 
 router.get('/me/appointments',
