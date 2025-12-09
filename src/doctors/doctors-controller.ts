@@ -25,7 +25,6 @@ export const getAll = async (req: Request, res: Response<FullDoctorDto[] | {mess
     }
 
     res.status(200).send(doctors)
-    return
 }
 
 // NOTE: done
@@ -33,7 +32,6 @@ export const getById = async (req: Request<DoctorsParamsDto>, res: Response<Full
     message: string
 }>): Promise<void> => {
     const id = req.params.id;
-    const loggedUser = req.user!;
 
     if (!id) {
         res.status(400).send({message: "Missing id parameter"})

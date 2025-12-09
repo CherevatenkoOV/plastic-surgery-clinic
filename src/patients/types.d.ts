@@ -12,15 +12,28 @@ export interface FullPatientDto extends FullUserBase{
 
 export type CreatePatientBody = Omit<Patient, "userId">;
 
+export interface UpdatePatientDto {
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    phone?: string | null;
+}
+
 export type UpdatePatientData = Partial<Omit<Patient, "userId">>
 
 export type UpdatePatientBody = UpdatePatientData & UpdateUserDto;
 
-export interface PatientsParams {
+export interface PatientsParamsDto {
     id?: string;
 }
 
-export type PatientFilter = Pick<Patient, "userId">
+// NOTE: maybe is deprecated. check it
+// export type PatientFilter = Pick<Patient, "userId">
+
+export interface FullPatientFilter {
+    firstName?: string;
+    lastName?: string;
+}
+
 
 
 

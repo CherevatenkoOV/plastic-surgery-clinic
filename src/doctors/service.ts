@@ -28,7 +28,7 @@ export class Service {
         return mergeUserWithRole(user, doctor)
     }
 
-    // NODE: done
+    // NOTE: done
     static async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
         const {firstName, lastName, specialization, schedule} = doctorData
         const updatedUser = await UserService.update(id, {firstName, lastName})
@@ -39,19 +39,8 @@ export class Service {
 
     static async delete(id: string): Promise<void> {
         await ServiceHelper.deleteDoctorData(id)
-        await UserServiceHelper.deleteUserData(id)
+        await UserService.remove(id)
     }
-
-    // NOTE: previous version
-    // static async deleteDoctor(req: Request): Promise<void> {
-    //     const userId = req.params.id ?? req.user!.id;
-    //
-    //     const [user] = await UserServiceHelper.getBasicInfo({id: userId})
-    //     if (user!.role !== Role.DOCTOR) throw new Error("The specified ID does not belong to the doctor. Please check the ID.")
-    //
-    //     await ServiceHelper.deleteDoctorData(userId)
-    //     await UserServiceHelper.deleteUserData(userId)
-    // }
 
     static async getAppointments(req: Request): Promise<Appointment[] | undefined> {
         const loggedUser = req.user!;
@@ -210,6 +199,7 @@ export class ServiceHelper {
     static async deleteDoctorData(userId: string): Promise<void> {
         const doctors = await ServiceHelper.getDoctorsData();
         const updatedDoctors = doctors.filter(doctor => doctor.userId !== userId)
+
         await fs.writeFile(
             paths.DOCTORS,
             JSON.stringify(updatedDoctors),

@@ -1,6 +1,6 @@
 import express, {Router} from 'express';
 import {
-    getAll, getById, remove, update
+    deleteById, deleteMe, getAll, getById, getMe, updateById, updateMe
 } from "./patients-controller.js";
 import {validateRequest} from "../shared/middleware/validate-request.js";
 import {patientIdSchema, searchPatientSchema, updatePatientSchema} from "./validation.js";
@@ -11,6 +11,20 @@ import {getAppointments} from "../doctors/doctors-controller.js";
 
 const router: Router = express.Router();
 
+router.get('/me',
+    validateRequest(patientIdSchema, 'params'),
+    authenticate,
+    authorize([Role.PATIENT]),
+    getMe
+)
+
+router.get('/:id',
+    validateRequest(patientIdSchema, 'params'),
+    authenticate,
+    authorize([Role.DOCTOR, Role.ADMIN]),
+    getById
+)
+
 router.get('/',
     validateRequest(searchPatientSchema, 'query'),
     authenticate,
@@ -18,49 +32,34 @@ router.get('/',
     getAll
 )
 
-router.get('/me',
-    validateRequest(patientIdSchema, 'params'),
-    authenticate,
-    authorize([Role.PATIENT]),
-    getById
-)
-
 router.patch('/me',
     validateRequest(patientIdSchema, 'params'),
     validateRequest(updatePatientSchema, 'body'),
     authenticate,
     authorize([Role.PATIENT]),
-    update
+    updateMe
 )
-
-router.delete('/me',
-    validateRequest(patientIdSchema, 'params'),
-    authenticate,
-    authorize([Role.PATIENT]),
-    remove
-)
-
-router.get('/:id',
-    validateRequest(patientIdSchema, 'params'),
-    authenticate,
-    authorize([Role.ADMIN, Role.DOCTOR]),
-    getById
-)
-
 
 router.patch('/:id',
     validateRequest(patientIdSchema, 'params'),
     validateRequest(updatePatientSchema, 'body'),
     authenticate,
     authorize([Role.ADMIN]),
-    update
+    updateById
+)
+
+router.delete('/me',
+    validateRequest(patientIdSchema, 'params'),
+    authenticate,
+    authorize([Role.PATIENT]),
+    deleteMe
 )
 
 router.delete('/:id',
     validateRequest(patientIdSchema, 'params'),
     authenticate,
-    authorize([Role.ADMIN]),
-    remove
+    authorize([Role.PATIENT]),
+    deleteById
 )
 
 router.get('/me/appointments',

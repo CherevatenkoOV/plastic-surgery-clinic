@@ -28,7 +28,7 @@ router.get('/me',
 
 router.get('/:id',
     authenticate,
-    authorize([Role.DOCTOR]),
+    authorize([Role.PATIENT, Role.ADMIN]),
     getById
 )
 
