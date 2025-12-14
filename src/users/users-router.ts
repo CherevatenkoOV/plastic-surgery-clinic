@@ -1,27 +1,25 @@
-import express, {Router} from "express";
+import {Router} from "express";
 import {
-    getAll, getByEmail,
-    getById,
-    remove,
-    update,
+    UserController,
 } from "./users-controller.js";
 import {authenticate} from "../shared/middleware/authenticate.js";
 import {authorize} from "../shared/middleware/authorize.js";
 import {Role} from "../shared/roles.js";
-import {getMe} from "../doctors/doctors-controller.js";
 
-const router: Router = express.Router();
+export function createUserRouter (userController: UserController) {
+    const router = Router();
+    router.get('/', authenticate, authorize([Role.ADMIN]), userController.getAll)
+    router.get('/:id', authenticate, authorize([Role.ADMIN]), userController.getById)
 
-router.get('/', authenticate, authorize([Role.ADMIN]), getAll)
-router.get('/:id', authenticate, authorize([Role.ADMIN]), getById)
-router.get('/me', authenticate, authorize([Role.DOCTOR]), getMe)
+    router.get('/by-email', authenticate, authorize([Role.ADMIN]), userController.getByEmail)
 
-router.get('/by-email', authenticate, authorize([Role.ADMIN]), getByEmail)
+// router.post('/', authenticate, authorize([Role.ADMIN]), userController.create)
 
-// router.post('/', authenticate, authorize([Role.ADMIN]), create)
+    router.patch('/:id', authenticate, authorize([Role.ADMIN]), userController.update)
 
-router.patch('/:id', authenticate, authorize([Role.ADMIN]), update)
+    router.delete('/:id', authenticate, authorize([Role.ADMIN]), userController.remove)
 
-router.delete('/:id', authenticate, authorize([Role.ADMIN]), remove)
+    return router;
+}
 
-export default router;
+

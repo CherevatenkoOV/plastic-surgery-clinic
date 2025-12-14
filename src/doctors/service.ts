@@ -1,6 +1,6 @@
 import {Request} from "express";
 import {Doctor, DoctorsQueryDto, FullDoctorDto, FullDoctorFilter, UpdateDoctorData, UpdateDoctorDto} from "./types.js";
-import {Service as UserService} from "../users/service.js"
+import {UserService as UserService} from "../users/service.js"
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"

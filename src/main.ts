@@ -5,6 +5,7 @@ import {errorHandler} from "./shared/middleware/error-handler.js";
 import {appointmentsRoutes} from "./appointments/index.js";
 import {usersRoutes} from "./users/index.js";
 import {authRoutes} from "./auth/index.js";
+import {userRouter} from "./di.js";
 
 const app: Application = express()
 const PORT = process.env.PORT
@@ -14,7 +15,7 @@ app.use(express.json())
 app.use('/doctors', doctorsRoutes)
 app.use('/patients', patientsRoutes)
 app.use('/appointments', appointmentsRoutes)
-app.use('/users', usersRoutes)
+app.use('/users', userRouter)
 app.use('/auth', authRoutes)
 
 app.use(errorHandler)

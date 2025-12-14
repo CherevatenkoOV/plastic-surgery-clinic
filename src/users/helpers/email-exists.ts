@@ -1,5 +1,5 @@
 import {User} from "../types.js";
-import {Service as UserService} from "../service.js"
+import {UserService as UserService} from "../service.js"
 
 export async function emailExists(email: string) {
     try {

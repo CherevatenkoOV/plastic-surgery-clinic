@@ -7,7 +7,7 @@ import {
     Patient, UpdatePatientData,
     UpdatePatientDto
 } from "./types.js";
-import {Service as UserService} from "../users/service.js"
+import {UserService as UserService} from "../users/service.js"
 import {Appointment} from "../appointments/types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js";
 import {mergeUsersWithRoles} from "../shared/helpers/merge-users-with-roles.js";

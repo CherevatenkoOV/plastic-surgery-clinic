@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import {Service as UserService} from "../users/service.js";
+import {UserService as UserService} from "../users/service.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js";
 import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js";
 import {ServiceHelper as PatientServiceHelper} from "../patients/service.js";
@@ -73,7 +73,7 @@ export class Service {
         const user = await UserService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
 
         const {specialization, schedule} = registerInfo
-    
+
         await DoctorServiceHelper.createDoctorData({
             userId: user.id,
             specialization: specialization ?? null,
