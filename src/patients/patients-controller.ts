@@ -7,14 +7,9 @@ import {Appointment} from "../appointments/types.js";
 
 // NOTE: done
 export const getAll = async (req: Request, res: Response<FullPatientDto[] | { message: string }>): Promise<void> => {
-    const loggedUser = req.user
+    const filter = req.query
 
-    if (!loggedUser) {
-        res.status(401).send({message: "User not authenticated"})
-        return
-    }
-
-    const patients = await Service.get()
+    const patients = await Service.get(filter)
 
     if (!patients.length) {
         res.status(404).send({message: "Patients not found"})

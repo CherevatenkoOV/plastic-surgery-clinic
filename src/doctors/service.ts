@@ -1,9 +1,8 @@
 import {Request} from "express";
 import {Doctor, DoctorsQueryDto, FullDoctorDto, FullDoctorFilter, UpdateDoctorData, UpdateDoctorDto} from "./types.js";
-import {Service as UserService, ServiceHelper as UserServiceHelper} from "../users/service.js"
+import {Service as UserService} from "../users/service.js"
 import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
-import {Role} from "../shared/roles.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
@@ -12,7 +11,6 @@ import {mergeUsersWithRoles} from "../shared/helpers/merge-users-with-roles.js";
 import {mergeUserWithRole} from "../shared/helpers/merge-user-with-role.js";
 
 export class Service {
-    // NOTE: done
     static async get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]> {
         const {specialization, firstName, lastName} = filter ?? {}
 
@@ -21,14 +19,12 @@ export class Service {
         return mergeUsersWithRoles(users, doctors)
     }
 
-    // NOTE: done
-    static async getById(userId: string): Promise<FullDoctorDto> {
+    static async getById(userId: string): Promise<FullDoctorDto | undefined> {
         const doctor = await ServiceHelper.getDoctorDataById(userId)
         const user = await UserService.getById(userId)
         return mergeUserWithRole(user, doctor)
     }
 
-    // NOTE: done
     static async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
         const {firstName, lastName, specialization, schedule} = doctorData
         const updatedUser = await UserService.update(id, {firstName, lastName})
@@ -104,13 +100,13 @@ export class ServiceHelper {
         let filteredDoctors = doctors;
         if (filter?.specialization) filteredDoctors = filteredDoctors.filter((d: Doctor) => d.specialization?.toLowerCase() === filter.specialization?.toLowerCase())
 
-        if (!filteredDoctors.length) throw new Error("The specified doctor were not found")
+        if (!filteredDoctors.length) throw new Error("The specified doctor(s) were not found")
 
         return filteredDoctors
     }
 
     // NOTE: done
-    static async getDoctorDataById(id: string): Promise<Doctor> {
+    static async getDoctorDataById(id: string): Promise<Doctor | undefined> {
         const doctors = await this.getDoctorsData()
         const targetDoctor = doctors.find(d => d.userId === id)
         if(!targetDoctor)  throw new Error("The specified doctor was not found")
@@ -118,27 +114,6 @@ export class ServiceHelper {
         return targetDoctor
     }
 
-    // NOTE: previous version
-    // static async getDoctorsData(filter?: DoctorFilter, query?: DoctorsQuery): Promise<Doctor[]> {
-    //     const doctorsData = await fs.readFile(paths.DOCTORS, {encoding: "utf-8"})
-    //     const doctors = JSON.parse(doctorsData)
-    //
-    //     if (filter) {
-    //         if ('userId' in filter) return doctors.filter((d: Doctor) => d.userId === filter.userId)
-    //     }
-    //
-    //     if (query) {
-    //         let filtered = doctors;
-    //
-    //         if ('specialization' in query) {
-    //             filtered = filtered.filter((d: Doctor) => d.specialization === query.specialization)
-    //         }
-    //
-    //         return filtered
-    //     }
-    //
-    //     return doctors
-    // }
 
     static async createDoctorData(doctorData: Doctor): Promise<Doctor> {
         const {userId, specialization, schedule} = doctorData;

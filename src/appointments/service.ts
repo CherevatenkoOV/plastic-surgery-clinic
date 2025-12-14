@@ -1,72 +1,64 @@
-import {Request} from "express";
 import fs from "node:fs/promises";
 
 import {randomUUID} from "node:crypto";
 import {
     Appointment,
-    AppointmentsParams,
-    AppointmentsQuery,
-    CreateAppointmentData,
-    CreateAppointmentBody,
-    UpdateAppointmentBody, UpdateAppointmentData
+    AppointmentsFilter,
+    CreateAppointmentDto,
+    UpdateAppointmentDto,
 } from "./types.js";
 import {paths} from "../shared/paths.js";
 import {checkAppointmentTime} from "./helpers/check-appointment-time.js";
 
 export class Service {
-    static async getAppointments(req: Request): Promise<Appointment[]> {
-        return await ServiceHelper.getAppointmentsData(req.query);
+    static async get(filter?: AppointmentsFilter): Promise<Appointment[]> {
+        return await ServiceHelper.getAppointmentsData(filter)
     }
 
-    static async getAppointmentById(req: Request): Promise<Appointment | undefined> {
-        return await ServiceHelper.getAppointmentDataById(req.params.id as string);
+    static async getById(id: string): Promise<Appointment | undefined> {
+        return await ServiceHelper.getAppointmentDataById(id);
     }
 
-    static async createAppointment(req: Request<{}, unknown, CreateAppointmentBody>): Promise<Appointment> {
-        return await ServiceHelper.createAppointmentData(req.body)
+    static async create(appointmentData: CreateAppointmentDto): Promise<Appointment> {
+        return await ServiceHelper.createAppointmentData(appointmentData)
     }
 
-    static async updateAppointment(req: Request<AppointmentsParams, unknown, UpdateAppointmentBody>) {
-        return await ServiceHelper.updateAppointmentData(req.params.id, req.body)
+    static async update(id: string, appointmentData: UpdateAppointmentDto) {
+        return await ServiceHelper.updateAppointmentData(id, appointmentData)
     }
 
-    static async deleteAppointment(req: Request<AppointmentsParams>): Promise<void> {
-        await ServiceHelper.deleteAppointmentData(req.params.id)
+    static async delete (id: string): Promise<void> {
+        await ServiceHelper.deleteAppointmentData(id)
     }
+
 }
 
 export class ServiceHelper {
 
-    static async getAppointmentsData(query?: AppointmentsQuery): Promise<Appointment[]> {
-
-        try {
+    static async getAppointmentsData(filter?: AppointmentsFilter): Promise<Appointment[]> {
             const data: string = await fs.readFile(paths.APPOINTMENTS, {encoding: "utf-8"})
             const appointments: Appointment[] = JSON.parse(data)
 
-            if (!query) return appointments;
+            if (!filter || Object.keys(filter).length === 0) return appointments;
 
-            const {doctorId, patientId} = query;
+            let filteredAppointments = appointments
+            if(filter?.doctorId) filteredAppointments = filteredAppointments.filter((a: Appointment) => a.doctorId?.toLowerCase() === filter.doctorId?.toLowerCase())
+            if(filter?.patientId) filteredAppointments = filteredAppointments.filter((a: Appointment) => a.patientId?.toLowerCase() === filter.patientId?.toLowerCase())
 
-            if (doctorId) {
-                return appointments.filter((appointment: Appointment) => appointment.doctorId === doctorId)
-            } else if (patientId) {
-                return appointments.filter((appointment: Appointment) => appointment.patientId === patientId)
-            } else {
-                return appointments
-            }
+            if(!filteredAppointments.length) throw new Error("Appointments were not found")
 
-        } catch (err) {
-            throw new Error(`Something went wrong while reading appointments.json. Err: ${err}`)
-        }
-
+            return filteredAppointments
     }
 
-    static async getAppointmentDataById(id: string, appointments?: Appointment[]): Promise<Appointment | undefined> {
-        const data: Appointment[] = appointments ?? await this.getAppointmentsData();
-        return data.find((appointment: Appointment) => appointment.id === id)
+    static async getAppointmentDataById(id: string): Promise<Appointment | undefined> {
+        const appointments = await this.getAppointmentsData()
+        const targetAppointment = appointments.find(a => a.id === id)
+        if(!targetAppointment) throw new Error("The specified appointment was not found")
+
+        return targetAppointment
     }
 
-    static async createAppointmentData(appointmentData: CreateAppointmentData) {
+    static async createAppointmentData(appointmentData: CreateAppointmentDto) {
         const appointments = await ServiceHelper.getAppointmentsData();
 
         const isAvailable = checkAppointmentTime(appointmentData, appointments);
@@ -99,7 +91,7 @@ export class ServiceHelper {
         return newAppointment;
     }
 
-    static async updateAppointmentData(id: string, appointmentData: UpdateAppointmentData) {
+    static async updateAppointmentData(id: string, appointmentData: UpdateAppointmentDto) {
         const appointments = await ServiceHelper.getAppointmentsData();
         const targetAppointment = appointments.find((appointment: Appointment) => appointment.id === id)
 

@@ -10,7 +10,9 @@ export interface FullPatientDto extends FullUserBase{
     roleData: PatientDto | undefined
 }
 
-export type CreatePatientBody = Omit<Patient, "userId">;
+export interface CreatePatientDto {
+    phone: string | null;
+}
 
 export interface UpdatePatientDto {
     firstName?: string | undefined;

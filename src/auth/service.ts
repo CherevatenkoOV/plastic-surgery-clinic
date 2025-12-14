@@ -1,30 +1,30 @@
-import {Request} from "express";
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import {Service as UserService} from "../users/service.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js";
 import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js";
 import {ServiceHelper as PatientServiceHelper} from "../patients/service.js";
 import {
     AuthTokens,
-    ChangePasswordBody,
-    Credentials,
-    FullRegisterInfo, RecoverPasswordBody, RecoverPasswordParams,
-    ResetPasswordBody,
+    UpdatePasswordDto,
+    FullRegisterInfo, RecoverPasswordDto,
+    ResetPasswordDto,
 } from "./types.js";
-import {CreateDoctorBody} from "../doctors/types.js";
-import {CreatePatientBody} from "../patients/types.js";
 import {Role} from "../shared/roles.js";
-import {User} from "../users/types.js";
+import {User, CreateCredentialsDto} from "../users/types.js";
+import {emailExists} from "../users/helpers/email-exists.js";
 
 export class Service {
-    static async register(req: Request<{}, unknown, FullRegisterInfo>): Promise<AuthTokens | null> {
-        const {firstName, lastName, role, email, password} = req.body;
+    static async register(registerData: FullRegisterInfo): Promise<AuthTokens | null> {
+        const {firstName, lastName, role, email, password} = registerData;
 
-        if (await ServiceHelper.checkEmailExists(email)) throw new Error("User with specified email already exists.")
+        // NOTE: checkEmailExists maybe should be replaced to helpers
+        if (await emailExists(email)) throw new Error("User with specified email already exists.")
 
-        const user = await UserServiceHelper.createUserData({firstName, lastName, role})
-        await ServiceHelper.saveCredentials({email, password}, user)
+        const hashedPassword = await this.hashPassword(password)
+
+        const user = await UserService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
 
         switch (role) {
             case Role.DOCTOR:
@@ -33,7 +33,7 @@ export class Service {
                 break;
 
             case Role.PATIENT:
-                const {phone} = req.body as CreatePatientBody
+                const {phone} = registerData
                 await PatientServiceHelper.createPatientData({
                     userId: user.id,
                     phone
@@ -44,11 +44,15 @@ export class Service {
                 throw new Error(`Unknown role: ${role}`)
         }
 
-        return ServiceHelper.generateTokens({id: user.id});
+        const tokens = this.generateTokens({id: user.id})
+
+        await UserServiceHelper.updateCredentialsData(user.id, {refreshToken: tokens.refreshToken})
+
+        return tokens
     }
 
-    static async registerByToken(req: Request<{ token: string }, unknown, FullRegisterInfo>): Promise<AuthTokens> {
-        const token = req.params.token;
+    static async registerByToken(token: string, registerInfo: FullRegisterInfo): Promise<AuthTokens> {
+
         const secret: string = process.env.RESET_PASSWORD_JWT as string;
 
         let email;
@@ -60,51 +64,48 @@ export class Service {
             throw new Error("Wrong token.")
         }
 
-        const {firstName, lastName, role, password} = req.body;
+        const {firstName, lastName, role, password} = registerInfo;
 
-        if (await ServiceHelper.checkEmailExists(email)) throw new Error("User with specified email already exists.")
+        if (await UserService.emailExists(email)) throw new Error("User with specified email already exists.")
 
-        const user = await UserServiceHelper.createUserData({firstName, lastName, role})
-        await ServiceHelper.saveCredentials({email, password}, user)
+        const hashedPassword = await this.hashPassword(password)
 
-        const {specialization, schedule} = req.body as CreateDoctorBody
+        const user = await UserService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
 
+        const {specialization, schedule} = registerInfo
+    
         await DoctorServiceHelper.createDoctorData({
             userId: user.id,
             specialization: specialization ?? null,
             schedule: schedule ?? null
         })
 
-        return ServiceHelper.generateTokens({id: user.id});
+        return Service.generateTokens({id: user.id});
     }
 
-    static async login(req: Request<{}, unknown, Credentials>): Promise<AuthTokens> {
-        const {email, password} = req.body;
+    static async login(credentials: CreateCredentialsDto): Promise<AuthTokens> {
+        const {email, password} = credentials;
 
-        const [user] = await UserServiceHelper.getBasicInfo({email: email})
+        const user = await UserService.getByEmail(email)
+        if(!user!.auth.password) throw new Error("User with specified email doesn't have the password. Please contact the support team.")
 
         const passwordMatch: boolean = await bcrypt.compare(password, user!.auth.password)
         if (!passwordMatch) throw new Error("Wrong password")
 
-        const tokens = ServiceHelper.generateTokens({id: user!.id, role: user!.role})
-        await ServiceHelper.saveRefreshToken(user!.id, tokens.refreshToken)
+        const tokens = Service.generateTokens({id: user!.id, role: user!.role})
+        await UserServiceHelper.updateCredentialsData(user!.id, {refreshToken: tokens.refreshToken})
 
         return tokens
     }
 
-    static async logout(req: Request): Promise<void> {
-        const userId = req.user!.id;
-
-        const [user] = await UserServiceHelper.getBasicInfo({id: userId})
-        delete user!.auth.refreshToken;
-
-        await UserServiceHelper.saveUserData(user!)
+    static async logout(id: string): Promise<void> {
+        await UserServiceHelper.updateCredentialsData(id, {refreshToken: undefined})
     }
 
-    static async recoverPassword(req: Request<RecoverPasswordParams, unknown, RecoverPasswordBody>): Promise<void> {
-        const {resetToken} = req.params;
+    static async recoverPassword(resetToken: string, newPasswordData: RecoverPasswordDto): Promise<void> {
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string;
+
         let email;
         try {
             const decoded = jwt.verify(resetToken, secret) as { email: string };
@@ -113,39 +114,36 @@ export class Service {
             throw new Error("Wrong token.")
         }
 
-        const [user] = await UserServiceHelper.getBasicInfo({email})
+        const user = await UserService.getByEmail(email)
 
-        const {newPassword, confirmPassword} = req.body;
+        const {newPassword, confirmPassword} = newPasswordData;
         if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
 
-        const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS)
-        if (!saltRounds) throw new Error("Salt rounds not found")
-        user!.auth.password = await bcrypt.hash(newPassword, saltRounds);
-
-        await UserServiceHelper.saveUserData(user!)
+        const hashedPassword = await this.hashPassword(newPassword)
+        await UserServiceHelper.updateCredentialsData(user!.id, {password: hashedPassword})
     }
 
-    static async updatePassword(req: Request<{}, unknown, ChangePasswordBody>): Promise<void> {
-        const {email, oldPassword, newPassword, confirmPassword} = req.body;
-
-        const [user] = await UserServiceHelper.getBasicInfo({email})
+    static async updatePassword(newPasswordData: UpdatePasswordDto): Promise<void> {
+        const {email, oldPassword, newPassword, confirmPassword} = newPasswordData;
+        const user = await UserService.getByEmail(email)
 
         const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, user!.auth.password)
+
         if (!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
 
         if (oldPassword === newPassword) throw new Error("You have entered your current password in the \"new password\" field. ")
 
         if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
 
-        const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
-        user!.auth.password = await bcrypt.hash(newPassword, salt)
+        const hashedPassword = await this.hashPassword(newPassword)
 
-        await UserServiceHelper.saveUserData(user!)
+        await UserServiceHelper.updateCredentialsData(user!.id, {password: hashedPassword} )
     }
-    static async resetPassword(req: Request<{}, unknown, ResetPasswordBody>): Promise<string> {
-        const {email} = req.body;
 
-        const [user] = await UserServiceHelper.getBasicInfo({email})
+    static async resetPassword(requestResetData: ResetPasswordDto): Promise<string> {
+        const {email} = requestResetData;
+
+        const user = await UserService.getByEmail(email)
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string
         const token = jwt.sign({email}, secret, {expiresIn: '15m'})
@@ -185,35 +183,12 @@ export class Service {
 
         return token;
     }
-}
 
-export class ServiceHelper {
-
-    static async saveCredentials(credentialsData: Credentials, user: User) {
-        const {email, password} = credentialsData;
-
+    static async hashPassword(password: string): Promise<string> {
         const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
-        const hashedPassword: string = await bcrypt.hash(password, salt)
-
-        user.auth = {
-            email,
-            password: hashedPassword
-        }
-
-        await UserServiceHelper.saveUserData(user!)
-
+        return await bcrypt.hash(password, salt)
     }
 
-    static async checkEmailExists(email: string) {
-        try {
-                const users = await UserServiceHelper.getBasicInfo()
-            return users.some((u: User) => u.auth.email === email)
-        } catch (e) {
-            throw new Error(`Something went wrong with checkEmailExists function. Err: ${e}`)
-        }
-    }
-
-    // NOTE: CHECKED
     static generateTokens(payload: JwtPayload) {
         const accessTokenKey = process.env.ACCESS_TOKEN_SECRET;
         const refreshTokenKey = process.env.REFRESH_TOKEN_SECRET;
@@ -226,10 +201,25 @@ export class ServiceHelper {
         return {accessToken, refreshToken}
     }
 
-    static async saveRefreshToken(id: string, refreshToken: string) {
-        const [user] = await UserServiceHelper.getBasicInfo({id})
+}
 
-        user!.auth.refreshToken = refreshToken;
-        await UserServiceHelper.saveUserData(user!)
-    }
+
+//------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+export class ServiceHelper {
+
+
+
+
+
+
 }

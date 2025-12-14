@@ -1,7 +1,7 @@
-import {Appointment, CreateAppointmentData} from "../types.js";
+import {Appointment, CreateAppointmentDto} from "../types.js";
 
 
-export const checkAppointmentTime = (newAppointment: CreateAppointmentData, appointments: Appointment[]) => {
+export const checkAppointmentTime = (newAppointment: CreateAppointmentDto, appointments: Appointment[]) => {
     const {doctorId, timeISO} = newAppointment;
 
     if(timeISO < new Date().toISOString()) {

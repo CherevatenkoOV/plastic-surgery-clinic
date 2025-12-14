@@ -1,4 +1,4 @@
-import {UpdateUserDto, UserDto, FullUserBase} from "../users/types.js";
+import {FullUserBase} from "../users/types.js";
 
 
 export interface Doctor {
@@ -19,7 +19,10 @@ export interface ScheduleItem {
     end: string;
 }
 
-export type CreateDoctorBody = Omit<Doctor, "userId">;
+export interface CreateDoctorDto {
+    specialization: string | null;
+    schedule: ScheduleItem[] | [];
+}
 
 export type UpdateDoctorData = Partial<Omit<Doctor, "userId">>
 
@@ -43,10 +46,6 @@ export interface DoctorInviteToken {
     inviteToken: string;
 }
 
-// NOTE: maybe is deprecated. check it
-export type DoctorFilter = Partial<Pick<Doctor, "specialization">>
-
-// export type FullDoctorFilter = DoctorFilter & UserFilter
 export interface FullDoctorFilter {
     specialization?: string;
     firstName?: string;

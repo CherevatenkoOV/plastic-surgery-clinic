@@ -26,7 +26,7 @@ export class Service {
     }
 
     // NOTE: done
-    static async getById(userId: string): Promise<FullPatientDto> {
+    static async getById(userId: string): Promise<FullPatientDto | undefined> {
         const doctor = await ServiceHelper.getPatientDataById(userId)
         const user = await UserService.getById(userId)
         return mergeUserWithRole(user, doctor)
@@ -63,7 +63,7 @@ export class ServiceHelper {
     }
 
     // NOTE: done
-    static async getPatientDataById(id: string): Promise<Patient> {
+    static async getPatientDataById(id: string): Promise<Patient | undefined> {
         const patients = await this.getPatientsData()
         const targetPatient = patients.find(p => p.userId === id)
         if(!targetPatient) throw new Error("The specified patient was not found")
