@@ -2,33 +2,33 @@ import fs from "node:fs/promises";
 import {paths} from "../shared/paths.js";
 import {CreateUserDto, UpdateUserDto, User, UserDto, UserFilter, CredentialsDto} from "./types.js";
 import {randomUUID} from "node:crypto";
-import {UserRepository} from "./repository/user-repository.js";
+import {IUsersRepository} from "./repository/i-users-repository.js";
 
-export class UserService {
-    constructor(private readonly userRepo: UserRepository) {}
+export class UsersService {
+    constructor(private readonly usersRepo: IUsersRepository) {}
 
     async get(filter?: UserFilter): Promise<User[]> {
-        return await this.userRepo.find(filter)
+        return await this.usersRepo.find(filter)
     }
 
     async getById(id: string): Promise<User | undefined> {
-        return await this.userRepo.findById(id)
+        return await this.usersRepo.findById(id)
     }
 
     async getByEmail(email: string): Promise<User | undefined> {
-        return await this.userRepo.findByEmail(email)
+        return await this.usersRepo.findByEmail(email)
     }
 
     async create(userData: CreateUserDto): Promise<User> {
-        return await this.userRepo.create(userData)
-    }
-    async update(id: string, userData: UpdateUserDto): Promise<User | undefined> {
-       return await this.userRepo.updateProfile(id, userData)
+        return await this.usersRepo.create(userData)
     }
 
+    async update(id: string, userData: UpdateUserDto): Promise<User | undefined> {
+       return await this.usersRepo.updateProfile(id, userData)
+    }
 
     async remove(id: string): Promise<void> {
-        await this.userRepo.delete(id)
+        await this.usersRepo.delete(id)
     }
 
     async emailExists(email: string): Promise<boolean> {
@@ -36,9 +36,6 @@ export class UserService {
     }
 }
 
-export class ServiceHelper {
-
-}
 
 
 

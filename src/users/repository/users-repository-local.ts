@@ -1,11 +1,11 @@
-import {UserRepository} from "./user-repository.js";
+import {IUsersRepository} from "./i-users-repository.js";
 import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserDto, UserFilter} from "../types.js";
 import fs from "node:fs/promises";
 import {paths} from "../../shared/paths.js";
-import {ServiceHelper} from "../service.js";
 import {randomUUID} from "node:crypto";
 
-export class UserRepositoryLocal implements UserRepository {
+
+export class UsersRepositoryLocal implements IUsersRepository {
     private users: User[] = []
 
     async find(filter?: UserFilter): Promise<User[]> {

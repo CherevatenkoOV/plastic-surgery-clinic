@@ -1,6 +1,6 @@
 import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserFilter} from "../types.js";
 
-export interface UserRepository {
+export interface IUsersRepository {
     find(filter?: UserFilter): Promise<User[]>;
     findById(id: string): Promise<User>;
     findByEmail(email: string): Promise<User>;

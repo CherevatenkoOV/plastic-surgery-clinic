@@ -1,49 +1,62 @@
 import {Request} from "express";
-import {Doctor, DoctorsQueryDto, FullDoctorDto, FullDoctorFilter, UpdateDoctorData, UpdateDoctorDto} from "./types.js";
-import {UserService as UserService} from "../users/service.js"
-import fs from "node:fs/promises";
-import {paths} from "../shared/paths.js";
+import {FullDoctorDto, FullDoctorFilter, UpdateDoctorDto} from "./types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import {mergeUsersWithRoles} from "../shared/helpers/merge-users-with-roles.js";
 import {mergeUserWithRole} from "../shared/helpers/merge-user-with-role.js";
+import {IDoctorsRepository} from "./repository/i-doctors-repository.js";
+import {UsersService} from "../users/service.js";
 
-export class Service {
-    static async get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]> {
+export interface IDoctorsService {
+    get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]>;
+    getById(userId: string): Promise<FullDoctorDto | undefined>;
+    update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto>;
+    delete(id: string): Promise<void>;
+    getAppointments(req: Request): Promise<Appointment[] | undefined>;
+    sendInviteDoctor(req: Request): Promise<string>;
+}
+
+export class DoctorsService {
+    constructor(
+        private readonly doctorsRepo: IDoctorsRepository,
+        private readonly usersService: UsersService
+    ){}
+
+      async get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]> {
         const {specialization, firstName, lastName} = filter ?? {}
 
-        const doctors = await ServiceHelper.getDoctorsData({specialization})
-        const users = await UserService.get({firstName, lastName})
+        const doctors = await this.doctorsRepo.find({specialization})
+        const users = await this.usersService.get({firstName, lastName})
         return mergeUsersWithRoles(users, doctors)
     }
 
-    static async getById(userId: string): Promise<FullDoctorDto | undefined> {
-        const doctor = await ServiceHelper.getDoctorDataById(userId)
-        const user = await UserService.getById(userId)
+      async getById(userId: string): Promise<FullDoctorDto | undefined> {
+        const doctor = await this.doctorsRepo.findById(userId)
+        const user = await this.usersService.getById(userId)
         return mergeUserWithRole(user, doctor)
     }
 
-    static async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
+      async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
         const {firstName, lastName, specialization, schedule} = doctorData
-        const updatedUser = await UserService.update(id, {firstName, lastName})
-        const updatedDoctor = await ServiceHelper.updateDoctorData(id, {specialization, schedule})
+        const updatedUser = await this.usersService.update(id, {firstName, lastName})
+        const updatedDoctor = await this.doctorsRepo.update(id, {specialization, schedule})
 
         return mergeUserWithRole(updatedUser, updatedDoctor)
     }
 
-    static async delete(id: string): Promise<void> {
-        await ServiceHelper.deleteDoctorData(id)
-        await UserService.remove(id)
+      async delete(id: string): Promise<void> {
+        await this.doctorsRepo.delete(id)
+        await this.usersService.remove(id)
     }
 
-    static async getAppointments(req: Request): Promise<Appointment[] | undefined> {
+      async getAppointments(req: Request): Promise<Appointment[] | undefined> {
         const loggedUser = req.user!;
         return await AppointmentServiceHelper.getAppointmentsData({doctorId: loggedUser.id})
     }
 
-    static async sendInviteDoctor(req: Request): Promise<string> {
+     async sendInviteDoctor(req: Request): Promise<string> {
         const email = req.body.email;
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string
@@ -87,99 +100,4 @@ export class Service {
 
         return token
     }
-}
-
-// NOTE: refactored
-export class ServiceHelper {
-    static async getDoctorsData(filter?: DoctorsQueryDto): Promise<Doctor[]> {
-        const doctorsData = await fs.readFile(paths.DOCTORS, {encoding: "utf-8"})
-        const doctors = JSON.parse(doctorsData)
-
-        if (!filter || Object.keys(filter).length === 0) return doctors
-
-        let filteredDoctors = doctors;
-        if (filter?.specialization) filteredDoctors = filteredDoctors.filter((d: Doctor) => d.specialization?.toLowerCase() === filter.specialization?.toLowerCase())
-
-        if (!filteredDoctors.length) throw new Error("The specified doctor(s) were not found")
-
-        return filteredDoctors
-    }
-
-    // NOTE: done
-    static async getDoctorDataById(id: string): Promise<Doctor | undefined> {
-        const doctors = await this.getDoctorsData()
-        const targetDoctor = doctors.find(d => d.userId === id)
-        if(!targetDoctor)  throw new Error("The specified doctor was not found")
-
-        return targetDoctor
-    }
-
-
-    static async createDoctorData(doctorData: Doctor): Promise<Doctor> {
-        const {userId, specialization, schedule} = doctorData;
-
-        const doctors = await ServiceHelper.getDoctorsData();
-        if (doctors.find(d => d.userId === userId)) throw new Error("Doctor with specified userId already exists")
-
-        const newDoctor = {
-            userId,
-            specialization,
-            schedule
-        }
-
-        doctors.push(newDoctor)
-        await fs.writeFile(
-            paths.DOCTORS,
-            JSON.stringify(doctors),
-            {encoding: 'utf-8'},
-        )
-
-        return newDoctor
-    }
-
-    static async updateDoctorData(userId: string, doctorData: UpdateDoctorData): Promise<Doctor> {
-        const doctors = await ServiceHelper.getDoctorsData();
-        const targetDoctor = doctors.find((d) => d.userId === userId)
-        let doctor: Doctor;
-
-        if (!targetDoctor) {
-            doctor = await ServiceHelper.createDoctorData({
-                userId,
-                specialization: doctorData.specialization ?? null,
-                schedule: doctorData.schedule ?? [],
-            })
-
-            return doctor
-
-        } else {
-            doctor = {
-                userId,
-                specialization: doctorData.specialization ?? null,
-                schedule: doctorData.schedule ?? [],
-            }
-
-            const index = doctors.findIndex((doctor) => doctor.userId === userId);
-            doctors[index] = doctor;
-
-            await fs.writeFile(
-                paths.DOCTORS,
-                JSON.stringify(doctors),
-                {encoding: 'utf-8'},
-            )
-
-            return doctor;
-        }
-    }
-
-    static async deleteDoctorData(userId: string): Promise<void> {
-        const doctors = await ServiceHelper.getDoctorsData();
-        const updatedDoctors = doctors.filter(doctor => doctor.userId !== userId)
-
-        await fs.writeFile(
-            paths.DOCTORS,
-            JSON.stringify(updatedDoctors),
-            {encoding: 'utf-8'},
-        )
-    }
-
 }

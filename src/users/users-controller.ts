@@ -3,18 +3,17 @@ import {
     UsersParams,
     UpdateUserDto, UserDto
 } from "./types.js";
-import {UserService} from "./service.js";
-import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js"
+import {UsersService} from "./service.js";
 import {ServiceHelper as PatientServiceHelper} from "../patients/service.js"
 import {Role} from "../shared/roles.js";
 import {sanitizeUsers} from "./helpers/sanitize-users.js";
 import {sanitizeUser} from "./helpers/sanitize-user.js";
 
-export class UserController {
-    constructor(private readonly userService: UserService){}
+export class UsersController {
+    constructor(private readonly usersService: UsersService){}
 
     async getAll(req: Request, res: Response<UserDto[]>): Promise<void> {
-        const users = await this.userService.get();
+        const users = await this.usersService.get();
         const publicUsers = sanitizeUsers(users)
 
         res.status(200).send(publicUsers)
@@ -22,7 +21,7 @@ export class UserController {
 
     async getById(req: Request<UsersParams>, res: Response<UserDto | { message: string }>): Promise<void> {
         const id = req.params.id;
-        const user = await this.userService.getById(id)
+        const user = await this.usersService.getById(id)
 
         const publicUser = sanitizeUser(user!)
 
@@ -33,7 +32,7 @@ export class UserController {
         message: string
     }>): Promise<void> {
         const email = req.query.email
-        const user = await this.userService.getByEmail(email)
+        const user = await this.usersService.getByEmail(email)
 
         const publicUser = sanitizeUser(user!)
         res.status(200).send(publicUser)
@@ -45,7 +44,7 @@ export class UserController {
         const id = req.params.id;
         const userData = req.body;
 
-        const updatedUser = await this.userService.update(id, userData);
+        const updatedUser = await this.usersService.update(id, userData);
         if (!updatedUser) {
             res.status(404).send({message: "User with specified id was not found"})
             return
@@ -62,7 +61,7 @@ export class UserController {
         if (role === Role.DOCTOR) await DoctorServiceHelper.deleteDoctorData(id)
         if (role === Role.PATIENT) await PatientServiceHelper.deletePatientData(id)
 
-        await this.userService.remove(id)
+        await this.usersService.remove(id)
         res.status(204).send({message: "User was successfully deleted"})
     }
 }

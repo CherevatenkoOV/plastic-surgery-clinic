@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import {UserService as UserService} from "../users/service.js";
+import {UsersService as UserService} from "../users/service.js";
 import {ServiceHelper as UserServiceHelper} from "../users/service.js";
 import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js";
 import {ServiceHelper as PatientServiceHelper} from "../patients/service.js";
