@@ -3,8 +3,8 @@ import {Doctor, DoctorsQueryDto, UpdateDoctorData} from "../types.js";
 import fs from "node:fs/promises";
 import {paths} from "../../shared/paths.js";
 
-export class DoctorsRepositoryLocal implements IDoctorsRepository {
-    private doctors: Doctor[] = [];
+export class DoctorsRepositoryFile implements IDoctorsRepository {
+
     async find(filter?: DoctorsQueryDto): Promise<Doctor[]> {
         const doctorsData = await fs.readFile(paths.DOCTORS, {encoding: "utf-8"})
         const doctors = JSON.parse(doctorsData)

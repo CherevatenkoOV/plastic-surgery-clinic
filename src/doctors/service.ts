@@ -9,15 +9,6 @@ import {mergeUserWithRole} from "../shared/helpers/merge-user-with-role.js";
 import {IDoctorsRepository} from "./repository/i-doctors-repository.js";
 import {UsersService} from "../users/service.js";
 
-export interface IDoctorsService {
-    get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]>;
-    getById(userId: string): Promise<FullDoctorDto | undefined>;
-    update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto>;
-    delete(id: string): Promise<void>;
-    getAppointments(req: Request): Promise<Appointment[] | undefined>;
-    sendInviteDoctor(req: Request): Promise<string>;
-}
-
 export class DoctorsService {
     constructor(
         private readonly doctorsRepo: IDoctorsRepository,

@@ -2,119 +2,115 @@ import {
     FullPatientDto, PatientsParamsDto, UpdatePatientBody
 } from "./types.js";
 import {Request, Response} from "express";
-import {Service} from "./service.js";
 import {Appointment} from "../appointments/types.js";
+import {PatientsService} from "./service.js";
 
-// NOTE: done
-export const getAll = async (req: Request, res: Response<FullPatientDto[] | { message: string }>): Promise<void> => {
-    const filter = req.query
+export class PatientsController {
+    constructor(private readonly patientsService: PatientsService){}
 
-    const patients = await Service.get(filter)
+    async getAll  (req: Request, res: Response<FullPatientDto[] | { message: string }>): Promise<void> {
+        const filter = req.query
 
-    if (!patients.length) {
-        res.status(404).send({message: "Patients not found"})
-        return
+        const patients = await this.patientsService.get(filter)
+
+        if (!patients.length) {
+            res.status(404).send({message: "Patients not found"})
+            return
+        }
+
+        res.status(200).send(patients)
     }
 
-    res.status(200).send(patients)
-}
 
-// NOTE: done
-export const getById = async (req: Request<PatientsParamsDto>, res: Response<FullPatientDto | {
-    message: string
-}>): Promise<void> => {
-    const id = req.params.id
+    async getById  (req: Request<PatientsParamsDto>, res: Response<FullPatientDto | {
+        message: string
+    }>): Promise<void> {
+        const id = req.params.id
 
-    if (!id) {
-        res.status(400).send({message: "Missing id parameter"})
-        return
+        if (!id) {
+            res.status(400).send({message: "Missing id parameter"})
+            return
+        }
+
+        const patient = await this.patientsService.getById(id)
+
+        if (!patient) {
+            res.status(404).send({message: "Patient was not found"})
+            return
+        }
+
+        res.status(200).send(patient)
     }
 
-    const patient = await Service.getById(id)
+    async getMe  (req: Request, res: Response<FullPatientDto | { message: string }>): Promise<void> {
+        const loggedUser = req.user!
+        const id = loggedUser.id
 
-    if (!patient) {
-        res.status(404).send({message: "Patient was not found"})
-        return
+        if (!id) {
+            res.status(400).send({message: "Missing id parameter"})
+            return
+        }
+
+        const patient = await this.patientsService.getById(id)
+
+        if (!patient) {
+            res.status(404).send({message: "Patient was not found"})
+            return
+        }
+
+        res.status(200).send(patient)
     }
 
-    res.status(200).send(patient)
-}
+    async updateById  (req: Request<PatientsParamsDto, unknown, UpdatePatientBody>, res: Response<FullPatientDto | {
+        message: string
+    }>): Promise<void> {
+        const id = req.params.id!
+        if (!id) {
+            res.status(400).send({message: "Missing id parameter"})
+            return
+        }
+        const patientData = req.body
 
-// NOTE: done
-export const getMe = async (req: Request, res: Response<FullPatientDto | { message: string }>): Promise<void> => {
-    const loggedUser = req.user!
-    const id = loggedUser.id
-
-    if (!id) {
-        res.status(400).send({message: "Missing id parameter"})
-        return
+        const updatedPatient = await this.patientsService.update(id, patientData)
+        res.status(200).send(updatedPatient)
     }
 
-    const patient = await Service.getById(id)
+    async updateMe  (req: Request<unknown, unknown, UpdatePatientBody>, res: Response<FullPatientDto | {
+        message: string
+    }>): Promise<void> {
+        const loggedUser = req.user!
+        const patientData = req.body
 
-    if (!patient) {
-        res.status(404).send({message: "Patient was not found"})
-        return
+
+        const updatedPatient = await this.patientsService.update(loggedUser.id, patientData)
+        res.status(200).send(updatedPatient)
     }
 
-    res.status(200).send(patient)
-}
+    async deleteMe (req: Request<PatientsParamsDto>, res: Response<boolean | {
+        message: string
+    }>): Promise<void> {
+        const loggedUser = req.user!
 
-// NOTE: done
-export const updateById = async (req: Request<PatientsParamsDto, unknown, UpdatePatientBody>, res: Response<FullPatientDto | {
-    message: string
-}>): Promise<void> => {
-    const id = req.params.id!
-    if (!id) {
-        res.status(400).send({message: "Missing id parameter"})
-        return
-    }
-    const patientData = req.body
-
-    const updatedPatient = await Service.update(id, patientData)
-    res.status(200).send(updatedPatient)
-}
-
-// NOTE: done
-export const updateMe = async (req: Request<unknown, unknown, UpdatePatientBody>, res: Response<FullPatientDto | {
-    message: string
-}>): Promise<void> => {
-    const loggedUser = req.user!
-    const patientData = req.body
-
-
-    const updatedPatient = await Service.update(loggedUser.id, patientData)
-    res.status(200).send(updatedPatient)
-}
-
-// NOTE: done
-export const deleteMe = async (req: Request<PatientsParamsDto>, res: Response<boolean | {
-    message: string
-}>): Promise<void> => {
-    const loggedUser = req.user!
-
-    await Service.delete(loggedUser.id)
-    res.status(204).send(true)
-}
-
-// NOTE: done
-export const deleteById = async (req: Request<PatientsParamsDto>, res: Response<boolean | {
-    message: string
-}>): Promise<void> => {
-    const id = req.params.id
-    if (!id) {
-        res.status(400).send({message: "Missing id parameter"})
-        return
+        await this.patientsService.delete(loggedUser.id)
+        res.status(204).send(true)
     }
 
-    await Service.delete(id)
-    res.status(204).send(true)
+    async deleteById (req: Request<PatientsParamsDto>, res: Response<boolean | {
+        message: string
+    }>): Promise<void> {
+        const id = req.params.id
+        if (!id) {
+            res.status(400).send({message: "Missing id parameter"})
+            return
+        }
+
+        await this.patientsService.delete(id)
+        res.status(204).send(true)
+    }
+
+    async getAppointments  (req: Request, res: Response<Appointment[]>): Promise<void> {
+        const appointments = await this.patientsService.getAppointments(req)
+        res.status(200).send(appointments)
+    }
+
 }
-
-
-export const getAppointments = async (req: Request, res: Response<Appointment[]>): Promise<void> => {
-    const appointments = await Service.getAppointments(req)
-    res.status(200).send(appointments)
-}
-
-

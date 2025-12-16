@@ -1,10 +1,10 @@
 import {Request, Response} from "express";
 import {DoctorInviteToken, DoctorsParamsDto, FullDoctorDto, UpdateDoctorDto} from "./types.js";
-import {DoctorsService, IDoctorsService} from "./service.js";
+import {DoctorsService} from "./service.js";
 import {Appointment} from "../appointments/types.js";
 
 export class DoctorsController {
-    constructor(private readonly doctorsService: IDoctorsService) {}
+    constructor(private readonly doctorsService: DoctorsService) {}
 
     async getAll(req: Request, res: Response<FullDoctorDto[] | { message: string }>): Promise<void> {
         const filter = req.query

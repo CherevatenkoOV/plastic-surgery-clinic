@@ -5,8 +5,7 @@ import {paths} from "../../shared/paths.js";
 import {randomUUID} from "node:crypto";
 
 
-export class UsersRepositoryLocal implements IUsersRepository {
-    private users: User[] = []
+export class UsersRepositoryFile implements IUsersRepository {
 
     async find(filter?: UserFilter): Promise<User[]> {
         const data: string = await fs.readFile(paths.USERS, {encoding: "utf-8"})
