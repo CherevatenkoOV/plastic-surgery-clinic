@@ -1,2 +1,2 @@
-import router from "./patients-router.js";
-export {router as patientsRoutes};
+// import router from "./patients-router.js";
+// export {router as patientsRoutes};

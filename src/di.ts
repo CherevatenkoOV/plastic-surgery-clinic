@@ -13,18 +13,21 @@ import {createPatientsRouter} from "./patients/patients-router.js";
 
 
 const usersRepository = new UsersRepositoryFile()
-const usersService = new UsersService(usersRepository)
-const usersController = new UsersController(usersService)
-const usersRouter = createUsersRouter(usersController)
-
 const doctorsRepository = new DoctorsRepositoryFile()
-const doctorsService = new DoctorsService(doctorsRepository, usersService)
-const doctorsController = new DoctorsController(doctorsService)
-const doctorsRouter = createDoctorsRouter(doctorsController)
-
 const patientsRepository = new PatientsRepositoryFile()
+
+
+const usersService = new UsersService(usersRepository, doctorsRepository, patientsRepository)
+const doctorsService = new DoctorsService(doctorsRepository, usersService)
 const patientsService = new PatientsService(patientsRepository, usersService)
+
+const usersController = new UsersController(usersService)
+const doctorsController = new DoctorsController(doctorsService)
 const patientsController = new PatientsController(patientsService)
+
+
+const usersRouter = createUsersRouter(usersController)
+const doctorsRouter = createDoctorsRouter(doctorsController)
 const patientsRouter = createPatientsRouter(patientsController)
 
 export {usersRouter, doctorsRouter, patientsRouter}

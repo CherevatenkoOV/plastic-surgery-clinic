@@ -51,7 +51,7 @@ export class PatientsService {
     // NOTE: done
     async delete(id: string): Promise<void> {
         await this.patientsRepo.delete(id)
-        await this.usersService.remove(id)
+        await this.usersService.delete(id)
     }
 
     async getAppointments(req: Request): Promise<Appointment[] | undefined> {

@@ -17,7 +17,7 @@ export function createUsersRouter (usersController: UsersController) {
 
     router.patch('/:id', authenticate, authorize([Role.ADMIN]), usersController.update)
 
-    router.delete('/:id', authenticate, authorize([Role.ADMIN]), usersController.remove)
+    router.delete('/:id', authenticate, authorize([Role.ADMIN]), usersController.delete)
 
     return router;
 }

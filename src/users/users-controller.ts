@@ -4,7 +4,6 @@ import {
     UpdateUserDto, UserDto
 } from "./types.js";
 import {UsersService} from "./service.js";
-import {ServiceHelper as PatientServiceHelper} from "../patients/service.js"
 import {Role} from "../shared/roles.js";
 import {sanitizeUsers} from "./helpers/sanitize-users.js";
 import {sanitizeUser} from "./helpers/sanitize-user.js";
@@ -54,14 +53,10 @@ export class UsersController {
         res.status(200).send(publicUser)
     }
 
-    async remove(req: Request<UsersParams>, res: Response<{ message: string }>): Promise<void> {
+    async delete(req: Request<UsersParams>, res: Response<{ message: string }>): Promise<void> {
         const id = req.params.id
-        const role = req.user!.role
 
-        if (role === Role.DOCTOR) await DoctorServiceHelper.deleteDoctorData(id)
-        if (role === Role.PATIENT) await PatientServiceHelper.deletePatientData(id)
-
-        await this.usersService.remove(id)
+        await this.usersService.delete(id)
         res.status(204).send({message: "User was successfully deleted"})
     }
 }
