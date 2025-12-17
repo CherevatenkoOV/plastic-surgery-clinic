@@ -20,11 +20,11 @@ export interface ScheduleItem {
 }
 
 export interface CreateDoctorDto {
+    userId: string;
     specialization: string | null;
     schedule: ScheduleItem[] | [];
 }
 
-export type UpdateDoctorData = Partial<Omit<Doctor, "userId">>
 
 
 export interface UpdateDoctorDto {

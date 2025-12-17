@@ -1,8 +1,7 @@
 import express, {Application} from 'express'
 import {errorHandler} from "./shared/middleware/error-handler.js";
 import {appointmentsRoutes} from "./appointments/index.js";
-import {authRoutes} from "./auth/index.js";
-import {doctorsRouter, usersRouter, patientsRouter} from "./di.js";
+import {doctorsRouter, usersRouter, patientsRouter, authRouter} from "./di.js";
 
 const app: Application = express()
 const PORT = process.env.PORT
@@ -13,7 +12,7 @@ app.use('/doctors', doctorsRouter)
 app.use('/patients', patientsRouter)
 app.use('/appointments', appointmentsRoutes)
 app.use('/users', usersRouter)
-app.use('/auth', authRoutes)
+app.use('/auth', authRouter)
 
 app.use(errorHandler)
 

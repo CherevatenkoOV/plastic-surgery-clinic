@@ -1,5 +1,5 @@
 import {IDoctorsRepository} from "./i-doctors-repository.js";
-import {Doctor, DoctorsQueryDto, UpdateDoctorData} from "../types.js";
+import {CreateDoctorDto, Doctor, DoctorsQueryDto, UpdateDoctorDto} from "../types.js";
 import fs from "node:fs/promises";
 import {paths} from "../../shared/paths.js";
 
@@ -27,7 +27,7 @@ export class DoctorsRepositoryFile implements IDoctorsRepository {
         return targetDoctor
     }
 
-    async create(doctorData: Doctor): Promise<Doctor> {
+    async create(doctorData: Doctor): Promise<CreateDoctorDto> {
         const {userId, specialization, schedule} = doctorData;
 
         const doctors = await this.find();
@@ -49,7 +49,7 @@ export class DoctorsRepositoryFile implements IDoctorsRepository {
         return newDoctor
     }
 
-    async update(userId: string, doctorData: UpdateDoctorData): Promise<Doctor> {
+    async update(userId: string, doctorData: UpdateDoctorDto): Promise<Doctor> {
         const doctors = await this.find();
         const targetDoctor = doctors.find((d) => d.userId === userId)
         let doctor: Doctor;

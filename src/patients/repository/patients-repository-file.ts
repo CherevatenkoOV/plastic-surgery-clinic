@@ -1,4 +1,4 @@
-import {Patient, UpdatePatientData} from "../types.js";
+import {CreatePatientDto, Patient, UpdatePatientDto} from "../types.js";
 import {IPatientsRepository} from "./i-patients-repository.js";
 import fs from "node:fs/promises";
 import {paths} from "../../shared/paths.js";
@@ -18,7 +18,7 @@ export class PatientsRepositoryFile implements IPatientsRepository {
         return targetPatient
     }
 
-    async create(patientData: Patient): Promise<Patient> {
+    async create(patientData: CreatePatientDto): Promise<Patient> {
         const {userId, phone} = patientData;
 
         const patients = await this.find();
@@ -40,7 +40,7 @@ export class PatientsRepositoryFile implements IPatientsRepository {
     }
 
 
-    async update(userId: string, patientData: UpdatePatientData): Promise<Patient> {
+    async update(userId: string, patientData: UpdatePatientDto): Promise<Patient> {
         const patients = await this.find();
         const targetPatient = patients.find((p: Patient) => p.userId === userId)
         let patient: Patient;

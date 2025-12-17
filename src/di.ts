@@ -10,6 +10,9 @@ import {PatientsRepositoryFile} from "./patients/repository/patients-repository-
 import {PatientsService} from "./patients/service.js";
 import {PatientsController} from "./patients/patients-controller.js";
 import {createPatientsRouter} from "./patients/patients-router.js";
+import { AuthService } from "./auth/service.js";
+import {AuthController} from "./auth/auth-controller.js";
+import {createAuthRouter} from "./auth/auth-router.js";
 
 
 const usersRepository = new UsersRepositoryFile()
@@ -20,14 +23,16 @@ const patientsRepository = new PatientsRepositoryFile()
 const usersService = new UsersService(usersRepository, doctorsRepository, patientsRepository)
 const doctorsService = new DoctorsService(doctorsRepository, usersService)
 const patientsService = new PatientsService(patientsRepository, usersService)
+const authService = new AuthService(usersService, doctorsService, patientsService)
 
 const usersController = new UsersController(usersService)
 const doctorsController = new DoctorsController(doctorsService)
 const patientsController = new PatientsController(patientsService)
-
+const authController = new AuthController(authService)
 
 const usersRouter = createUsersRouter(usersController)
 const doctorsRouter = createDoctorsRouter(doctorsController)
 const patientsRouter = createPatientsRouter(patientsController)
+const authRouter = createAuthRouter(authController)
 
-export {usersRouter, doctorsRouter, patientsRouter}
+export {usersRouter, doctorsRouter, patientsRouter, authRouter}

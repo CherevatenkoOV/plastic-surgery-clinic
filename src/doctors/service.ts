@@ -1,5 +1,5 @@
 import {Request} from "express";
-import {FullDoctorDto, FullDoctorFilter, UpdateDoctorDto} from "./types.js";
+import {CreateDoctorDto, Doctor, FullDoctorDto, FullDoctorFilter, UpdateDoctorDto} from "./types.js";
 import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
@@ -13,9 +13,14 @@ export class DoctorsService {
     constructor(
         private readonly doctorsRepo: IDoctorsRepository,
         private readonly usersService: UsersService
-    ){}
+    ) {
+    }
 
-      async get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]> {
+    async create(doctorData: CreateDoctorDto): Promise<Doctor> {
+        return await this.doctorsRepo.create(doctorData)
+    }
+
+    async get(filter?: FullDoctorFilter): Promise<FullDoctorDto[]> {
         const {specialization, firstName, lastName} = filter ?? {}
 
         const doctors = await this.doctorsRepo.find({specialization})
@@ -23,13 +28,13 @@ export class DoctorsService {
         return mergeUsersWithRoles(users, doctors)
     }
 
-      async getById(userId: string): Promise<FullDoctorDto | undefined> {
+    async getById(userId: string): Promise<FullDoctorDto | undefined> {
         const doctor = await this.doctorsRepo.findById(userId)
         const user = await this.usersService.getById(userId)
         return mergeUserWithRole(user, doctor)
     }
 
-      async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
+    async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
         const {firstName, lastName, specialization, schedule} = doctorData
         const updatedUser = await this.usersService.update(id, {firstName, lastName})
         const updatedDoctor = await this.doctorsRepo.update(id, {specialization, schedule})
@@ -37,17 +42,17 @@ export class DoctorsService {
         return mergeUserWithRole(updatedUser, updatedDoctor)
     }
 
-      async delete(id: string): Promise<void> {
+    async delete(id: string): Promise<void> {
         await this.doctorsRepo.delete(id)
         await this.usersService.delete(id)
     }
 
-      async getAppointments(req: Request): Promise<Appointment[] | undefined> {
+    async getAppointments(req: Request): Promise<Appointment[] | undefined> {
         const loggedUser = req.user!;
         return await AppointmentServiceHelper.getAppointmentsData({doctorId: loggedUser.id})
     }
 
-     async sendInviteDoctor(req: Request): Promise<string> {
+    async sendInviteDoctor(req: Request): Promise<string> {
         const email = req.body.email;
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string

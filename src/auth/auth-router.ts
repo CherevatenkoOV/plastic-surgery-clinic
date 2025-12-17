@@ -1,24 +1,24 @@
-import express, {Router} from "express";
+import  {Router} from "express";
 import {
-    login,
-    logout, recoverPassword,
-    register,
-    registerByToken,
-    resetPassword, updatePassword
+    AuthController
 } from "./auth-controller.js";
 import {authenticate} from "../shared/middleware/authenticate.js";
 
-const router: Router = express.Router();
+export function createAuthRouter(authController: AuthController) {
+    const router = Router()
 
-router.post('/register/patient', register)
-router.post('/register/doctor/:token', registerByToken)
-router.post('/login', login)
-router.post('/logout', authenticate, logout)
 
-router.post('/reset', resetPassword)
-router.patch('/recover/:resetToken', recoverPassword)
+router.post('/register/patient', authController.register)
+router.post('/register/doctor/:token', authController.registerByToken)
+router.post('/login', authController.login)
+router.post('/logout', authenticate, authController.logout)
 
-router.patch('/update-password', authenticate, updatePassword)
+router.post('/reset', authController.resetPassword)
+router.patch('/recover/:resetToken', authController.recoverPassword)
 
-export default router;
+router.patch('/update-password', authenticate, authController.updatePassword)
 
+return router;
+
+
+}

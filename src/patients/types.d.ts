@@ -11,6 +11,7 @@ export interface FullPatientDto extends FullUserBase{
 }
 
 export interface CreatePatientDto {
+    userId: string;
     phone: string | null;
 }
 
@@ -20,7 +21,7 @@ export interface UpdatePatientDto {
     phone?: string | null;
 }
 
-export type UpdatePatientData = Partial<Omit<Patient, "userId">>
+
 
 export type UpdatePatientBody = UpdatePatientData & UpdateUserDto;
 

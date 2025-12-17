@@ -21,7 +21,7 @@ export class UsersRepositoryFile implements IUsersRepository {
         return users
     }
 
-     async findById(id: string): Promise<User> {
+    async findById(id: string): Promise<User> {
         const users = await this.find()
         const targetUser = users.find((u) => u.id === id)
         if (!targetUser) throw new Error("User with specified id was not found")
@@ -29,7 +29,7 @@ export class UsersRepositoryFile implements IUsersRepository {
         return targetUser
     }
 
-     async findByEmail(email: string): Promise<User> {
+    async findByEmail(email: string): Promise<User> {
         const users = await this.find()
         const targetUser = users.find((u: User) => u.auth.email === email.toLowerCase())
         if (!targetUser) throw new Error("User with specified email was not found")
@@ -37,7 +37,7 @@ export class UsersRepositoryFile implements IUsersRepository {
         return targetUser
     }
 
-     async create(userData: CreateUserDto): Promise<User> {
+    async create(userData: CreateUserDto): Promise<User> {
         const {firstName, lastName, role, auth} = userData;
         const users = await this.find();
 
@@ -66,7 +66,7 @@ export class UsersRepositoryFile implements IUsersRepository {
         return createdUser
     }
 
-     async updateProfile(id: string, data: UpdateUserDto): Promise<User> {
+    async updateProfile(id: string, data: UpdateUserDto): Promise<User> {
         const {firstName, lastName} = data;
         const user = await this.findById(id);
         const users = await this.find();
@@ -98,7 +98,7 @@ export class UsersRepositoryFile implements IUsersRepository {
     }
 
     // NOTE: this one should only save the credentials (with hashedPassword) without checking. subtle layer
-     async updateCredentialsData(id: string, credentials: CredentialsDto): Promise<User> {
+    async updateCredentials(id: string, credentials: CredentialsDto): Promise<User> {
         const {email, password, refreshToken} = credentials;
         const user = await this.findById(id);
         const users = await this.find();
@@ -129,7 +129,7 @@ export class UsersRepositoryFile implements IUsersRepository {
         return updatedUser
     }
 
-     async delete(id: string): Promise<void> {
+    async delete(id: string): Promise<void> {
         const users = await this.find();
         const updatedUsers = users.filter((user: User) => user.id !== id)
 

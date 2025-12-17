@@ -1,22 +1,28 @@
 import {Request, Response} from "express";
-import {Service} from "./service.js";
 import {
     AuthTokens,
     UpdatePasswordDto,
     ResetPasswordDto, FullRegisterInfo, RecoverPasswordParams, RecoverPasswordDto
 } from "./types.js";
 import {CreateCredentialsDto} from "../users/types.js";
+import {Service} from "../appointments/service.js";
+import {AuthService} from "./service.js";
 
-export const register = async (req: Request<{}, unknown, FullRegisterInfo>, res: Response<{message: string}>): Promise<void> => {
-    const registerData = req.body
+export class AuthController {
+    constructor(private readonly authService: AuthService){}
 
-    const tokens = await Service.register(registerData);
+    async register (req: Request<{}, unknown, FullRegisterInfo>, res: Response<{
+        message: string
+    }>): Promise<void> {
+        const registerData = req.body
 
-    // TODO: check this code in PostMan. Probably redundant
-    if(!tokens) {
-        res.status(201).send({message: "A problem occurred while generating tokens"})
-        return
-    }
+        const tokens = await this.authService.register(registerData);
+
+        // TODO: check this code in PostMan. Probably redundant
+        if (!tokens) {
+            res.status(201).send({message: "A problem occurred while generating tokens"})
+            return
+        }
 
         res.cookie('refreshToken', tokens!.refreshToken, {
             secure: true,
@@ -25,67 +31,69 @@ export const register = async (req: Request<{}, unknown, FullRegisterInfo>, res:
         })
 
         res.status(201).send({message: "New user was registered successfully"})
-}
+    }
 
-export const registerByToken = async (req: Request<{token: string}, unknown, FullRegisterInfo>, res: Response<{message: string}>): Promise<void> => {
-    const token = req.params.token;
-    const registerInfo = req.body
+    registerByToken = async (req: Request<{ token: string }, unknown, FullRegisterInfo>, res: Response<{
+        message: string
+    }>): Promise<void> => {
+        const token = req.params.token;
+        const registerInfo = req.body
 
-    const tokens = await Service.registerByToken(token, registerInfo);
+        const tokens = await this.authService.registerByToken(token, registerInfo);
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-        secure: true,
-        httpOnly: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000
-    })
+        res.cookie('refreshToken', tokens.refreshToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        })
 
-    res.status(201).send({message: "New user was registered successfully with using invite token"})
-}
+        res.status(201).send({message: "New user was registered successfully with using invite token"})
+    }
 
-export const login = async (req: Request<{}, unknown, CreateCredentialsDto>, res: Response<AuthTokens>): Promise<void> => {
-    const credentials = req.body
+    login = async (req: Request<{}, unknown, CreateCredentialsDto>, res: Response<AuthTokens>): Promise<void> => {
+        const credentials = req.body
 
-    const tokens = await Service.login(credentials)
+        const tokens = await this.authService.login(credentials)
 
-    res.status(201).send(tokens)
-}
+        res.status(201).send(tokens)
+    }
 
-export const logout = async (req: Request, res: Response): Promise<void> => {
-    const loggedUser = req.user!
+    logout = async (req: Request, res: Response): Promise<void> => {
+        const loggedUser = req.user!
 
-    await Service.logout(loggedUser.id);
+        await this.authService.logout(loggedUser.id);
 
-    res.sendStatus(200)
-}
+        res.sendStatus(200)
+    }
 
-export const updatePassword = async (req: Request<{}, unknown, UpdatePasswordDto>, res: Response<{
-    message: string
-}>): Promise<void> => {
-    const newPasswordData = req.body
+    updatePassword = async (req: Request<{}, unknown, UpdatePasswordDto>, res: Response<{
+        message: string
+    }>): Promise<void> => {
+        const newPasswordData = req.body
 
-    await Service.updatePassword(newPasswordData)
+        await this.authService.updatePassword(newPasswordData)
 
-    res.status(200).send({message: "Password was changed successfully"})
-}
+        res.status(200).send({message: "Password was changed successfully"})
+    }
 
+    resetPassword = async (req: Request<{}, unknown, ResetPasswordDto>, res: Response<{
+        message: string
+    }>): Promise<void> => {
+        const requestResetData = req.body
 
-export const resetPassword = async (req: Request<{}, unknown, ResetPasswordDto>, res: Response<{
-    message: string
-}>): Promise<void> => {
-    const requestResetData = req.body
+        await this.authService.resetPassword(requestResetData)
 
-    await Service.resetPassword(requestResetData)
+        res.status(200).send({message: "Link for changing password was sent to email"})
+    }
 
-    res.status(200).send({message: "Link for changing password was sent to email"})
-}
+    recoverPassword = async (req: Request<RecoverPasswordParams, unknown, RecoverPasswordDto>, res: Response<{
+        message: string
+    }>): Promise<void> => {
+        const resetToken = req.params.resetToken;
+        const newPasswordData = req.body
 
-export const recoverPassword = async (req: Request<RecoverPasswordParams, unknown, RecoverPasswordDto>, res: Response<{
-    message: string
-}>): Promise<void> => {
-    const resetToken = req.params.resetToken;
-    const newPasswordData = req.body
+        await this.authService.recoverPassword(resetToken, newPasswordData)
 
-    await Service.recoverPassword(resetToken, newPasswordData)
-
-    res.status(200).send({message: "New password was set successfully"})
+        res.status(200).send({message: "New password was set successfully"})
+    }
 }

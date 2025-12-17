@@ -1,10 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import {UsersService as UserService} from "../users/service.js";
-import {ServiceHelper as UserServiceHelper} from "../users/service.js";
-import {ServiceHelper as DoctorServiceHelper} from "../doctors/service.js";
-import {ServiceHelper as PatientServiceHelper} from "../patients/service.js";
+import {UsersService, UsersService as UserService} from "../users/service.js";
 import {
     AuthTokens,
     UpdatePasswordDto,
@@ -13,18 +10,24 @@ import {
 } from "./types.js";
 import {Role} from "../shared/roles.js";
 import {User, CreateCredentialsDto} from "../users/types.js";
-import {emailExists} from "../users/helpers/email-exists.js";
+import {DoctorsService} from "../doctors/service.js";
+import {PatientsService} from "../patients/service.js";
 
-export class Service {
-    static async register(registerData: FullRegisterInfo): Promise<AuthTokens | null> {
+export class AuthService {
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly doctorsService: DoctorsService,
+        private readonly patientsService: PatientsService
+    ) {}
+
+    async register(registerData: FullRegisterInfo): Promise<AuthTokens | null> {
         const {firstName, lastName, role, email, password} = registerData;
 
-        // NOTE: checkEmailExists maybe should be replaced to helpers
-        if (await emailExists(email)) throw new Error("User with specified email already exists.")
+        if (await this.usersService.emailExists(email)) throw new Error("User with specified email already exists.")
 
         const hashedPassword = await this.hashPassword(password)
 
-        const user = await UserService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
+        const user = await this.usersService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
 
         switch (role) {
             case Role.DOCTOR:
@@ -34,7 +37,7 @@ export class Service {
 
             case Role.PATIENT:
                 const {phone} = registerData
-                await PatientServiceHelper.createPatientData({
+                await this.patientsService.create({
                     userId: user.id,
                     phone
                 })
@@ -44,14 +47,15 @@ export class Service {
                 throw new Error(`Unknown role: ${role}`)
         }
 
+
         const tokens = this.generateTokens({id: user.id})
 
-        await UserServiceHelper.updateCredentialsData(user.id, {refreshToken: tokens.refreshToken})
+        await this.usersService.updateCredentials(user.id, {refreshToken: tokens.refreshToken})
 
         return tokens
     }
 
-    static async registerByToken(token: string, registerInfo: FullRegisterInfo): Promise<AuthTokens> {
+    async registerByToken(token: string, registerInfo: FullRegisterInfo): Promise<AuthTokens> {
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string;
 
@@ -66,43 +70,43 @@ export class Service {
 
         const {firstName, lastName, role, password} = registerInfo;
 
-        if (await UserService.emailExists(email)) throw new Error("User with specified email already exists.")
+        if (await this.usersService.emailExists(email)) throw new Error("User with specified email already exists.")
 
         const hashedPassword = await this.hashPassword(password)
 
-        const user = await UserService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
+        const user = await this.usersService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
 
         const {specialization, schedule} = registerInfo
 
-        await DoctorServiceHelper.createDoctorData({
+        await this.doctorsService.create({
             userId: user.id,
             specialization: specialization ?? null,
             schedule: schedule ?? null
         })
 
-        return Service.generateTokens({id: user.id});
+        return this.generateTokens({id: user.id});
     }
 
-    static async login(credentials: CreateCredentialsDto): Promise<AuthTokens> {
+    async login(credentials: CreateCredentialsDto): Promise<AuthTokens> {
         const {email, password} = credentials;
 
-        const user = await UserService.getByEmail(email)
+        const user = await this.usersService.getByEmail(email)
         if(!user!.auth.password) throw new Error("User with specified email doesn't have the password. Please contact the support team.")
 
         const passwordMatch: boolean = await bcrypt.compare(password, user!.auth.password)
         if (!passwordMatch) throw new Error("Wrong password")
 
-        const tokens = Service.generateTokens({id: user!.id, role: user!.role})
-        await UserServiceHelper.updateCredentialsData(user!.id, {refreshToken: tokens.refreshToken})
+        const tokens = this.generateTokens({id: user!.id, role: user!.role})
+        await this.usersService.updateCredentials(user!.id, {refreshToken: tokens.refreshToken})
 
         return tokens
     }
 
-    static async logout(id: string): Promise<void> {
-        await UserServiceHelper.updateCredentialsData(id, {refreshToken: undefined})
+    async logout(id: string): Promise<void> {
+        await this.usersService.updateCredentials(id, {refreshToken: undefined})
     }
 
-    static async recoverPassword(resetToken: string, newPasswordData: RecoverPasswordDto): Promise<void> {
+    async recoverPassword(resetToken: string, newPasswordData: RecoverPasswordDto): Promise<void> {
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string;
 
@@ -114,18 +118,18 @@ export class Service {
             throw new Error("Wrong token.")
         }
 
-        const user = await UserService.getByEmail(email)
+        const user = await this.usersService.getByEmail(email)
 
         const {newPassword, confirmPassword} = newPasswordData;
         if (newPassword !== confirmPassword) throw new Error("Password confirmation failed. Please make sure both passwords match.")
 
         const hashedPassword = await this.hashPassword(newPassword)
-        await UserServiceHelper.updateCredentialsData(user!.id, {password: hashedPassword})
+        await this.usersService.updateCredentials(user!.id, {password: hashedPassword})
     }
 
-    static async updatePassword(newPasswordData: UpdatePasswordDto): Promise<void> {
+    async updatePassword(newPasswordData: UpdatePasswordDto): Promise<void> {
         const {email, oldPassword, newPassword, confirmPassword} = newPasswordData;
-        const user = await UserService.getByEmail(email)
+        const user = await this.usersService.getByEmail(email)
 
         const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, user!.auth.password)
 
@@ -137,13 +141,13 @@ export class Service {
 
         const hashedPassword = await this.hashPassword(newPassword)
 
-        await UserServiceHelper.updateCredentialsData(user!.id, {password: hashedPassword} )
+        await this.usersService.updateCredentials(user!.id, {password: hashedPassword} )
     }
 
-    static async resetPassword(requestResetData: ResetPasswordDto): Promise<string> {
+    async resetPassword(requestResetData: ResetPasswordDto): Promise<string> {
         const {email} = requestResetData;
 
-        const user = await UserService.getByEmail(email)
+        const user = await this.usersService.getByEmail(email)
 
         const secret: string = process.env.RESET_PASSWORD_JWT as string
         const token = jwt.sign({email}, secret, {expiresIn: '15m'})
@@ -184,12 +188,12 @@ export class Service {
         return token;
     }
 
-    static async hashPassword(password: string): Promise<string> {
+    async hashPassword(password: string): Promise<string> {
         const salt = Number(process.env!.BCRYPT_SALT_ROUNDS ?? 10);
         return await bcrypt.hash(password, salt)
     }
 
-    static generateTokens(payload: JwtPayload) {
+    generateTokens(payload: JwtPayload) {
         const accessTokenKey = process.env.ACCESS_TOKEN_SECRET;
         const refreshTokenKey = process.env.REFRESH_TOKEN_SECRET;
 
@@ -200,26 +204,5 @@ export class Service {
 
         return {accessToken, refreshToken}
     }
-
-}
-
-
-//------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-export class ServiceHelper {
-
-
-
-
-
 
 }

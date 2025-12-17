@@ -1,4 +1,4 @@
-import {CreateUserDto, UpdateUserDto, User, UserFilter} from "./types.js";
+import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserFilter} from "./types.js";
 import {IUsersRepository} from "./repository/i-users-repository.js";
 import {Role} from "../shared/roles.js";
 import {IDoctorsRepository} from "../doctors/repository/i-doctors-repository.js";
@@ -49,6 +49,10 @@ export class UsersService {
 
     async emailExists(email: string): Promise<boolean> {
         return !!(await this.getByEmail(email));
+    }
+
+    async updateCredentials(id: string, credentials: CredentialsDto): Promise<User> {
+        return await this.usersRepo.updateCredentials(id, credentials)
     }
 }
 

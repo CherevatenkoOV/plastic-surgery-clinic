@@ -1,10 +1,9 @@
 import {Request} from "express";
-import fs from "node:fs/promises";
-import {paths} from "../shared/paths.js";
 import {
+    CreatePatientDto,
     FullPatientDto,
     FullPatientFilter,
-    Patient, UpdatePatientData,
+    Patient,
     UpdatePatientDto
 } from "./types.js";
 import {UsersService as UserService} from "../users/service.js"
@@ -20,6 +19,10 @@ export class PatientsService {
         private readonly patientsRepo: IPatientsRepository,
         private readonly usersService: UserService
     ) {
+    }
+
+    async create(patientData: CreatePatientDto): Promise<Patient> {
+        return await this.patientsRepo.create(patientData)
     }
 
     async get(filter?: FullPatientFilter): Promise<FullPatientDto[]> {
