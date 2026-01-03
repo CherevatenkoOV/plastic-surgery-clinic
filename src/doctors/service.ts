@@ -1,18 +1,19 @@
 import {Request} from "express";
 import {CreateDoctorDto, Doctor, FullDoctorDto, FullDoctorFilter, UpdateDoctorDto} from "./types.js";
-import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js"
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import {mergeUsersWithRoles} from "../shared/helpers/merge-users-with-roles.js";
 import {mergeUserWithRole} from "../shared/helpers/merge-user-with-role.js";
 import {IDoctorsRepository} from "./repository/i-doctors-repository.js";
-import {UsersService} from "../users/service.js";
+import {IUsersRepository} from "../users/repository/i-users-repository.js";
+import {IAppointmentsRepository} from "../appointments/repository/i-appointments-repository.js";
 
 export class DoctorsService {
     constructor(
         private readonly doctorsRepo: IDoctorsRepository,
-        private readonly usersService: UsersService
+        private readonly usersRepo: IUsersRepository,
+        private readonly appointmentsRepo: IAppointmentsRepository
     ) {
     }
 
@@ -24,19 +25,19 @@ export class DoctorsService {
         const {specialization, firstName, lastName} = filter ?? {}
 
         const doctors = await this.doctorsRepo.find({specialization})
-        const users = await this.usersService.get({firstName, lastName})
+        const users = await this.usersRepo.find({firstName, lastName})
         return mergeUsersWithRoles(users, doctors)
     }
 
     async getById(userId: string): Promise<FullDoctorDto | undefined> {
         const doctor = await this.doctorsRepo.findById(userId)
-        const user = await this.usersService.getById(userId)
+        const user = await this.usersRepo.findById(userId)
         return mergeUserWithRole(user, doctor)
     }
 
     async update(id: string, doctorData: UpdateDoctorDto): Promise<FullDoctorDto> {
         const {firstName, lastName, specialization, schedule} = doctorData
-        const updatedUser = await this.usersService.update(id, {firstName, lastName})
+        const updatedUser = await this.usersRepo.updateProfile(id, {firstName, lastName})
         const updatedDoctor = await this.doctorsRepo.update(id, {specialization, schedule})
 
         return mergeUserWithRole(updatedUser, updatedDoctor)
@@ -44,12 +45,13 @@ export class DoctorsService {
 
     async delete(id: string): Promise<void> {
         await this.doctorsRepo.delete(id)
-        await this.usersService.delete(id)
+        await this.usersRepo.delete(id)
     }
 
     async getAppointments(req: Request): Promise<Appointment[] | undefined> {
         const loggedUser = req.user!;
-        return await AppointmentServiceHelper.getAppointmentsData({doctorId: loggedUser.id})
+
+        return await this.appointmentsRepo.find({doctorId: loggedUser.id})
     }
 
     async sendInviteDoctor(req: Request): Promise<string> {

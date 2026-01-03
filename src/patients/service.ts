@@ -6,18 +6,19 @@ import {
     Patient,
     UpdatePatientDto
 } from "./types.js";
-import {UsersService as UserService} from "../users/service.js"
 import {Appointment} from "../appointments/types.js";
-import {ServiceHelper as AppointmentServiceHelper} from "../appointments/service.js";
 import {mergeUsersWithRoles} from "../shared/helpers/merge-users-with-roles.js";
 import {mergeUserWithRole} from "../shared/helpers/merge-user-with-role.js";
 import {IPatientsRepository} from "./repository/i-patients-repository.js";
+import {IUsersRepository} from "../users/repository/i-users-repository.js";
+import {IAppointmentsRepository} from "../appointments/repository/i-appointments-repository.js";
 
 // NOTE: done
 export class PatientsService {
     constructor(
         private readonly patientsRepo: IPatientsRepository,
-        private readonly usersService: UserService
+        private readonly usersRepo: IUsersRepository,
+        private readonly appointmentsRepo: IAppointmentsRepository
     ) {
     }
 
@@ -29,7 +30,7 @@ export class PatientsService {
         const {firstName, lastName} = filter ?? {}
 
         const patients = await this.patientsRepo.find()
-        const users = await this.usersService.get({firstName, lastName})
+        const users = await this.usersRepo.find({firstName, lastName})
 
         return mergeUsersWithRoles(users, patients)
 
@@ -38,14 +39,14 @@ export class PatientsService {
     // NOTE: done
     async getById(userId: string): Promise<FullPatientDto | undefined> {
         const patient = await this.patientsRepo.findById(userId)
-        const user = await this.usersService.getById(userId)
+        const user = await this.usersRepo.findById(userId)
         return mergeUserWithRole(user, patient)
     }
 
     // NOTE: done
     async update(id: string, patientData: UpdatePatientDto): Promise<FullPatientDto> {
         const {firstName, lastName, phone} = patientData
-        const updatedUser = await this.usersService.update(id, {firstName, lastName})
+        const updatedUser = await this.usersRepo.updateProfile(id, {firstName, lastName})
         const updatedPatient = await this.patientsRepo.update(id, {phone})
 
         return mergeUserWithRole(updatedUser, updatedPatient)
@@ -54,13 +55,12 @@ export class PatientsService {
     // NOTE: done
     async delete(id: string): Promise<void> {
         await this.patientsRepo.delete(id)
-        await this.usersService.delete(id)
+        await this.usersRepo.delete(id)
     }
 
     async getAppointments(req: Request): Promise<Appointment[] | undefined> {
         const loggedUser = req.user!;
-        return await AppointmentServiceHelper.getAppointmentsData({patientId: loggedUser.id})
+        return await this.appointmentsRepo.find({patientId: loggedUser.id})
     }
-
 }
 
