@@ -1,36 +1,31 @@
 export interface User {
     id: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     role: UserRole;
-    createdAt: string;
-    updatedAt: string;
+    created_at: string;
+    updated_at: string;
     auth: {
         email: string;
         password: string;
         refreshToken?: string;
     }
-    // auth: {
-    //     email: string | undefined;
-    //     password: string | undefined;
-    //     refreshToken?: string;
-    // }
 }
 
 export type UserWithoutAuth = Omit<User, "auth">
 
 export interface UserDto {
     id: string;
-    firstName: string;
-    lastName: sring;
+    first_name: string;
+    last_name: sring;
     role: string;
 }
 
 export type UsersParams = Pick<User, 'id'>
 
 export interface CreateUserDto {
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     role: string;
     auth: {
         email: string;
@@ -39,8 +34,8 @@ export interface CreateUserDto {
 }
 
 export interface UpdateUserDto {
-    firstName?: string;
-    lastName?: string;
+    first_name?: string;
+    last_name?: string;
     auth?: {
         email?: string;
         password?: string;
@@ -48,13 +43,7 @@ export interface UpdateUserDto {
     }
 }
 
-// NOTE: prev
-// export interface UpdateUserDto {
-//     firstName?: string | undefined;
-//     lastName?: string | undefined;
-// }
-
-export type UserFilter = Partial<Pick<User, "firstName" | "lastName">>
+export type UserFilter = Partial<Pick<User, "first_name" | "last_name">>
 
 export interface FullUserBase {
     profile: UserWithoutAuth | UserDto

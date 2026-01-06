@@ -17,6 +17,7 @@ export class AppointmentsService {
         return await this.appointmentsRepo.findById(id);
     }
 
+    // TODO: refactor according to change format of doctor schedules
     async create(appointmentData: CreateAppointmentDto): Promise<Appointment> {
         return await this.appointmentsRepo.create(appointmentData)
     }

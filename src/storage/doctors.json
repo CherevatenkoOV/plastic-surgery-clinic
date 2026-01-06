@@ -1,1 +1,22 @@
-[{"userId":"7c5aba41-60ef-43a8-9a1c-32811e14a7b0","specialization":"dermatologist","schedule":[{"_day":1,"day":"Monday","isAvailable":false},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"08:00:00","end":"12:00:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":4,"day":"Thursday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":false},{"_day":0,"day":"Sunday","isAvailable":false}]},{"userId":"e1e66c8f-ec15-401c-9b8b-fdd654e87567","specialization":"intimate surgeon","schedule":[{"_day":1,"day":"Monday","isAvailable":false},{"_day":2,"day":"Tuesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":3,"day":"Wednesday","isAvailable":true,"start":"10:00","end":"14:00:00"},{"_day":4,"day":"Thursday","isAvailable":false},{"_day":5,"day":"Friday","isAvailable":false},{"_day":6,"day":"Saturday","isAvailable":true,"start":"08:00:00","end":"14:00:00"},{"_day":0,"day":"Sunday","isAvailable":true,"start":"08:00:00","end":"14:00:00"}]},{"userId":"b8a189c3-a3a2-40b5-bc5a-df99a02ba065","specialization":"oculoplastic surgeon","schedule":[]},{"userId":"d068bf3a-b931-4d28-83ec-b1d9e25afb4a","specialization":"ear surgeon","schedule":[]},{"userId":"63545c5b-e1ea-4800-9390-c12abb32925c","specialization":null,"schedule":[]},{"userId":"e78259b1-4cd0-4486-acc1-084c139879b8","specialization":null,"schedule":[]}]
+[
+  {
+    "doctor_id": "9bf31c7f-28d6-4d27-b8ae-4d1211e3e847",
+    "specialization": "dermatologist"
+  },
+  {
+    "doctor_id": "e1e66c8f-ec15-401c-9b8b-fdd654e87567",
+    "specialization": "intimate surgeon"
+  },
+  {
+    "doctor_id": "b8a189c3-a3a2-40b5-bc5a-df99a02ba065",
+    "specialization": "oculoplastic surgeon"
+  },
+  {
+    "doctor_id": "d068bf3a-b931-4d28-83ec-b1d9e25afb4a",
+    "specialization": "ear surgeon"
+  },
+  {
+    "doctor_id": "9c95ddce-f9de-4d24-87c5-a31d3d6d2a0f",
+    "specialization": "dermatologist"
+  }
+]

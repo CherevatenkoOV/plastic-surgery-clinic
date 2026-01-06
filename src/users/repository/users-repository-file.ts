@@ -14,8 +14,8 @@ export class UsersRepositoryFile implements IUsersRepository {
         if (!filter || Object.keys(filter).length === 0) return users
 
         let filteredUsers = users;
-        if (filter?.firstName) filteredUsers = filteredUsers.filter((u: UserDto) => u.firstName.toLowerCase() === filter.firstName?.toLowerCase())
-        if (filter?.lastName) filteredUsers = filteredUsers.filter((u: UserDto) => u.lastName.toLowerCase() === filter.lastName?.toLowerCase())
+        if (filter?.first_name) filteredUsers = filteredUsers.filter((u: UserDto) => u.first_name.toLowerCase() === filter.first_name?.toLowerCase())
+        if (filter?.last_name) filteredUsers = filteredUsers.filter((u: UserDto) => u.last_name.toLowerCase() === filter.last_name?.toLowerCase())
 
         if (!filteredUsers.length) throw new Error("The specified user(s) was(were) not found")
         return users
@@ -38,18 +38,18 @@ export class UsersRepositoryFile implements IUsersRepository {
     }
 
     async create(userData: CreateUserDto): Promise<User> {
-        const {firstName, lastName, role, auth} = userData;
+        const {first_name, last_name, role, auth} = userData;
         const users = await this.find();
 
         const now = new Date().toISOString();
 
         const createdUser: User = {
             id: randomUUID(),
-            firstName: firstName,
-            lastName: lastName,
+            first_name: first_name,
+            last_name: last_name,
             role: role,
-            createdAt: now,
-            updatedAt: now,
+            created_at: now,
+            updated_at: now,
             auth: {
                 email: auth.email,
                 password: auth.password
@@ -67,17 +67,17 @@ export class UsersRepositoryFile implements IUsersRepository {
     }
 
     async updateProfile(id: string, data: UpdateUserDto): Promise<User> {
-        const {firstName, lastName} = data;
+        const {first_name, last_name} = data;
         const user = await this.findById(id);
         const users = await this.find();
 
         const updatedUser: User = {
             id: user.id,
-            firstName: firstName ?? user.firstName,
-            lastName: lastName ?? user.lastName,
+            first_name: first_name ?? user.first_name,
+            last_name: last_name ?? user.last_name,
             role: user.role,
-            createdAt: user.createdAt,
-            updatedAt: new Date().toISOString(),
+            created_at: user.created_at,
+            updated_at: new Date().toISOString(),
             auth: {
                 email: user.auth.email,
                 password: user.auth.password,
@@ -105,11 +105,11 @@ export class UsersRepositoryFile implements IUsersRepository {
 
         const updatedUser: User = {
             id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            first_name: user.first_name,
+            last_name: user.last_name,
             role: user.role,
-            createdAt: user.createdAt,
-            updatedAt: new Date().toISOString(),
+            created_at: user.created_at,
+            updated_at: new Date().toISOString(),
             auth: {
                 email: email ?? user.auth.email,
                 password: password ?? user.auth.password,

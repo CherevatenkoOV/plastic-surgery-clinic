@@ -21,13 +21,13 @@ export class AuthService {
     ) {}
 
     async register(registerData: FullRegisterInfo): Promise<AuthTokens | null> {
-        const {firstName, lastName, role, email, password} = registerData;
+        const {first_name, last_name, role, email, password} = registerData;
 
         if (await this.usersService.emailExists(email)) throw new Error("User with specified email already exists.")
 
         const hashedPassword = await this.hashPassword(password)
 
-        const user = await this.usersService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
+        const user = await this.usersService.create({first_name, last_name, role, auth: {email, password: hashedPassword}})
 
         switch (role) {
             case Role.DOCTOR:
@@ -68,13 +68,13 @@ export class AuthService {
             throw new Error("Wrong token.")
         }
 
-        const {firstName, lastName, role, password} = registerInfo;
+        const {first_name, last_name, role, password} = registerInfo;
 
         if (await this.usersService.emailExists(email)) throw new Error("User with specified email already exists.")
 
         const hashedPassword = await this.hashPassword(password)
 
-        const user = await this.usersService.create({firstName, lastName, role, auth: {email, password: hashedPassword}})
+        const user = await this.usersService.create({first_name, last_name, role, auth: {email, password: hashedPassword}})
 
         const {specialization, schedule} = registerInfo
 

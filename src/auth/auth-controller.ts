@@ -5,7 +5,6 @@ import {
     ResetPasswordDto, FullRegisterInfo, RecoverPasswordParams, RecoverPasswordDto
 } from "./types.js";
 import {CreateCredentialsDto} from "../users/types.js";
-import {Service} from "../appointments/service.js";
 import {AuthService} from "./service.js";
 
 export class AuthController {
