@@ -4,7 +4,6 @@ import {
     UpdateUserDto, UserDto
 } from "./types.js";
 import {UsersService} from "./service.js";
-import {Role} from "../shared/roles.js";
 import {sanitizeUsers} from "./helpers/sanitize-users.js";
 import {sanitizeUser} from "./helpers/sanitize-user.js";
 

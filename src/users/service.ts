@@ -1,4 +1,4 @@
-import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserFilter} from "./types.js";
+import {UpdateUserDto, UserEntity, UserFilter} from "./types.js";
 import {IUsersRepository} from "./repository/i-users-repository.js";
 import {Role} from "../shared/roles.js";
 import {IDoctorsRepository} from "../doctors/repository/i-doctors-repository.js";
@@ -11,23 +11,24 @@ export class UsersService {
         private readonly patientsRepo: IPatientsRepository
     ) {}
 
-    async get(filter?: UserFilter): Promise<User[]> {
+    async get(filter?: UserFilter): Promise<UserEntity[]> {
         return await this.usersRepo.find(filter)
     }
 
-    async getById(id: string): Promise<User | undefined> {
+    async getById(id: string): Promise<UserEntity | null> {
         return await this.usersRepo.findById(id)
     }
 
-    async getByEmail(email: string): Promise<User | undefined> {
+    async getByEmail(email: string): Promise<UserEntity | null> {
         return await this.usersRepo.findByEmail(email)
     }
 
-    async create(userData: CreateUserDto): Promise<User> {
-        return await this.usersRepo.create(userData)
-    }
+    // user creation functionality is moved to repo responsibilities
+    // async create(userData: CreateUserDto): Promise<UserEntity> {
+    //     return await this.usersRepo.create(userData)
+    // }
 
-    async update(id: string, userData: UpdateUserDto): Promise<User | undefined> {
+    async update(id: string, userData: UpdateUserDto): Promise<UserEntity | undefined> {
        return await this.usersRepo.updateProfile(id, userData)
     }
 
@@ -51,9 +52,10 @@ export class UsersService {
         return !!(await this.getByEmail(email));
     }
 
-    async updateCredentials(id: string, credentials: CredentialsDto): Promise<User> {
-        return await this.usersRepo.updateCredentials(id, credentials)
-    }
+    // deprecated
+    // async updateCredentials(id: string, credentials: CredentialsDto): Promise<UserEntity> {
+    //     return await this.usersRepo.updateCredentials(id, credentials)
+    // }
 }
 
 

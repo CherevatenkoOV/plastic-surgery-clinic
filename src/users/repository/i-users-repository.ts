@@ -1,11 +1,11 @@
-import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserFilter} from "../types.js";
+import {CreateUserDto, CredentialsDto, UpdateUserDto, UserEntity, UserFilter} from "../types.js";
 
 export interface IUsersRepository {
-    find(filter?: UserFilter): Promise<User[]>;
-    findById(id: string): Promise<User>;
-    findByEmail(email: string): Promise<User>;
-    create(userData: CreateUserDto): Promise<User>;
-    updateProfile(id: string, data: UpdateUserDto): Promise<User>;
-    updateCredentials(id: string, credentials: CredentialsDto): Promise<User>;
+    find(filter?: UserFilter): Promise<UserEntity[]>;
+    findById(id: string): Promise<UserEntity | null>;
+    findByEmail(email: string): Promise<UserEntity | null>;
+    create(userData: CreateUserDto): Promise<UserEntity>;
+    updateProfile(id: string, data: UpdateUserDto): Promise<UserEntity>;
+    updateCredentials(id: string, credentials: CredentialsDto): Promise<void>;
     delete(id: string): Promise<void>;
 }

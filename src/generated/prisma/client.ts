@@ -30,7 +30,7 @@ export * from "./enums.js"
  * ```
  * const prisma = new PrismaClient()
  * // Fetch zero or more Appointments
- * const appointments = await prisma.appointments.findMany()
+ * const appointments = await prisma.appointment.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -40,33 +40,33 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
- * Model appointments
+ * Model Appointment
  * 
  */
-export type appointments = Prisma.appointmentsModel
+export type Appointment = Prisma.AppointmentModel
 /**
- * Model doctor_weekly_slots
+ * Model DoctorWeeklySlots
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  * This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
  */
-export type doctor_weekly_slots = Prisma.doctor_weekly_slotsModel
+export type DoctorWeeklySlots = Prisma.DoctorWeeklySlotsModel
 /**
- * Model doctors
+ * Model Doctor
  * 
  */
-export type doctors = Prisma.doctorsModel
+export type Doctor = Prisma.DoctorModel
 /**
- * Model patients
+ * Model Patient
  * 
  */
-export type patients = Prisma.patientsModel
+export type Patient = Prisma.PatientModel
 /**
- * Model user_auth
+ * Model UserAuth
  * 
  */
-export type user_auth = Prisma.user_authModel
+export type UserAuth = Prisma.UserAuthModel
 /**
- * Model users
+ * Model User
  * 
  */
-export type users = Prisma.usersModel
+export type User = Prisma.UserModel

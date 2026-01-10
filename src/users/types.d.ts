@@ -1,49 +1,60 @@
-export interface User {
+// TODO: UserEntity для работы до слоя HTTP, дальше - оставить UserDto
+import {AuthEntity} from "../auth/types";
+import {UserRole} from "../generated/prisma/enums";
+
+// export interface UserEntity {
+//     id: string;
+//     firstName: string;
+//     lastName: string;
+//     role: UserRole;
+//     createdAt: Date;
+//     updatedAt: Date;
+//     userAuth: Omit<AuthEntity, "userId"> | null
+// }
+
+export interface UserEntity {
     id: string;
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     role: UserRole;
-    created_at: string;
-    updated_at: string;
-    auth: {
-        email: string;
-        password: string;
-        refreshToken?: string;
-    }
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-export type UserWithoutAuth = Omit<User, "auth">
+
+
+// export type UserWithoutAuth = Omit<UserEntity, "userAuth">
 
 export interface UserDto {
     id: string;
-    first_name: string;
-    last_name: sring;
+    firstName: string;
+    lastName: sring;
     role: string;
 }
 
-export type UsersParams = Pick<User, 'id'>
+export type UsersParams = Pick<UserEntity, 'id'>
 
 export interface CreateUserDto {
-    first_name: string;
-    last_name: string;
-    role: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
     auth: {
         email: string;
-        password: string;
+        passwordHash: string;
     }
 }
 
 export interface UpdateUserDto {
-    first_name?: string;
-    last_name?: string;
+    firstName?: string;
+    lastName?: string;
     auth?: {
         email?: string;
-        password?: string;
+        passwordHash?: string;
         refreshToken?: string;
     }
 }
 
-export type UserFilter = Partial<Pick<User, "first_name" | "last_name">>
+export type UserFilter = Partial<Pick<UserEntity, "firstName" | "lastName">>
 
 export interface FullUserBase {
     profile: UserWithoutAuth | UserDto
@@ -51,12 +62,12 @@ export interface FullUserBase {
 
 export interface CreateCredentialsDto {
     email: string;
-    password: string;
+    passwordHash: string;
 }
 
 export interface CredentialsDto {
     email?: string;
-    password?: string;
+    passwordHash?: string;
     refreshToken?: string;
 }
 

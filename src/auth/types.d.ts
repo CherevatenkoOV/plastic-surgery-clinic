@@ -1,11 +1,18 @@
 import {CreateUserDto, CreateRoleData} from "../users/types.js";
 
-export interface AuthItem {
+export interface AuthEntity {
     userId: string;
     email: string;
     password: string;
-    refreshToken?: string;
+    refreshToken?: string  | null;
 }
+
+export interface AuthDto {
+    email: string;
+    password: string;
+    refreshToken?: string  | null;
+}
+
 
 export interface AuthRegisterBody{
     email: string;

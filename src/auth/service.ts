@@ -9,15 +9,19 @@ import {
     ResetPasswordDto,
 } from "./types.js";
 import {Role} from "../shared/roles.js";
-import {User, CreateCredentialsDto} from "../users/types.js";
+import {UserEntity, CreateCredentialsDto} from "../users/types.js";
 import {DoctorsService} from "../doctors/service.js";
 import {PatientsService} from "../patients/service.js";
+import {IUsersRepository} from "../users/repository/i-users-repository";
+import {IDoctorsRepository} from "../doctors/repository/i-doctors-repository";
+import {IPatientsRepository} from "../patients/repository/i-patients-repository";
 
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
-        private readonly doctorsService: DoctorsService,
-        private readonly patientsService: PatientsService
+        private readonly usersRepo: IUsersRepository,
+        private readonly doctorsRepo: IDoctorsRepository,
+        private readonly patientsRepo: IPatientsRepository
     ) {}
 
     async register(registerData: FullRegisterInfo): Promise<AuthTokens | null> {
@@ -88,12 +92,12 @@ export class AuthService {
     }
 
     async login(credentials: CreateCredentialsDto): Promise<AuthTokens> {
-        const {email, password} = credentials;
+        const {email, passwordHash} = credentials;
 
         const user = await this.usersService.getByEmail(email)
-        if(!user!.auth.password) throw new Error("User with specified email doesn't have the password. Please contact the support team.")
+        if(!user!.user_auth.password) throw new Error("User with specified email doesn't have the password. Please contact the support team.")
 
-        const passwordMatch: boolean = await bcrypt.compare(password, user!.auth.password)
+        const passwordMatch: boolean = await bcrypt.compare(passwordHash, user!.user_auth.password)
         if (!passwordMatch) throw new Error("Wrong password")
 
         const tokens = this.generateTokens({id: user!.id, role: user!.role})
@@ -131,7 +135,7 @@ export class AuthService {
         const {email, oldPassword, newPassword, confirmPassword} = newPasswordData;
         const user = await this.usersService.getByEmail(email)
 
-        const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, user!.auth.password)
+        const currentPasswordIsCorrect = await bcrypt.compare(oldPassword, user!.user_auth.password)
 
         if (!currentPasswordIsCorrect) throw new Error("You entered an incorrect current password")
 
@@ -168,7 +172,7 @@ export class AuthService {
         });
 
         const mailOptions = {
-            to: user!.auth.email,
+            to: user!.user_auth.email,
             from: process.env.MAIL_USER,
             subject: 'Password Reset Request',
             text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n

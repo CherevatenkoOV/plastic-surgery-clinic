@@ -8,10 +8,10 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/appointments.js'
-export type * from './models/doctor_weekly_slots.js'
-export type * from './models/doctors.js'
-export type * from './models/patients.js'
-export type * from './models/user_auth.js'
-export type * from './models/users.js'
+export type * from './models/Appointment.js'
+export type * from './models/DoctorWeeklySlots.js'
+export type * from './models/Doctor.js'
+export type * from './models/Patient.js'
+export type * from './models/UserAuth.js'
+export type * from './models/User.js'
 export type * from './commonInputTypes.js'

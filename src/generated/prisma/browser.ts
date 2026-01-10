@@ -18,33 +18,33 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
- * Model appointments
+ * Model Appointment
  * 
  */
-export type appointments = Prisma.appointmentsModel
+export type Appointment = Prisma.AppointmentModel
 /**
- * Model doctor_weekly_slots
+ * Model DoctorWeeklySlots
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  * This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
  */
-export type doctor_weekly_slots = Prisma.doctor_weekly_slotsModel
+export type DoctorWeeklySlots = Prisma.DoctorWeeklySlotsModel
 /**
- * Model doctors
+ * Model Doctor
  * 
  */
-export type doctors = Prisma.doctorsModel
+export type Doctor = Prisma.DoctorModel
 /**
- * Model patients
+ * Model Patient
  * 
  */
-export type patients = Prisma.patientsModel
+export type Patient = Prisma.PatientModel
 /**
- * Model user_auth
+ * Model UserAuth
  * 
  */
-export type user_auth = Prisma.user_authModel
+export type UserAuth = Prisma.UserAuthModel
 /**
- * Model users
+ * Model User
  * 
  */
-export type users = Prisma.usersModel
+export type User = Prisma.UserModel

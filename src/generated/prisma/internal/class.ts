@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel appointments {\n  id           String   @id @db.Uuid\n  doctor_id    String   @db.Uuid\n  patient_id   String   @db.Uuid\n  service_name String\n  starts_at    DateTime @db.Timestamptz(6)\n  created_at   DateTime @default(now()) @db.Timestamptz(6)\n  updated_at   DateTime @default(now()) @db.Timestamptz(6)\n  doctors      doctors  @relation(fields: [doctor_id], references: [doctor_id], onDelete: NoAction, onUpdate: NoAction)\n  patients     patients @relation(fields: [patient_id], references: [patient_id], onDelete: NoAction, onUpdate: NoAction)\n\n  @@unique([doctor_id, starts_at])\n}\n\n/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.\n/// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.\nmodel doctor_weekly_slots {\n  id         String                 @id @db.Uuid\n  doctor_id  String                 @db.Uuid\n  weekday    Int                    @db.SmallInt\n  time_range Unsupported(\"tsrange\")\n  doctors    doctors                @relation(fields: [doctor_id], references: [doctor_id], onDelete: Cascade, onUpdate: NoAction)\n\n  @@unique([doctor_id, weekday, time_range])\n}\n\nmodel doctors {\n  doctor_id           String                @id @db.Uuid\n  specialization      String\n  appointments        appointments[]\n  doctor_weekly_slots doctor_weekly_slots[]\n  users               users                 @relation(fields: [doctor_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: \"doctors_user_id_fkey\")\n}\n\nmodel patients {\n  patient_id   String         @id(map: \"patients_pk\") @db.Uuid\n  phone        String\n  appointments appointments[]\n  users        users          @relation(fields: [patient_id], references: [id], onDelete: Cascade, onUpdate: NoAction)\n}\n\nmodel user_auth {\n  user_id      String  @id @db.Uuid\n  email        String  @unique\n  password     String\n  refreshtoken String?\n  users        users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)\n}\n\nmodel users {\n  id         String     @id(map: \"users_pk\") @default(dbgenerated(\"gen_random_uuid()\")) @db.Uuid\n  first_name String     @db.VarChar(50)\n  last_name  String     @db.VarChar(50)\n  role       user_role  @default(patient)\n  created_at DateTime   @default(now()) @db.Timestamptz(6)\n  updated_at DateTime   @default(now()) @db.Timestamptz(6)\n  doctors    doctors?\n  patients   patients?\n  user_auth  user_auth?\n}\n\nenum user_role {\n  admin\n  doctor\n  patient\n}\n",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Appointment {\n  id          String   @id @default(dbgenerated(\"gen_random_uuid()\")) @db.Uuid\n  doctorId    String   @map(\"doctor_id\") @db.Uuid\n  patientId   String   @map(\"patient_id\") @db.Uuid\n  serviceName String   @map(\"service_name\")\n  startsAt    DateTime @map(\"starts_at\") @db.Timestamptz(6)\n  createdAt   DateTime @default(now()) @map(\"created_at\") @db.Timestamptz(6)\n  updatedAt   DateTime @default(now()) @map(\"updated_at\") @db.Timestamptz(6)\n  doctor      Doctor   @relation(fields: [doctorId], references: [doctorId], onDelete: NoAction, onUpdate: NoAction)\n  patient     Patient  @relation(fields: [patientId], references: [patientId], onDelete: NoAction, onUpdate: NoAction)\n\n  @@unique([doctorId, startsAt])\n  @@map(\"appointments\")\n}\n\n/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.\n/// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.\nmodel DoctorWeeklySlots {\n  id        String                 @id @default(dbgenerated(\"gen_random_uuid()\")) @db.Uuid\n  doctorId  String                 @map(\"doctor_id\") @db.Uuid\n  weekday   Int                    @db.SmallInt\n  timeRange Unsupported(\"tsrange\") @map(\"time_range\")\n  doctor    Doctor                 @relation(fields: [doctorId], references: [doctorId], onDelete: Cascade, onUpdate: NoAction)\n\n  @@unique([doctorId, weekday, timeRange])\n  @@map(\"doctor_weekly_slots\")\n}\n\nmodel Doctor {\n  doctorId          String              @id @default(dbgenerated(\"gen_random_uuid()\")) @map(\"doctor_id\") @db.Uuid\n  specialization    String\n  appointments      Appointment[]\n  doctorWeeklySlots DoctorWeeklySlots[]\n  user              User                @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: \"doctors_user_id_fkey\")\n\n  @@map(\"doctors\")\n}\n\nmodel Patient {\n  patientId    String        @id(map: \"patients_pk\") @default(dbgenerated(\"gen_random_uuid()\")) @map(\"patient_id\") @db.Uuid\n  phone        String\n  appointments Appointment[]\n  user         User          @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: NoAction)\n\n  @@map(\"patients\")\n}\n\nmodel UserAuth {\n  userId       String  @id @map(\"user_id\") @db.Uuid\n  email        String  @unique\n  passwordHash String  @map(\"password_hash\")\n  refreshToken String? @map(\"refresh_token\")\n  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)\n\n  @@map(\"user_auth\")\n}\n\nmodel User {\n  id        String    @id(map: \"users_pk\") @default(dbgenerated(\"gen_random_uuid()\")) @db.Uuid\n  firstName String    @map(\"first_name\") @db.VarChar(50)\n  lastName  String    @map(\"last_name\") @db.VarChar(50)\n  role      UserRole  @default(patient)\n  createdAt DateTime  @default(now()) @map(\"created_at\") @db.Timestamptz(6)\n  updatedAt DateTime  @default(now()) @map(\"updated_at\") @db.Timestamptz(6)\n  doctor    Doctor?\n  patient   Patient?\n  userAuth  UserAuth?\n\n  @@map(\"users\")\n}\n\nenum UserRole {\n  admin\n  doctor\n  patient\n\n  @@map(\"user_role\")\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"appointments\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"doctor_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"patient_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"service_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"starts_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"doctors\",\"kind\":\"object\",\"type\":\"doctors\",\"relationName\":\"appointmentsTodoctors\"},{\"name\":\"patients\",\"kind\":\"object\",\"type\":\"patients\",\"relationName\":\"appointmentsTopatients\"}],\"dbName\":null},\"doctor_weekly_slots\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"doctor_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"weekday\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"doctors\",\"kind\":\"object\",\"type\":\"doctors\",\"relationName\":\"doctor_weekly_slotsTodoctors\"}],\"dbName\":null},\"doctors\":{\"fields\":[{\"name\":\"doctor_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"specialization\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"appointments\",\"kind\":\"object\",\"type\":\"appointments\",\"relationName\":\"appointmentsTodoctors\"},{\"name\":\"doctor_weekly_slots\",\"kind\":\"object\",\"type\":\"doctor_weekly_slots\",\"relationName\":\"doctor_weekly_slotsTodoctors\"},{\"name\":\"users\",\"kind\":\"object\",\"type\":\"users\",\"relationName\":\"doctorsTousers\"}],\"dbName\":null},\"patients\":{\"fields\":[{\"name\":\"patient_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"appointments\",\"kind\":\"object\",\"type\":\"appointments\",\"relationName\":\"appointmentsTopatients\"},{\"name\":\"users\",\"kind\":\"object\",\"type\":\"users\",\"relationName\":\"patientsTousers\"}],\"dbName\":null},\"user_auth\":{\"fields\":[{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refreshtoken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"users\",\"kind\":\"object\",\"type\":\"users\",\"relationName\":\"user_authTousers\"}],\"dbName\":null},\"users\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"first_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"last_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"user_role\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"doctors\",\"kind\":\"object\",\"type\":\"doctors\",\"relationName\":\"doctorsTousers\"},{\"name\":\"patients\",\"kind\":\"object\",\"type\":\"patients\",\"relationName\":\"patientsTousers\"},{\"name\":\"user_auth\",\"kind\":\"object\",\"type\":\"user_auth\",\"relationName\":\"user_authTousers\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Appointment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"doctorId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"doctor_id\"},{\"name\":\"patientId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"patient_id\"},{\"name\":\"serviceName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"service_name\"},{\"name\":\"startsAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"starts_at\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"doctor\",\"kind\":\"object\",\"type\":\"Doctor\",\"relationName\":\"AppointmentToDoctor\"},{\"name\":\"patient\",\"kind\":\"object\",\"type\":\"Patient\",\"relationName\":\"AppointmentToPatient\"}],\"dbName\":\"appointments\"},\"DoctorWeeklySlots\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"doctorId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"doctor_id\"},{\"name\":\"weekday\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"doctor\",\"kind\":\"object\",\"type\":\"Doctor\",\"relationName\":\"DoctorToDoctorWeeklySlots\"}],\"dbName\":\"doctor_weekly_slots\"},\"Doctor\":{\"fields\":[{\"name\":\"doctorId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"doctor_id\"},{\"name\":\"specialization\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"appointments\",\"kind\":\"object\",\"type\":\"Appointment\",\"relationName\":\"AppointmentToDoctor\"},{\"name\":\"doctorWeeklySlots\",\"kind\":\"object\",\"type\":\"DoctorWeeklySlots\",\"relationName\":\"DoctorToDoctorWeeklySlots\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"DoctorToUser\"}],\"dbName\":\"doctors\"},\"Patient\":{\"fields\":[{\"name\":\"patientId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"patient_id\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"appointments\",\"kind\":\"object\",\"type\":\"Appointment\",\"relationName\":\"AppointmentToPatient\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PatientToUser\"}],\"dbName\":\"patients\"},\"UserAuth\":{\"fields\":[{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"user_id\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"password_hash\"},{\"name\":\"refreshToken\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"refresh_token\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToUserAuth\"}],\"dbName\":\"user_auth\"},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"first_name\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"last_name\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"doctor\",\"kind\":\"object\",\"type\":\"Doctor\",\"relationName\":\"DoctorToUser\"},{\"name\":\"patient\",\"kind\":\"object\",\"type\":\"Patient\",\"relationName\":\"PatientToUser\"},{\"name\":\"userAuth\",\"kind\":\"object\",\"type\":\"UserAuth\",\"relationName\":\"UserToUserAuth\"}],\"dbName\":\"users\"}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -59,7 +59,7 @@ export interface PrismaClientConstructor {
    * ```
    * const prisma = new PrismaClient()
    * // Fetch zero or more Appointments
-   * const appointments = await prisma.appointments.findMany()
+   * const appointments = await prisma.appointment.findMany()
    * ```
    * 
    * Read more in our [docs](https://pris.ly/d/client).
@@ -81,7 +81,7 @@ export interface PrismaClientConstructor {
  * ```
  * const prisma = new PrismaClient()
  * // Fetch zero or more Appointments
- * const appointments = await prisma.appointments.findMany()
+ * const appointments = await prisma.appointment.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -175,64 +175,64 @@ export interface PrismaClient<
   }>>
 
       /**
-   * `prisma.appointments`: Exposes CRUD operations for the **appointments** model.
+   * `prisma.appointment`: Exposes CRUD operations for the **Appointment** model.
     * Example usage:
     * ```ts
     * // Fetch zero or more Appointments
-    * const appointments = await prisma.appointments.findMany()
+    * const appointments = await prisma.appointment.findMany()
     * ```
     */
-  get appointments(): Prisma.appointmentsDelegate<ExtArgs, { omit: OmitOpts }>;
+  get appointment(): Prisma.AppointmentDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.doctor_weekly_slots`: Exposes CRUD operations for the **doctor_weekly_slots** model.
+   * `prisma.doctorWeeklySlots`: Exposes CRUD operations for the **DoctorWeeklySlots** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more Doctor_weekly_slots
-    * const doctor_weekly_slots = await prisma.doctor_weekly_slots.findMany()
+    * // Fetch zero or more DoctorWeeklySlots
+    * const doctorWeeklySlots = await prisma.doctorWeeklySlots.findMany()
     * ```
     */
-  get doctor_weekly_slots(): Prisma.doctor_weekly_slotsDelegate<ExtArgs, { omit: OmitOpts }>;
+  get doctorWeeklySlots(): Prisma.DoctorWeeklySlotsDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.doctors`: Exposes CRUD operations for the **doctors** model.
+   * `prisma.doctor`: Exposes CRUD operations for the **Doctor** model.
     * Example usage:
     * ```ts
     * // Fetch zero or more Doctors
-    * const doctors = await prisma.doctors.findMany()
+    * const doctors = await prisma.doctor.findMany()
     * ```
     */
-  get doctors(): Prisma.doctorsDelegate<ExtArgs, { omit: OmitOpts }>;
+  get doctor(): Prisma.DoctorDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.patients`: Exposes CRUD operations for the **patients** model.
+   * `prisma.patient`: Exposes CRUD operations for the **Patient** model.
     * Example usage:
     * ```ts
     * // Fetch zero or more Patients
-    * const patients = await prisma.patients.findMany()
+    * const patients = await prisma.patient.findMany()
     * ```
     */
-  get patients(): Prisma.patientsDelegate<ExtArgs, { omit: OmitOpts }>;
+  get patient(): Prisma.PatientDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.user_auth`: Exposes CRUD operations for the **user_auth** model.
+   * `prisma.userAuth`: Exposes CRUD operations for the **UserAuth** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more User_auths
-    * const user_auths = await prisma.user_auth.findMany()
+    * // Fetch zero or more UserAuths
+    * const userAuths = await prisma.userAuth.findMany()
     * ```
     */
-  get user_auth(): Prisma.user_authDelegate<ExtArgs, { omit: OmitOpts }>;
+  get userAuth(): Prisma.UserAuthDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.users`: Exposes CRUD operations for the **users** model.
+   * `prisma.user`: Exposes CRUD operations for the **User** model.
     * Example usage:
     * ```ts
     * // Fetch zero or more Users
-    * const users = await prisma.users.findMany()
+    * const users = await prisma.user.findMany()
     * ```
     */
-  get users(): Prisma.usersDelegate<ExtArgs, { omit: OmitOpts }>;
+  get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

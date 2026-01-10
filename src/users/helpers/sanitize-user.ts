@@ -1,6 +1,6 @@
-import {User, UserWithoutAuth} from "../types.js";
+import {UserEntity, UserWithoutAuth} from "../types.js";
 
-export function sanitizeUser(user: User): UserWithoutAuth {
-    const { auth, ...rest } = user
+export function sanitizeUser(user: UserEntity): UserWithoutAuth {
+    const { userAuth, ...rest } = user
     return rest
 }

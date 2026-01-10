@@ -1,142 +1,191 @@
-import {IUsersRepository} from "./i-users-repository.js";
-import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserDto, UserFilter} from "../types.js";
-import fs from "node:fs/promises";
-import {paths} from "../../shared/paths.js";
-import {randomUUID} from "node:crypto";
-
-
-export class UsersRepositoryFile implements IUsersRepository {
-
-    async find(filter?: UserFilter): Promise<User[]> {
-        const data: string = await fs.readFile(paths.USERS, {encoding: "utf-8"})
-        const users = JSON.parse(data)
-
-        if (!filter || Object.keys(filter).length === 0) return users
-
-        let filteredUsers = users;
-        if (filter?.first_name) filteredUsers = filteredUsers.filter((u: UserDto) => u.first_name.toLowerCase() === filter.first_name?.toLowerCase())
-        if (filter?.last_name) filteredUsers = filteredUsers.filter((u: UserDto) => u.last_name.toLowerCase() === filter.last_name?.toLowerCase())
-
-        if (!filteredUsers.length) throw new Error("The specified user(s) was(were) not found")
-        return users
-    }
-
-    async findById(id: string): Promise<User> {
-        const users = await this.find()
-        const targetUser = users.find((u) => u.id === id)
-        if (!targetUser) throw new Error("User with specified id was not found")
-
-        return targetUser
-    }
-
-    async findByEmail(email: string): Promise<User> {
-        const users = await this.find()
-        const targetUser = users.find((u: User) => u.auth.email === email.toLowerCase())
-        if (!targetUser) throw new Error("User with specified email was not found")
-
-        return targetUser
-    }
-
-    async create(userData: CreateUserDto): Promise<User> {
-        const {first_name, last_name, role, auth} = userData;
-        const users = await this.find();
-
-        const now = new Date().toISOString();
-
-        const createdUser: User = {
-            id: randomUUID(),
-            first_name: first_name,
-            last_name: last_name,
-            role: role,
-            created_at: now,
-            updated_at: now,
-            auth: {
-                email: auth.email,
-                password: auth.password
-            }
-        }
-
-        users.push(createdUser)
-        await fs.writeFile(
-            paths.USERS,
-            JSON.stringify(users),
-            {encoding: 'utf-8'},
-        )
-
-        return createdUser
-    }
-
-    async updateProfile(id: string, data: UpdateUserDto): Promise<User> {
-        const {first_name, last_name} = data;
-        const user = await this.findById(id);
-        const users = await this.find();
-
-        const updatedUser: User = {
-            id: user.id,
-            first_name: first_name ?? user.first_name,
-            last_name: last_name ?? user.last_name,
-            role: user.role,
-            created_at: user.created_at,
-            updated_at: new Date().toISOString(),
-            auth: {
-                email: user.auth.email,
-                password: user.auth.password,
-                refreshToken: user.auth.refreshToken,
-            }
-        }
-
-        const index = users.findIndex((user) => user.id === updatedUser.id);
-        users[index] = updatedUser;
-
-        await fs.writeFile(
-            paths.USERS,
-            JSON.stringify(users),
-            {encoding: 'utf-8'},
-        )
-
-        return updatedUser
-    }
-
-    // NOTE: this one should only save the credentials (with hashedPassword) without checking. subtle layer
-    async updateCredentials(id: string, credentials: CredentialsDto): Promise<User> {
-        const {email, password, refreshToken} = credentials;
-        const user = await this.findById(id);
-        const users = await this.find();
-
-        const updatedUser: User = {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            role: user.role,
-            created_at: user.created_at,
-            updated_at: new Date().toISOString(),
-            auth: {
-                email: email ?? user.auth.email,
-                password: password ?? user.auth.password,
-                refreshToken: refreshToken ?? user.auth.refreshToken
-            }
-        }
-
-        const index = users.findIndex((user) => user.id === updatedUser.id);
-        users[index] = updatedUser;
-
-        await fs.writeFile(
-            paths.USERS,
-            JSON.stringify(users),
-            {encoding: 'utf-8'},
-        )
-
-        return updatedUser
-    }
-
-    async delete(id: string): Promise<void> {
-        const users = await this.find();
-        const updatedUsers = users.filter((user: User) => user.id !== id)
-
-        await fs.writeFile(
-            paths.USERS,
-            JSON.stringify(updatedUsers),
-            {encoding: 'utf-8'},
-        )
-    }
-}
+// import {IUsersRepository} from "./i-users-repository.js";
+// import {CreateUserDto, CredentialsDto, StoredUser, UpdateUserDto, UserEntity, UserFilter} from "../types.js";
+// import fs from "node:fs/promises";
+// import {paths} from "../../shared/paths.js";
+// import {randomUUID} from "node:crypto";
+//
+//
+// export class UsersRepositoryFile implements IUsersRepository {
+//     private toEntity(user: StoredUser) {
+//         return {
+//             ...user,
+//             createdAt: new Date(user.createdAt),
+//             updatedAt: new Date(user.updatedAt)
+//         }
+//     }
+//
+//     private toStored(user: UserEntity) {
+//         return {
+//             ...user,
+//             createdAt: user.createdAt.toISOString(),
+//             updatedAt: user.updatedAt.toISOString()
+//         }
+//     }
+//
+//     // DONE
+//     async find(filter?: UserFilter): Promise<UserEntity[]> {
+//         const data: string = await fs.readFile(paths.USERS, {encoding: "utf-8"})
+//         const storedUsers: StoredUser[] = JSON.parse(data)
+//         const users: UserEntity[] = storedUsers.map(u => this.toEntity(u))
+//
+//         if (!filter || Object.keys(filter).length === 0) return users
+//
+//         const firstName = filter?.firstName?.trim().toLowerCase()
+//         const lastName = filter?.lastName?.trim().toLowerCase()
+//
+//         if (!firstName && !lastName) return users
+//
+//         const filteredUsers: UserEntity[] = users.filter((u) => {
+//             const uFirstName = u.firstName?.trim().toLowerCase()
+//             const uLastName = u.lastName?.trim().toLowerCase()
+//
+//             if (firstName && uFirstName !== firstName) return false
+//             if (lastName && uLastName !== lastName) return false
+//
+//             return true
+//         })
+//
+//         if (filteredUsers.length === 0) throw new Error("No users matched the filter");
+//
+//         return filteredUsers
+//     }
+//
+//     // DONE
+//     async findById(id: string): Promise<UserEntity> {
+//         const data: string = await fs.readFile(paths.USERS, {encoding: "utf-8"})
+//         const storedUsers: StoredUser[] = JSON.parse(data)
+//         const users: UserEntity[] = storedUsers.map(u => this.toEntity(u))
+//
+//         const user = users.find((u) => u.id === id)
+//
+//         if (!user) throw new Error(`User with id ${id} not found`)
+//
+//         return user
+//     }
+//
+//     // DONE
+//     async findByEmail(email: string): Promise<UserEntity> {
+//         const data: string = await fs.readFile(paths.USERS, {encoding: "utf-8"})
+//         const storedUsers: StoredUser[] = JSON.parse(data)
+//         const users: UserEntity[] = storedUsers.map(u => this.toEntity(u))
+//
+//         const user = users.find((u: UserEntity) => {
+//             if (!u.userAuth) return false
+//
+//             return u.userAuth.email.trim().toLowerCase() === email.trim().toLowerCase()
+//         })
+//
+//         if (!user) throw new Error(`User with email ${email} was not found`)
+//
+//         return user
+//     }
+//
+//     // DONE
+//     async create(userData: CreateUserDto): Promise<UserEntity> {
+//         const {firstName, lastName, role, auth} = userData;
+//
+//         const data: string = await fs.readFile(paths.USERS, {encoding: "utf-8"})
+//         const storedUsers: StoredUser[] = JSON.parse(data)
+//         const users: UserEntity[] = storedUsers.map(u => this.toEntity(u))
+//
+//         const now = new Date();
+//
+//         const createdUser: UserEntity = {
+//             id: randomUUID(),
+//             firstName,
+//             lastName,
+//             role,
+//             createdAt: now,
+//             updatedAt: now,
+//             userAuth: {
+//                 email: auth.email,
+//                 password: auth.password,
+//                 refreshToken: null
+//             }
+//         }
+//
+//         users.push(createdUser)
+//         const updatedStoredUsers = users.map(u => this.toStored(u))
+//         await fs.writeFile(
+//             paths.USERS,
+//             JSON.stringify(updatedStoredUsers),
+//             {encoding: 'utf-8'},
+//         )
+//
+//         return createdUser
+//     }
+//
+//     async updateProfile(id: string, data: UpdateUserDto): Promise<UserEntity> {
+//         const {firstName, lastName} = data;
+//         const user = await this.findById(id);
+//         const users = await this.find();
+//
+//         const updatedUser: UserEntity = {
+//             id: user.id,
+//             firstName: firstName ?? user.firstName,
+//             lastName: lastName ?? user.lastName,
+//             role: user.role,
+//             createdAt: user.createdAt,
+//             updatedAt: new Date().toISOString(),
+//             userAuth: {
+//                 email: user.userAuth.email,
+//                 password: user.userAuth.password,
+//                 refreshToken: user.userAuth.refreshToken,
+//             }
+//         }
+//
+//         const index = users.findIndex((user) => user.id === updatedUser.id);
+//         users[index] = updatedUser;
+//
+//         await fs.writeFile(
+//             paths.USERS,
+//             JSON.stringify(users),
+//             {encoding: 'utf-8'},
+//         )
+//
+//         return updatedUser
+//     }
+//
+//     // NOTE: this one should only save the credentials (with hashedPassword) without checking. subtle layer
+//     async updateCredentials(id: string, credentials: CredentialsDto): Promise<UserEntity> {
+//         const {email, password, refreshToken} = credentials;
+//         const user = await this.findById(id);
+//         const users = await this.find();
+//
+//         const updatedUser: UserEntity = {
+//             id: user.id,
+//             firstName: user.firstName,
+//             lastName: user.lastName,
+//             role: user.role,
+//             createdAt: user.createdAt,
+//             updatedAt: new Date().toISOString(),
+//             userAuth: {
+//                 email: email ?? user.userAuth.email,
+//                 password: password ?? user.userAuth.password,
+//                 refreshToken: refreshToken ?? user.userAuth.refreshToken
+//             }
+//         }
+//
+//         const index = users.findIndex((user) => user.id === updatedUser.id);
+//         users[index] = updatedUser;
+//
+//         await fs.writeFile(
+//             paths.USERS,
+//             JSON.stringify(users),
+//             {encoding: 'utf-8'},
+//         )
+//
+//         return updatedUser
+//     }
+//
+//     async delete(id: string): Promise<void> {
+//         const users = await this.find();
+//         const updatedUsers = users.filter((user: UserEntity) => user.id !== id)
+//
+//         await fs.writeFile(
+//             paths.USERS,
+//             JSON.stringify(updatedUsers),
+//             {encoding: 'utf-8'},
+//         )
+//     }
+// }
