@@ -45,11 +45,11 @@ export { Prisma }
  */
 export type Appointment = Prisma.AppointmentModel
 /**
- * Model DoctorWeeklySlots
+ * Model DoctorWeeklySlot
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  * This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
  */
-export type DoctorWeeklySlots = Prisma.DoctorWeeklySlotsModel
+export type DoctorWeeklySlot = Prisma.DoctorWeeklySlotModel
 /**
  * Model Doctor
  * 

@@ -1,9 +1,12 @@
 import {IUsersRepository} from "./i-users-repository";
 import {CreateUserDto, CredentialsDto, UpdateUserDto, UserEntity, UserFilter} from "../types";
-import {prisma} from "../../lib/prisma";
 import {UserWhereInput} from "../../generated/prisma/models/User";
+import {PrismaClient} from "../../generated/prisma/client";
 
 export class UsersRepositoryPrisma implements IUsersRepository {
+
+    constructor(private readonly prisma: PrismaClient) {}
+
     // DONE
     async find(filter?: UserFilter): Promise<UserEntity[]> {
         const where: UserWhereInput = {};
@@ -13,7 +16,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         if (filter?.lastName) where.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
 
 
-        const prismaUsers = await prisma.user.findMany({
+        const prismaUsers = await this.prisma.user.findMany({
             where,
             select: {
                 id: true,
@@ -25,17 +28,14 @@ export class UsersRepositoryPrisma implements IUsersRepository {
             }
         })
 
-        if (filter && (filter.firstName || filter.lastName) && prismaUsers.length === 0) {
-            throw new Error("No users matched the filter")
-        }
-
+        if (filter && (filter.firstName || filter.lastName) && prismaUsers.length === 0) throw new Error("No users matched the filter")
 
         return prismaUsers
     }
 
     // DONE
     async findById(id: string): Promise<UserEntity | null> {
-        return prisma.user.findUnique({
+        return this.prisma.user.findUnique({
             where: {id},
             select: {
                 id: true,
@@ -51,7 +51,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     // DONE
     //TODO:  if you need email -> create method getCredentialsByEmail
     async findByEmail(email: string): Promise<UserEntity | null> {
-        const authRow = await prisma.userAuth.findUnique({
+        const authRow = await this.prisma.userAuth.findUnique({
             where: {email},
             select: {
                 user: {
@@ -75,7 +75,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     async create(userData: CreateUserDto): Promise<UserEntity> {
         const {firstName, lastName, role, auth: {email, passwordHash}} = userData;
 
-        return prisma.user.create({
+        return this.prisma.user.create({
             data: {
                 firstName,
                 lastName,
@@ -102,7 +102,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     async updateProfile(id: string, data: UpdateUserDto): Promise<UserEntity> {
         const {firstName, lastName} = data;
 
-        return prisma.user.update({
+        return this.prisma.user.update({
             where : {id},
             data: {firstName, lastName},
             select: {
@@ -118,7 +118,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
 
     async updateCredentials(id: string, credentials: CredentialsDto): Promise<void> {
             const {email, passwordHash, refreshToken} = credentials;
-            await prisma.userAuth.update({
+            await this.prisma.userAuth.update({
                 where: {userId: id},
                 data: {
                    email,
@@ -129,7 +129,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     }
 
     async delete(id: string): Promise<void> {
-        await prisma.user.delete({
+        await this.prisma.user.delete({
             where: {id}
         })
     }

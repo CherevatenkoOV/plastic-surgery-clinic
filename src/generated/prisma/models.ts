@@ -9,7 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Appointment.js'
-export type * from './models/DoctorWeeklySlots.js'
+export type * from './models/DoctorWeeklySlot.js'
 export type * from './models/Doctor.js'
 export type * from './models/Patient.js'
 export type * from './models/UserAuth.js'

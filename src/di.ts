@@ -17,6 +17,9 @@ import {createAuthRouter} from "./auth/auth-router.js";
 import {AppointmentsService} from "./appointments/service.js";
 import {AppointmentsController} from "./appointments/appointments-controller.js";
 import {createAppointmentsRouter} from "./appointments/appointments-router.js";
+import {prisma} from "./lib/prisma";
+
+// TODO: import prisma from lib/prisma
 
 
 const usersRepository = new UsersRepositoryFile()

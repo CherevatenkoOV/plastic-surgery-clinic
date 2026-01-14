@@ -18,6 +18,7 @@ export class DoctorsService {
     }
 
     async create(doctorData: CreateDoctorDto): Promise<Doctor> {
+
         return await this.doctorsRepo.create(doctorData)
     }
 

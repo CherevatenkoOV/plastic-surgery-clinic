@@ -1,35 +1,14 @@
 // TODO: UserEntity для работы до слоя HTTP, дальше - оставить UserDto
-import {AuthEntity} from "../auth/types";
 import {UserRole} from "../generated/prisma/enums";
+import {User} from "../generated/prisma/client";
 
-// export interface UserEntity {
-//     id: string;
-//     firstName: string;
-//     lastName: string;
-//     role: UserRole;
-//     createdAt: Date;
-//     updatedAt: Date;
-//     userAuth: Omit<AuthEntity, "userId"> | null
-// }
-
-export interface UserEntity {
-    id: string;
-    firstName: string;
-    lastName: string;
-    role: UserRole;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-
-
-// export type UserWithoutAuth = Omit<UserEntity, "userAuth">
+export type UserEntity = User
 
 export interface UserDto {
     id: string;
     firstName: string;
     lastName: sring;
-    role: string;
+    role: UserRole;
 }
 
 export type UsersParams = Pick<UserEntity, 'id'>
@@ -55,10 +34,6 @@ export interface UpdateUserDto {
 }
 
 export type UserFilter = Partial<Pick<UserEntity, "firstName" | "lastName">>
-
-export interface FullUserBase {
-    profile: UserWithoutAuth | UserDto
-}
 
 export interface CreateCredentialsDto {
     email: string;

@@ -33,7 +33,7 @@ export class UsersService {
     }
 
     async delete(id: string): Promise<void> {
-        const user = await this.getById(id)
+        const user = await this.usersRepo.findById(id)
 
         switch(user!.role) {
             case Role.DOCTOR:

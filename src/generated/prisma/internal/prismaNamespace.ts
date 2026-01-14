@@ -385,7 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Appointment: 'Appointment',
-  DoctorWeeklySlots: 'DoctorWeeklySlots',
+  DoctorWeeklySlot: 'DoctorWeeklySlot',
   Doctor: 'Doctor',
   Patient: 'Patient',
   UserAuth: 'UserAuth',
@@ -405,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "appointment" | "doctorWeeklySlots" | "doctor" | "patient" | "userAuth" | "user"
+    modelProps: "appointment" | "doctorWeeklySlot" | "doctor" | "patient" | "userAuth" | "user"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -483,61 +483,61 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    DoctorWeeklySlots: {
-      payload: Prisma.$DoctorWeeklySlotsPayload<ExtArgs>
-      fields: Prisma.DoctorWeeklySlotsFieldRefs
+    DoctorWeeklySlot: {
+      payload: Prisma.$DoctorWeeklySlotPayload<ExtArgs>
+      fields: Prisma.DoctorWeeklySlotFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.DoctorWeeklySlotsFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload> | null
+          args: Prisma.DoctorWeeklySlotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.DoctorWeeklySlotsFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload>
+          args: Prisma.DoctorWeeklySlotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload>
         }
         findFirst: {
-          args: Prisma.DoctorWeeklySlotsFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload> | null
+          args: Prisma.DoctorWeeklySlotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.DoctorWeeklySlotsFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload>
+          args: Prisma.DoctorWeeklySlotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload>
         }
         findMany: {
-          args: Prisma.DoctorWeeklySlotsFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload>[]
+          args: Prisma.DoctorWeeklySlotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload>[]
         }
         delete: {
-          args: Prisma.DoctorWeeklySlotsDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload>
+          args: Prisma.DoctorWeeklySlotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload>
         }
         update: {
-          args: Prisma.DoctorWeeklySlotsUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload>
+          args: Prisma.DoctorWeeklySlotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload>
         }
         deleteMany: {
-          args: Prisma.DoctorWeeklySlotsDeleteManyArgs<ExtArgs>
+          args: Prisma.DoctorWeeklySlotDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.DoctorWeeklySlotsUpdateManyArgs<ExtArgs>
+          args: Prisma.DoctorWeeklySlotUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.DoctorWeeklySlotsUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotsPayload>[]
+          args: Prisma.DoctorWeeklySlotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DoctorWeeklySlotPayload>[]
         }
         aggregate: {
-          args: Prisma.DoctorWeeklySlotsAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateDoctorWeeklySlots>
+          args: Prisma.DoctorWeeklySlotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDoctorWeeklySlot>
         }
         groupBy: {
-          args: Prisma.DoctorWeeklySlotsGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DoctorWeeklySlotsGroupByOutputType>[]
+          args: Prisma.DoctorWeeklySlotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DoctorWeeklySlotGroupByOutputType>[]
         }
         count: {
-          args: Prisma.DoctorWeeklySlotsCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DoctorWeeklySlotsCountAggregateOutputType> | number
+          args: Prisma.DoctorWeeklySlotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DoctorWeeklySlotCountAggregateOutputType> | number
         }
       }
     }
@@ -858,6 +858,10 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         args: [query: string, ...values: any[]],
         result: any
       }
+      $queryRawTyped: {
+        args: runtime.UnknownTypedSql,
+        result: JsonObject
+      }
     }
   }
 }
@@ -889,13 +893,13 @@ export const AppointmentScalarFieldEnum = {
 export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
 
 
-export const DoctorWeeklySlotsScalarFieldEnum = {
+export const DoctorWeeklySlotScalarFieldEnum = {
   id: 'id',
   doctorId: 'doctorId',
   weekday: 'weekday'
 } as const
 
-export type DoctorWeeklySlotsScalarFieldEnum = (typeof DoctorWeeklySlotsScalarFieldEnum)[keyof typeof DoctorWeeklySlotsScalarFieldEnum]
+export type DoctorWeeklySlotScalarFieldEnum = (typeof DoctorWeeklySlotScalarFieldEnum)[keyof typeof DoctorWeeklySlotScalarFieldEnum]
 
 
 export const DoctorScalarFieldEnum = {
@@ -1131,7 +1135,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   appointment?: Prisma.AppointmentOmit
-  doctorWeeklySlots?: Prisma.DoctorWeeklySlotsOmit
+  doctorWeeklySlot?: Prisma.DoctorWeeklySlotOmit
   doctor?: Prisma.DoctorOmit
   patient?: Prisma.PatientOmit
   userAuth?: Prisma.UserAuthOmit
