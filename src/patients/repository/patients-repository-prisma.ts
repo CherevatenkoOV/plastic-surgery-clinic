@@ -12,7 +12,7 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
     async find(filter?: PatientFilter): Promise<PatientWithUser[]> {
         const where: PatientWhereInput = {}
 
-        if (filter?.phone) where.phone = {equals: filter.phone}
+        if (filter?.phone) where.phone = filter.phone
 
         if (filter?.firstName || filter?.lastName) {
             where.user = {}

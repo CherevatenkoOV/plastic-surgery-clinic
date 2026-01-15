@@ -1,9 +1,13 @@
-import {Appointment, AppointmentsFilter, CreateAppointmentDto, UpdateAppointmentDto} from "../types.js";
+import {
+    AppointmentEntity, AppointmentFilter,
+    CreateAppointmentDto,
+    UpdateAppointmentDto
+} from "../types.js";
 
 export interface IAppointmentsRepository {
-    find(filter?: AppointmentsFilter): Promise<Appointment[]>;
-    findById(id: string): Promise<Appointment | undefined>;
-    create(appointmentData: CreateAppointmentDto): Promise<Appointment>;
-    update(id: string, appointmentData: UpdateAppointmentDto): Promise<Appointment>;
+    find(filter?: AppointmentFilter): Promise<AppointmentEntity[]>;
+    findById(id: string): Promise<AppointmentEntity | null>;
+    create(appointmentData: CreateAppointmentDto): Promise<AppointmentEntity>;
+    update(id: string, appointmentData: UpdateAppointmentDto): Promise<AppointmentEntity>;
     delete(id: string): Promise<void>;
 }

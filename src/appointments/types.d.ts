@@ -1,30 +1,129 @@
+import type { Prisma, Appointment as PrismaAppointment } from "../generated/prisma/client";
 
-export interface Appointment {
+// ===== Prisma entities / Payloads =====
+
+export type AppointmentEntity = Prisma.AppointmentGetPayload<{
+    select: {
+        id: true;
+        doctorId: true;
+        patientId: true;
+        serviceName: true;
+        startsAt: true;          
+        createdAt: true;
+        updatedAt: true;
+    };
+}>;
+
+export type AppointmentWithDoctorAndPatient = Prisma.AppointmentGetPayload<{
+    select: {
+        id: true;
+        procedureType: true;
+        startsAt: true;
+        createdAt: true;
+        updatedAt: true;
+        doctor: {
+            select: {
+                doctorId: true;
+                user: {
+                    select: {
+                        id: true;
+                        firstName: true;
+                        lastName: true;
+                        role: true;
+                    };
+                };
+            };
+        };
+        patient: {
+            select: {
+                patientId: true;
+                user: {
+                    select: {
+                        id: true;
+                        firstName: true;
+                        lastName: true;
+                        role: true;
+                    };
+                };
+            };
+        };
+    };
+}>;
+
+// ===== DTO / app-level types =====
+
+type ISODateString = string;
+
+export interface AppointmentDto {
     id: string;
     doctorId: string;
     patientId: string;
-    procedureType: string;
-    timeISO: string;
-    createdAt: string;
-    updatedAt: string;
+    serviceName: string;
+    startsAt: ISODateString;
+    createdAt: ISODateString;
+    updatedAt: ISODateString;
 }
 
 export interface CreateAppointmentDto {
     doctorId: string;
     patientId: string;
-    procedureType: string;
-    timeISO: string;
+    serviceName: string;
+    startsAt: ISODateString;
 }
 
-export type UpdateAppointmentDto = Partial<Omit<Appointment, "id" | "createdAt" | "updatedAt">>;
+export type UpdateAppointmentDto = Partial<
+    Omit<AppointmentDto, "id" | "createdAt" | "updatedAt">
+>;
 
-export interface AppointmentsFilter {
+export interface AppointmentFilter {
     doctorId?: string;
     patientId?: string;
 }
 
-export interface AppointmentsParams {
-    id: string
+export interface AppointmentsParamsDto {
+    id: string;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//=========================================================
+//=================OLD VERSION=============================
+//=========================================================
+// export interface Appointment {
+//     id: string;
+//     doctorId: string;
+//     patientId: string;
+//     serviceName: string;
+//     startsAt: string;
+//     createdAt: string;
+//     updatedAt: string;
+// }
+//
+// export interface CreateAppointmentDto {
+//     doctorId: string;
+//     patientId: string;
+//     serviceName: string;
+//     startsAt: string;
+// }
+//
+// export type UpdateAppointmentDto = Partial<Omit<Appointment, "id" | "createdAt" | "updatedAt">>;
+//
+// export interface AppointmentsFilter {
+//     doctorId?: string;
+//     patientId?: string;
+// }
+//
+// export interface AppointmentsParams {
+//     id: string
+// }
 
 

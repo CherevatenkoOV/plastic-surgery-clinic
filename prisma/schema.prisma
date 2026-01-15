@@ -15,7 +15,7 @@ model Appointment {
   serviceName String   @map("service_name")
   startsAt    DateTime @map("starts_at") @db.Timestamptz(6)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
   doctor      Doctor   @relation(fields: [doctorId], references: [doctorId], onDelete: NoAction, onUpdate: NoAction)
   patient     Patient  @relation(fields: [patientId], references: [patientId], onDelete: NoAction, onUpdate: NoAction)
 
@@ -71,7 +71,7 @@ model User {
   lastName  String    @map("last_name") @db.VarChar(50)
   role      UserRole  @default(patient)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   doctor    Doctor?
   patient   Patient?
   userAuth  UserAuth?
