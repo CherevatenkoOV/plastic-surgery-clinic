@@ -2,7 +2,16 @@
 import {UserRole} from "../generated/prisma/enums";
 import {User} from "../generated/prisma/client";
 
-export type UserEntity = User
+export type UserEntity = Prisma.UserGetPayload<{
+    select: {
+        id: true;
+        firstName: true;
+        lastName: true;
+        role: true;
+        createdAt: true;
+        updatedAt: true;
+    };
+}>;
 
 export interface UserDto {
     id: string;

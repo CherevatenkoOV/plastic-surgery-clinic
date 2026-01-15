@@ -1,9 +1,9 @@
-import {CreatePatientDto, Patient, UpdatePatientDto} from "../types.js";
+import {CreatePatientDto, Patient, PatientEntity, PatientWithUser, UpdatePatientDto} from "../types.js";
 
 export interface IPatientsRepository {
-    find(): Promise<Patient[]>;
-    findById(id: string): Promise<Patient | undefined>;
-    create(patientData: CreatePatientDto): Promise<Patient>;
-    update(userId: string, patientData: UpdatePatientDto): Promise<Patient>;
-    delete(userId: string): Promise<void>;
+    find(): Promise<PatientWithUser[]>;
+    findById(patientId: string): Promise<PatientWithUser | null>;
+    create(patientData: CreatePatientDto): Promise<PatientEntity>;
+    update(patientId: string, patientData: UpdatePatientDto): Promise<PatientEntity>;
+    delete(patientId: string): Promise<void>;
 }

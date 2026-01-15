@@ -1,12 +1,12 @@
 import {
     CreateDoctorDto, CreateSlotDto,
     DoctorEntity,
-    DoctorsQueryDto, Slot,
+    DoctorFilter, Slot,
     UpdateDoctorDto
 } from "../types.js";
 
 export interface IDoctorsRepository {
-    find(filter?: DoctorsQueryDto): Promise<DoctorEntity[]>;
+    find(filter?: DoctorFilter): Promise<DoctorEntity[]>;
     findById(doctorId: string): Promise<DoctorEntity | null>;
     create(doctorData: CreateDoctorDto): Promise<DoctorEntity>;
     update(doctorId: string, doctorData: UpdateDoctorDto): Promise<DoctorEntity>;

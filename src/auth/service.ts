@@ -31,6 +31,7 @@ export class AuthService {
 
         const hashedPassword = await this.hashPassword(password)
 
+        //
         const user = await this.usersService.create({first_name, last_name, role, auth: {email, password: hashedPassword}})
 
         switch (role) {

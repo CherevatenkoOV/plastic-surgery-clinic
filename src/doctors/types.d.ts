@@ -1,25 +1,42 @@
-import {Doctor, DoctorWeeklySlots} from "../generated/prisma/client";
+import {DoctorWeeklySlots} from "../generated/prisma/client";
 import {addWeeklySlots} from "../generated/prisma/sql/addWeeklySlots";
 
 // ===== Prisma entities / Payloads =====
 
-export type DoctorEntity = Doctor
+export type DoctorEntity = Prisma.DoctorGetPayload<{
+    select: {
+        doctorId: true;
+        specialization: true;
+    };
+}>;
 
 export type DoctorWithUser = Prisma.DoctorGetPayload<{
-    include: { user: true }
-}>
+    select: {
+        doctorId: true;
+        specialization: true;
+        user: {
+            select: {
+                id: true;
+                firstName: true;
+                lastName: true;
+                role: true;
+            };
+        };
+    };
+}>;
 
-export type DoctorWithWeeklySlots = Prisma.DoctorGetPayload<{
-    include: { doctorWeeklySlots: true }
-}>
-
-export type DoctorWithUserAndWeeklySlots = Prisma.DoctorGetPayload<{
-    include: { user: true, doctorWeeklySlots: true }
-}>
-
-export type DoctorWithUserAndAppointments = Prisma.DoctorGetPayload<{
-    include: { user: true, appointments: true }
-}>
+// NOTE: should be removed?
+// export type DoctorWithWeeklySlots = Prisma.DoctorGetPayload<{
+//     include: { doctorWeeklySlots: true }
+// }>
+//
+// export type DoctorWithUserAndWeeklySlots = Prisma.DoctorGetPayload<{
+//     include: { user: true, doctorWeeklySlots: true }
+// }>
+//
+// export type DoctorWithUserAndAppointments = Prisma.DoctorGetPayload<{
+//     include: { user: true, appointments: true }
+// }>
 
 
 // TODO in the future functionality will be used pure SQL-raw for DB based on the type Slot below
@@ -48,12 +65,14 @@ export interface UpdateDoctorDto {
     doctorWeeklySlots?: Slot[];
 }
 
-export interface DoctorsQueryDto {
+export interface DoctorFilter {
+    firstName?: string;
+    lastName?: string;
     specialization?: string;
 }
 
 export interface DoctorsParamsDto {
-    id?: string;
+    doctorId?: string;
 }
 
 export interface DoctorInviteToken {

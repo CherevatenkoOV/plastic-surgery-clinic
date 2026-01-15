@@ -1,5 +1,5 @@
 import {Request} from "express";
-import {CreateDoctorDto, Doctor, FullDoctorDto, FullDoctorFilter, UpdateDoctorDto} from "./types.js";
+import {CreateDoctorDto, UpdateDoctorDto} from "./types.js";
 import {Appointment} from "../appointments/types.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
@@ -18,6 +18,8 @@ export class DoctorsService {
     }
 
     async create(doctorData: CreateDoctorDto): Promise<Doctor> {
+
+
 
         return await this.doctorsRepo.create(doctorData)
     }

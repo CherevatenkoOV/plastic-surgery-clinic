@@ -3,46 +3,72 @@ import {
     AddWeeklySlotsResult,
     CreateDoctorDto, CreateSlotDto,
     DoctorEntity,
-    DoctorsQueryDto,
+    DoctorFilter, DoctorWithUser,
     Slot, SlotId,
     UpdateDoctorDto
 } from "../types.js";
 import {DoctorWhereInput} from "../../generated/prisma/models/Doctor";
 import {getWeeklySlots} from "../../generated/prisma/sql/getWeeklySlots.js";
 import {addWeeklySlots} from "../../generated/prisma/sql/addWeeklySlots.js";
-import { replaceWeeklySlot } from "../../generated/prisma/sql/replaceWeeklySlot.js";
+import {replaceWeeklySlot} from "../../generated/prisma/sql/replaceWeeklySlot.js";
 import {PrismaClient} from "../../generated/prisma/client";
 
-export class DoctorsRepositoryFile implements IDoctorsRepository {
+export class DoctorsRepositoryPrisma implements IDoctorsRepository {
 
-    constructor(private readonly prisma: PrismaClient) {}
+    constructor(private readonly prisma: PrismaClient) {
+    }
 
     // DONE
-    async find(filter?: DoctorsQueryDto): Promise<DoctorEntity[]> {
+    async find(filter?: DoctorFilter): Promise<DoctorWithUser[]> {
         const where: DoctorWhereInput = {};
 
-        if (filter?.specialization) where.specialization = {equals: filter?.specialization?.trim(), mode: 'insensitive'}
+        if (filter?.specialization) where.specialization = {equals: filter.specialization.trim(), mode: 'insensitive'}
+
+        if (filter?.firstName || filter?.lastName) {
+            where.user = {}
+
+            if (filter.firstName) where.user.firstName = {equals: filter.firstName.trim(), mode: 'insensitive'}
+            if (filter.lastName) where.user.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
+        }
 
         const prismaDoctors = await this.prisma.doctor.findMany({
             where,
             select: {
                 doctorId: true,
-                specialization: true
-            }
+                specialization: true,
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        role: true
+                    }
+                }
+            },
         })
 
-        if (filter && filter.specialization && prismaDoctors.length === 0) throw new Error("No users matched the filter")
+        if (filter &&
+            (filter.specialization || filter.firstName || filter.lastName) &&
+            prismaDoctors.length === 0) throw new Error("No doctors matched the filter")
 
         return prismaDoctors
     }
 
     // DONE
-    async findById(doctorId: string): Promise<DoctorEntity | null> {
+    async findById(doctorId: string): Promise<DoctorWithUser | null> {
         return this.prisma.doctor.findUnique({
             where: {doctorId},
             select: {
                 doctorId: true,
-                specialization: true
+                specialization: true,
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        role: true
+                    }
+                }
             }
         })
     }
@@ -64,6 +90,10 @@ export class DoctorsRepositoryFile implements IDoctorsRepository {
             where: {doctorId},
             data: {
                 specialization
+            },
+            select: {
+                doctorId: true,
+                specialization: true
             }
         })
     }
@@ -129,7 +159,7 @@ export class DoctorsRepositoryFile implements IDoctorsRepository {
     }
 
     async deleteWeeklySlot(doctorId: string, slotId: string): Promise<void> {
-        const { count } = await this.prisma.doctorWeeklySlot.deleteMany({
+        const {count} = await this.prisma.doctorWeeklySlot.deleteMany({
             where: {
                 id: slotId,
                 doctorId,
