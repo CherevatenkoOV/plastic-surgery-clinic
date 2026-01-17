@@ -19,6 +19,26 @@ import {AppointmentsController} from "./appointments/appointments-controller.js"
 import {createAppointmentsRouter} from "./appointments/appointments-router.js";
 import {prisma} from "./lib/prisma";
 
+// ==== Актуальная сборка сервисов auth модуля =====
+// import { PasswordService } from "./auth/password.service";
+// import { TokenService } from "./auth/token.service";
+// import { MailerService } from "./auth/mailer.service";
+//
+// const passwordService = new PasswordService(Number(process.env.BCRYPT_SALT_ROUNDS ?? 10));
+//
+// const tokenService = new TokenService(
+//     process.env.ACCESS_TOKEN_SECRET!,
+//     process.env.REFRESH_TOKEN_SECRET!,
+//     process.env.RESET_PASSWORD_JWT_SECRET!,
+//     process.env.DOCTOR_INVITE_JWT_SECRET!
+// );
+//
+// const mailService = new MailService(
+//     process.env.MAIL_USER!,
+//     process.env.MAIL_PASS!,
+//     process.env.API_URL!
+// );
+
 // TODO: import prisma from lib/prisma
 
 

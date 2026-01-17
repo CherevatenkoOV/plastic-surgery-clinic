@@ -12,6 +12,7 @@ import {getWeeklySlots} from "../../generated/prisma/sql/getWeeklySlots.js";
 import {addWeeklySlots} from "../../generated/prisma/sql/addWeeklySlots.js";
 import {replaceWeeklySlot} from "../../generated/prisma/sql/replaceWeeklySlot.js";
 import {PrismaClient} from "../../generated/prisma/client";
+import {DbClient} from "../../shared/db";
 
 export class DoctorsRepositoryPrisma implements IDoctorsRepository {
 
@@ -19,7 +20,7 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     }
 
     // DONE
-    async find(filter?: DoctorFilter): Promise<DoctorWithUser[]> {
+    async find(filter?: DoctorFilter, db: DbClient = this.prisma): Promise<DoctorWithUser[]> {
         const where: DoctorWhereInput = {};
 
         if (filter?.specialization) where.specialization = {equals: filter.specialization.trim(), mode: 'insensitive'}
@@ -31,7 +32,7 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
             if (filter.lastName) where.user.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
         }
 
-        const prismaDoctors = await this.prisma.doctor.findMany({
+        const prismaDoctors = await db.doctor.findMany({
             where,
             select: {
                 doctorId: true,
@@ -55,8 +56,8 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     }
 
     // DONE
-    async findById(doctorId: string): Promise<DoctorWithUser | null> {
-        return this.prisma.doctor.findUnique({
+    async findById(doctorId: string, db: DbClient = this.prisma): Promise<DoctorWithUser | null> {
+        return db.doctor.findUnique({
             where: {doctorId},
             select: {
                 doctorId: true,
@@ -74,19 +75,19 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     }
 
     // DONE
-    async create(doctorData: CreateDoctorDto): Promise<DoctorEntity> {
+    async create(doctorData: CreateDoctorDto, db: DbClient = this.prisma): Promise<DoctorEntity> {
         const {doctorId, specialization} = doctorData
 
-        return this.prisma.doctor.create({
+        return db.doctor.create({
             data: {doctorId, specialization}
         })
     }
 
     // DONE
-    async update(doctorId: string, doctorData: UpdateDoctorDto): Promise<DoctorEntity> {
+    async update(doctorId: string, doctorData: UpdateDoctorDto, db: DbClient = this.prisma): Promise<DoctorEntity> {
         const {specialization} = doctorData;
 
-        return this.prisma.doctor.update({
+        return db.doctor.update({
             where: {doctorId},
             data: {
                 specialization
@@ -99,15 +100,15 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     }
 
     // DONE
-    async delete(doctorId: string): Promise<void> {
-        await this.prisma.doctor.delete({
+    async delete(doctorId: string, db: DbClient = this.prisma): Promise<void> {
+        await db.doctor.delete({
             where: {doctorId}
         })
     }
 
     // DONE
-    async getWeeklySlots(doctorId: string): Promise<Slot[]> {
-        const rows = await this.prisma.$queryRawTyped(getWeeklySlots(doctorId))
+    async getWeeklySlots(doctorId: string, db: DbClient = this.prisma): Promise<Slot[]> {
+        const rows = await db.$queryRawTyped(getWeeklySlots(doctorId))
 
         return rows.map(r => {
             if (r.startAt === null || r.endAt === null) throw new Error(`Invalid time_range for slot ${r.id}: boundaries are NULL/infinite`)
@@ -123,7 +124,7 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     }
 
     // DONE
-    async addWeeklySlots(doctorId: string, slots: CreateSlotDto[]): Promise<AddWeeklySlotsResult> {
+    async addWeeklySlots(doctorId: string, slots: CreateSlotDto[], db: DbClient = this.prisma): Promise<AddWeeklySlotsResult> {
         const payload = {
             slots: slots.map(s => ({
                 weekday: s.weekday,
@@ -132,7 +133,7 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
             }))
         }
 
-        const rows = await this.prisma.$queryRawTyped(addWeeklySlots(doctorId, payload))
+        const rows = await db.$queryRawTyped(addWeeklySlots(doctorId, payload))
 
         const result = rows[0]
         if (!result) throw new Error('addWeeklySlots: expected 1 row')
@@ -141,10 +142,10 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     }
 
     // DONE
-    async replaceWeeklySlot(doctorId: string, slotId: string, newSlot: CreateSlotDto): Promise<SlotId> {
+    async replaceWeeklySlot(doctorId: string, slotId: string, newSlot: CreateSlotDto, db: DbClient = this.prisma): Promise<SlotId> {
         const {weekday, startAt, endAt} = newSlot;
 
-        const rows = await this.prisma.$queryRawTyped(
+        const rows = await db.$queryRawTyped(
             replaceWeeklySlot(doctorId, slotId, weekday, startAt, endAt)
         )
 
@@ -158,8 +159,8 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
         return newSlotId as SlotId
     }
 
-    async deleteWeeklySlot(doctorId: string, slotId: string): Promise<void> {
-        const {count} = await this.prisma.doctorWeeklySlot.deleteMany({
+    async deleteWeeklySlot(doctorId: string, slotId: string, db: DbClient = this.prisma): Promise<void> {
+        const {count} = await db.doctorWeeklySlot.deleteMany({
             where: {
                 id: slotId,
                 doctorId,

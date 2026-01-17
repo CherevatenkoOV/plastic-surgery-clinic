@@ -48,9 +48,10 @@ export class UsersService {
         await this.usersRepo.delete(id)
     }
 
-    async emailExists(email: string): Promise<boolean> {
-        return !!(await this.getByEmail(email));
-    }
+    // deprecated
+    // async emailExists(email: string): Promise<boolean> {
+    //     return !!(await this.getByEmail(email));
+    // }
 
     // deprecated
     // async updateCredentials(id: string, credentials: CredentialsDto): Promise<UserEntity> {

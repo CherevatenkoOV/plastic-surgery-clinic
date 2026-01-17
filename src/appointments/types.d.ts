@@ -84,46 +84,11 @@ export interface AppointmentsParamsDto {
     id: string;
 }
 
+AppointmentTimeCheckInput
 
 
 
 
 
-
-
-
-
-
-
-//=========================================================
-//=================OLD VERSION=============================
-//=========================================================
-// export interface Appointment {
-//     id: string;
-//     doctorId: string;
-//     patientId: string;
-//     serviceName: string;
-//     startsAt: string;
-//     createdAt: string;
-//     updatedAt: string;
-// }
-//
-// export interface CreateAppointmentDto {
-//     doctorId: string;
-//     patientId: string;
-//     serviceName: string;
-//     startsAt: string;
-// }
-//
-// export type UpdateAppointmentDto = Partial<Omit<Appointment, "id" | "createdAt" | "updatedAt">>;
-//
-// export interface AppointmentsFilter {
-//     doctorId?: string;
-//     patientId?: string;
-// }
-//
-// export interface AppointmentsParams {
-//     id: string
-// }
 
 

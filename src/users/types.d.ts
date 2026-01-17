@@ -44,15 +44,24 @@ export interface UpdateUserDto {
 
 export type UserFilter = Partial<Pick<UserEntity, "firstName" | "lastName">>
 
-export interface CreateCredentialsDto {
+export interface UserAuthSubject {
+    id: string;
+    role: Role;
+    email: string;
+    passwordHash: string; // возможно стоит сделать string | null
+    refreshToken: string | null; // возможно стоит сделать string | null
+}
+
+export interface CreateUserCredentialsDto {
     email: string;
     passwordHash: string;
 }
 
-export interface CredentialsDto {
+
+export interface UpdateUserCredentialsDto {
     email?: string;
     passwordHash?: string;
-    refreshToken?: string;
+    refreshToken?: string | null;
 }
 
 

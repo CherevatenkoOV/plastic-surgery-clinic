@@ -1,14 +1,22 @@
 import {IUsersRepository} from "./i-users-repository";
-import {CreateUserDto, CredentialsDto, UpdateUserDto, UserEntity, UserFilter} from "../types";
+import {
+    CreateUserDto,
+    UpdateUserCredentialsDto,
+    UpdateUserDto,
+    UserAuthSubject,
+    UserEntity,
+    UserFilter
+} from "../types";
 import {UserWhereInput} from "../../generated/prisma/models/User";
 import {PrismaClient} from "../../generated/prisma/client";
+import {DbClient} from "../../shared/db";
 
 export class UsersRepositoryPrisma implements IUsersRepository {
 
     constructor(private readonly prisma: PrismaClient) {}
 
     // DONE
-    async find(filter?: UserFilter): Promise<UserEntity[]> {
+    async find(filter?: UserFilter, db: DbClient = this.prisma): Promise<UserEntity[]> {
         const where: UserWhereInput = {};
 
         if (filter?.firstName) where.firstName = {equals: filter.firstName.trim(), mode: 'insensitive'}
@@ -16,7 +24,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         if (filter?.lastName) where.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
 
 
-        const prismaUsers = await this.prisma.user.findMany({
+        const prismaUsers = await db.user.findMany({
             where,
             select: {
                 id: true,
@@ -34,8 +42,8 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     }
 
     // DONE
-    async findById(id: string): Promise<UserEntity | null> {
-        return this.prisma.user.findUnique({
+    async findById(id: string, db: DbClient = this.prisma): Promise<UserEntity | null> {
+        return db.user.findUnique({
             where: {id},
             select: {
                 id: true,
@@ -50,8 +58,8 @@ export class UsersRepositoryPrisma implements IUsersRepository {
 
     // DONE
     //TODO:  if you need email -> create method getCredentialsByEmail
-    async findByEmail(email: string): Promise<UserEntity | null> {
-        const authRow = await this.prisma.userAuth.findUnique({
+    async findByEmail(email: string, db: DbClient = this.prisma): Promise<UserEntity | null> {
+        const authRow = await db.userAuth.findUnique({
             where: {email},
             select: {
                 user: {
@@ -72,10 +80,10 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     }
 
     // DONE
-    async create(userData: CreateUserDto): Promise<UserEntity> {
+    async create(userData: CreateUserDto, db: DbClient = this.prisma): Promise<UserEntity> {
         const {firstName, lastName, role, auth: {email, passwordHash}} = userData;
 
-        return this.prisma.user.create({
+        return db.user.create({
             data: {
                 firstName,
                 lastName,
@@ -99,10 +107,58 @@ export class UsersRepositoryPrisma implements IUsersRepository {
     }
 
     // DONE
-    async updateProfile(id: string, data: UpdateUserDto): Promise<UserEntity> {
+    async getAuthSubjectById(id: string, db: DbClient = this.prisma): Promise<UserAuthSubject | null> {
+        const authRow = await db.userAuth.findUnique({
+            where: {userId: id},
+            select: {
+                user: { select: {id: true, role: true } },
+                email: true,
+                passwordHash: true,
+                refreshToken: true
+            }
+        })
+
+        if (!authRow) return null;
+        if (!authRow.user) throw new Error("Corrupted auth record: user not found");
+
+        return {
+            id: authRow.user.id,
+            role: authRow.user.role,
+            email: authRow.email,
+            passwordHash: authRow.passwordHash,
+            refreshToken: authRow.refreshToken
+        }
+    }
+
+    // DONE
+    async getAuthSubjectByEmail(email: string, db: DbClient = this.prisma): Promise<UserAuthSubject | null> {
+        const authRow = await db.userAuth.findUnique({
+            where: {email},
+            select: {
+                user: { select: {id: true, role: true } },
+                email: true,
+                passwordHash: true,
+                refreshToken: true
+            }
+        })
+
+        if (!authRow) return null;
+        if (!authRow.user) throw new Error("Corrupted auth record: user not found");
+
+        return {
+            id: authRow.user.id,
+            role: authRow.user.role,
+            email: authRow.email,
+            passwordHash: authRow.passwordHash,
+            refreshToken: authRow.refreshToken
+        }
+    }
+
+    // DONE
+    async updateProfile(id: string, data: UpdateUserDto, db: DbClient = this.prisma): Promise<UserEntity> {
         const {firstName, lastName} = data;
 
-        return this.prisma.user.update({
+        return db.user.update({
             where : {id},
             data: {firstName, lastName},
             select: {
@@ -116,9 +172,9 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         })
     }
 
-    async updateCredentials(id: string, credentials: CredentialsDto): Promise<void> {
+    async updateCredentials(id: string, credentials: UpdateUserCredentialsDto, db: DbClient = this.prisma): Promise<void> {
             const {email, passwordHash, refreshToken} = credentials;
-            await this.prisma.userAuth.update({
+            await db.userAuth.update({
                 where: {userId: id},
                 data: {
                    email,
@@ -128,8 +184,8 @@ export class UsersRepositoryPrisma implements IUsersRepository {
             })
     }
 
-    async delete(id: string): Promise<void> {
-        await this.prisma.user.delete({
+    async delete(id: string, db: DbClient = this.prisma): Promise<void> {
+        await db.user.delete({
             where: {id}
         })
     }

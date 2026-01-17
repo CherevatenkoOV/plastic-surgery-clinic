@@ -1,59 +1,80 @@
 import {CreateUserDto, CreateRoleData} from "../users/types.js";
 
-export interface AuthEntity {
-    userId: string;
+// OK
+export interface RegisterPatientDto {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
-    refreshToken?: string  | null;
+    phone: string;
 }
 
-export interface AuthDto {
+// OK
+export interface RegisterDoctorDto {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
-    refreshToken?: string  | null;
+    specialization: string;
 }
 
-
-export interface AuthRegisterBody{
+// OK
+export interface LoginDto {
     email: string;
     password: string;
 }
 
+// OK
 export interface RecoverPasswordDto {
     newPassword: string;
     confirmPassword: string;
 }
 
 export interface UpdatePasswordDto {
-    email: string;
     oldPassword: string;
     newPassword: string;
     confirmPassword: string;
 }
 
-
-export interface ResetPasswordDto {
-    email: string;
-}
-
+// NOTE: is deprecated?
+// export interface ResetPasswordDto {
+//     email: string;
+// }
 
 export interface RecoverPasswordParams {
     resetToken: string;
 }
-
-// export type Credentials = Pick<AuthItem, 'email' | 'password'>
-
 
 export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
 }
 
-export type FullRegisterInfo = AuthRegisterBody & CreateUserDto & (СreateDoctorDto | CreatePatientDto)
 
-// NOTE: previous version
-// export type FullRegisterInfo = AuthRegisterBody & CreateUserDto & CreateRoleData
 
-export type AuthFilter =
-    | { userId: string }
-    | { email: string }
+
+// export type FullRegisterInfo = AuthRegisterBody & CreateUserDto & (СreateDoctorDto | CreatePatientDto)
+
+
+// export type AuthFilter =
+//     | { userId: string }
+//     | { email: string }
+
+// export interface AuthEntity {
+//     userId: string;
+//     email: string;
+//     password: string;
+//     refreshToken?: string  | null;
+// }
+
+// export interface AuthDto {
+//     email: string;
+//     password: string;
+//     refreshToken?: string  | null;
+// }
+
+
+// export interface AuthRegisterBody{
+//     email: string;
+//     password: string;
+// }

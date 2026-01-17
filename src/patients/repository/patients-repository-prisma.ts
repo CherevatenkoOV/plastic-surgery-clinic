@@ -2,6 +2,7 @@ import {CreatePatientDto, PatientEntity, PatientFilter, PatientWithUser, UpdateP
 import {IPatientsRepository} from "./i-patients-repository";
 import {PrismaClient} from "../../generated/prisma/client";
 import {PatientWhereInput} from "../../generated/prisma/models/Patient";
+import {DbClient} from "../../shared/db";
 
 export class PatientsRepositoryPrisma implements IPatientsRepository {
 
@@ -9,7 +10,7 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
     }
 
     // DONE
-    async find(filter?: PatientFilter): Promise<PatientWithUser[]> {
+    async find(filter?: PatientFilter, db: DbClient = this.prisma): Promise<PatientWithUser[]> {
         const where: PatientWhereInput = {}
 
         if (filter?.phone) where.phone = filter.phone
@@ -21,7 +22,7 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
             if (filter.lastName) where.user.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
         }
 
-        const prismaPatients = await this.prisma.patient.findMany({
+        const prismaPatients = await db.patient.findMany({
             where,
             select: {
                 patientId: true,
@@ -45,8 +46,8 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
     }
 
     // DONE
-    async findById(patientId: string): Promise<PatientWithUser | null> {
-        return this.prisma.patient.findUnique({
+    async findById(patientId: string, db: DbClient = this.prisma): Promise<PatientWithUser | null> {
+        return db.patient.findUnique({
             where: {patientId},
             select: {
                 patientId: true,
@@ -64,16 +65,16 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
     }
 
     // DONE
-    async create(patientData: CreatePatientDto): Promise<PatientEntity> {
+    async create(patientData: CreatePatientDto, db: DbClient = this.prisma): Promise<PatientEntity> {
         const {patientId, phone} = patientData
 
-        return this.prisma.patient.create({
-            data: {patientId, phone: phone}
+        return db.patient.create({
+            data: {patientId, phone}
         })
     }
 
     // DONE
-    async update(patientId: string, patientData: UpdatePatientDto): Promise<PatientEntity> {
+    async update(patientId: string, patientData: UpdatePatientDto, db: DbClient = this.prisma): Promise<PatientEntity> {
         const {phone} = patientData;
 
         return this.prisma.patient.update({
@@ -86,8 +87,8 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
         })
     }
 
-    async delete(patientId: string): Promise<void> {
-        await this.prisma.patient.delete({
+    async delete(patientId: string, db: DbClient = this.prisma): Promise<void> {
+        await db.patient.delete({
             where: {patientId}
         })
     }

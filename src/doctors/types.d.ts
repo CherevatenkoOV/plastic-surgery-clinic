@@ -25,18 +25,6 @@ export type DoctorWithUser = Prisma.DoctorGetPayload<{
     };
 }>;
 
-// NOTE: should be removed?
-// export type DoctorWithWeeklySlots = Prisma.DoctorGetPayload<{
-//     include: { doctorWeeklySlots: true }
-// }>
-//
-// export type DoctorWithUserAndWeeklySlots = Prisma.DoctorGetPayload<{
-//     include: { user: true, doctorWeeklySlots: true }
-// }>
-//
-// export type DoctorWithUserAndAppointments = Prisma.DoctorGetPayload<{
-//     include: { user: true, appointments: true }
-// }>
 
 
 // TODO in the future functionality will be used pure SQL-raw for DB based on the type Slot below

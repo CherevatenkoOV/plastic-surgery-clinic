@@ -4,7 +4,7 @@ import {
     UpdatePasswordDto,
     ResetPasswordDto, FullRegisterInfo, RecoverPasswordParams, RecoverPasswordDto
 } from "./types.js";
-import {CreateCredentialsDto} from "../users/types.js";
+import {CreateUserCredentialsDto} from "../users/types.js";
 import {AuthService} from "./service.js";
 
 export class AuthController {
@@ -49,7 +49,7 @@ export class AuthController {
         res.status(201).send({message: "New user was registered successfully with using invite token"})
     }
 
-    login = async (req: Request<{}, unknown, CreateCredentialsDto>, res: Response<AuthTokens>): Promise<void> => {
+    login = async (req: Request<{}, unknown, CreateUserCredentialsDto>, res: Response<AuthTokens>): Promise<void> => {
         const credentials = req.body
 
         const tokens = await this.authService.login(credentials)

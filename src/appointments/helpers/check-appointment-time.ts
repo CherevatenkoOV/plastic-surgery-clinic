@@ -1,15 +1,15 @@
-import {Appointment, CreateAppointmentDto} from "../types.js";
+import { CreateAppointmentDto} from "../types.js";
 
-
+// NOTE: deprecated?
 export const checkAppointmentTime = (newAppointment: CreateAppointmentDto, appointments: Appointment[]) => {
-    const {doctorId, timeISO} = newAppointment;
+    const {doctorId, startsAt} = newAppointment;
 
-    if(timeISO < new Date().toISOString()) {
+    if(startsAt < new Date().toISOString()) {
         throw new Error("Unable to create an appointment in the past")
     }
 
     for (const appointment of appointments) {
-        if (appointment.doctorId === doctorId && appointment.timeISO === timeISO) {
+        if (appointment.doctorId === doctorId && appointment.timeISO === startsAt) {
             return false;
         }
     }

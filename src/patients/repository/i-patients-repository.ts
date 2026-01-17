@@ -1,9 +1,10 @@
-import {CreatePatientDto, Patient, PatientEntity, PatientWithUser, UpdatePatientDto} from "../types.js";
+import {CreatePatientDto, PatientEntity, PatientFilter, PatientWithUser, UpdatePatientDto} from "../types.js";
+import {DbClient} from "../../shared/db";
 
 export interface IPatientsRepository {
-    find(): Promise<PatientWithUser[]>;
-    findById(patientId: string): Promise<PatientWithUser | null>;
-    create(patientData: CreatePatientDto): Promise<PatientEntity>;
-    update(patientId: string, patientData: UpdatePatientDto): Promise<PatientEntity>;
-    delete(patientId: string): Promise<void>;
+    find(filter?: PatientFilter, db?: DbClient): Promise<PatientWithUser[]>;
+    findById(patientId: string, db?: DbClient): Promise<PatientWithUser | null>;
+    create(patientData: CreatePatientDto, db: DbClient): Promise<PatientEntity>;
+    update(patientId: string, patientData: UpdatePatientDto, db: DbClient): Promise<PatientEntity>;
+    delete(patientId: string, db: DbClient): Promise<void>;
 }
