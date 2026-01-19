@@ -9,7 +9,14 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
     constructor(private readonly prisma: PrismaClient) {
     }
 
-    // DONE
+    async create(patientData: CreatePatientDto, db: DbClient = this.prisma): Promise<PatientEntity> {
+        const {patientId, phone} = patientData
+
+        return db.patient.create({
+            data: {patientId, phone}
+        })
+    }
+
     async find(filter?: PatientFilter, db: DbClient = this.prisma): Promise<PatientWithUser[]> {
         const where: PatientWhereInput = {}
 
@@ -45,7 +52,6 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
         return prismaPatients
     }
 
-    // DONE
     async findById(patientId: string, db: DbClient = this.prisma): Promise<PatientWithUser | null> {
         return db.patient.findUnique({
             where: {patientId},
@@ -64,16 +70,6 @@ export class PatientsRepositoryPrisma implements IPatientsRepository {
         })
     }
 
-    // DONE
-    async create(patientData: CreatePatientDto, db: DbClient = this.prisma): Promise<PatientEntity> {
-        const {patientId, phone} = patientData
-
-        return db.patient.create({
-            data: {patientId, phone}
-        })
-    }
-
-    // DONE
     async update(patientId: string, patientData: UpdatePatientDto, db: DbClient = this.prisma): Promise<PatientEntity> {
         const {phone} = patientData;
 

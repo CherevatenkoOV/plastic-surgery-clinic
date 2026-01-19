@@ -2,25 +2,24 @@ import {
     AppointmentEntity,
     AppointmentFilter,
     CreateAppointmentDto,
-    ISODateString,
     UpdateAppointmentDto
 } from "../types";
 import {IAppointmentsRepository} from "./i-appointments-repository";
 import {AppointmentWhereInput} from "../../generated/prisma/models/Appointment";
 import {PrismaClient} from "../../generated/prisma/client";
+import {DbClient} from "../../shared/db";
 
 export class AppointmentsRepositoryPrisma implements IAppointmentsRepository {
     constructor(private readonly prisma: PrismaClient) {
     }
 
-    // DONE
-    async find(filter?: AppointmentFilter): Promise<AppointmentEntity[]> {
+    async find(filter?: AppointmentFilter, db: DbClient = this.prisma): Promise<AppointmentEntity[]> {
         const where: AppointmentWhereInput = {}
 
         if (filter?.doctorId) where.doctorId = filter.doctorId
         if (filter?.patientId) where.patientId = filter.patientId
 
-        const prismaAppointments = await this.prisma.appointment.findMany({
+        const prismaAppointments = await db.appointment.findMany({
             where,
             select: {
                 id: true,
@@ -40,9 +39,8 @@ export class AppointmentsRepositoryPrisma implements IAppointmentsRepository {
         return prismaAppointments
     }
 
-    // DONE
-    async findById(id: string): Promise<AppointmentEntity | null> {
-        return this.prisma.appointment.findUnique({
+    async findById(id: string, db: DbClient = this.prisma): Promise<AppointmentEntity | null> {
+        return db.appointment.findUnique({
             where: {id},
             select: {
                 id: true,
@@ -56,11 +54,10 @@ export class AppointmentsRepositoryPrisma implements IAppointmentsRepository {
         })
     }
 
-    // DONE
-    async create(appointmentData: CreateAppointmentDto): Promise<AppointmentEntity> {
+    async create(appointmentData: CreateAppointmentDto, db: DbClient = this.prisma): Promise<AppointmentEntity> {
         const {doctorId, patientId, serviceName, startsAt} = appointmentData
 
-        return this.prisma.appointment.create({
+        return db.appointment.create({
             data: {
                 doctorId,
                 patientId,
@@ -79,11 +76,10 @@ export class AppointmentsRepositoryPrisma implements IAppointmentsRepository {
         })
     }
 
-    // DONE
-    async update(id: string, appointmentData: UpdateAppointmentDto): Promise<AppointmentEntity> {
+    async update(id: string, appointmentData: UpdateAppointmentDto, db: DbClient = this.prisma): Promise<AppointmentEntity> {
         const {doctorId, patientId, serviceName, startsAt} = appointmentData;
 
-        return this.prisma.appointment.update({
+        return db.appointment.update({
             where: {id},
             data: {
                 doctorId,
@@ -103,9 +99,8 @@ export class AppointmentsRepositoryPrisma implements IAppointmentsRepository {
         })
     }
 
-    // DONE
-    async delete(id: string): Promise<void> {
-        await this.prisma.appointment.delete({
+    async delete(id: string, db: DbClient = this.prisma): Promise<void> {
+        await db.appointment.delete({
             where: {id}
         })
     }

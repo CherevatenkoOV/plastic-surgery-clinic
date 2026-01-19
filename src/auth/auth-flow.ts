@@ -12,6 +12,7 @@ import {PrismaClient} from "../generated/prisma/client";
 import {PasswordService} from "./services/password-service";
 import {TokenService} from "./services/token-service";
 import {MailService} from "./services/mail-service";
+import {DoctorInviteToken} from "../doctors";
 
 export class AuthFlow {
     constructor(
@@ -25,7 +26,6 @@ export class AuthFlow {
     ) {
     }
 
-    // DONE
     async registerPatient(patientData: RegisterPatientDto): Promise<AuthTokens> {
         const email = patientData.email.trim().toLowerCase();
         const firstName = patientData.firstName.trim();
@@ -57,8 +57,21 @@ export class AuthFlow {
         })
     }
 
-    // DONE
-    async registerDoctor(token: string, doctorData: RegisterDoctorDto): Promise<AuthTokens> {
+    async inviteDoctor(email: string): Promise<string | null> {
+        const doctor = await this.usersRepo.findByEmail(email, this.prisma);
+        if (doctor) throw new Error("User with specified email already exists.");
+
+        const token = this.tokenService.generateDoctorInviteToken(email);
+
+        const result = await this.mailService.sendDoctorInviteLink({
+            token,
+            toEmail: email,
+        });
+
+        return result.previewUrl ?? null;
+    }
+
+    async registerDoctor(token: DoctorInviteToken, doctorData: RegisterDoctorDto): Promise<AuthTokens> {
         const email = this.tokenService.verifyDoctorInviteToken(token)
 
         const firstName = doctorData.firstName.trim();
@@ -92,7 +105,6 @@ export class AuthFlow {
         })
     }
 
-    // DONE
     async login(loginData: LoginDto): Promise<AuthTokens> {
         const {email, password} = loginData;
 
@@ -111,12 +123,10 @@ export class AuthFlow {
         })
     }
 
-    // DONE
     async logout(id: string): Promise<void> {
         await this.usersRepo.updateCredentials(id, {refreshToken: null}, this.prisma)
     }
 
-    // DONE
     async recoverPassword(resetPasswordToken: string, newPasswordData: RecoverPasswordDto): Promise<void> {
         const email = this.tokenService.verifyResetPasswordToken(resetPasswordToken)
 
@@ -133,7 +143,6 @@ export class AuthFlow {
         })
     }
 
-    // DONE
     async updatePassword(userId: string, newPasswordData: UpdatePasswordDto): Promise<void> {
         const {oldPassword, newPassword, confirmPassword} = newPasswordData;
         return this.prisma.$transaction(async (tx) => {
@@ -154,7 +163,6 @@ export class AuthFlow {
         })
     }
 
-    // DONE
     async resetPassword(email: string): Promise<string | null> {
         const resetPasswordToken = await this.tokenService.generateResetPasswordToken(email)
 
@@ -165,6 +173,5 @@ export class AuthFlow {
 
         return result.previewUrl ?? null;
     }
-
 
 }

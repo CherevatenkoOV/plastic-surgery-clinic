@@ -1,4 +1,4 @@
-import type { Prisma, Appointment as PrismaAppointment } from "../generated/prisma/client";
+import type { Prisma } from "../generated/prisma/client";
 
 // ===== Prisma entities / Payloads =====
 
@@ -14,41 +14,6 @@ export type AppointmentEntity = Prisma.AppointmentGetPayload<{
     };
 }>;
 
-export type AppointmentWithDoctorAndPatient = Prisma.AppointmentGetPayload<{
-    select: {
-        id: true;
-        procedureType: true;
-        startsAt: true;
-        createdAt: true;
-        updatedAt: true;
-        doctor: {
-            select: {
-                doctorId: true;
-                user: {
-                    select: {
-                        id: true;
-                        firstName: true;
-                        lastName: true;
-                        role: true;
-                    };
-                };
-            };
-        };
-        patient: {
-            select: {
-                patientId: true;
-                user: {
-                    select: {
-                        id: true;
-                        firstName: true;
-                        lastName: true;
-                        role: true;
-                    };
-                };
-            };
-        };
-    };
-}>;
 
 // ===== DTO / app-level types =====
 
@@ -81,7 +46,7 @@ export interface AppointmentFilter {
 }
 
 export interface AppointmentsParamsDto {
-    id: string;
+    id?: string;
 }
 
 AppointmentTimeCheckInput

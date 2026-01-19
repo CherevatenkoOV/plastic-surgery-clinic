@@ -1,4 +1,3 @@
-import {UpdateUserDto} from "../users/types.js";
 
 
 // ===== Prisma entities / Payloads =====
@@ -16,7 +15,6 @@ export type PatientWithUser = Prisma.PatientGetPayload<{
         phone: true;
         user: {
             select: {
-                id: true;
                 firstName: true;
                 lastName: true;
                 role: true;
@@ -29,14 +27,15 @@ export type PatientProfile = PatientWithUser;
 
 // ===== DTO / app-level types =====
 
-export interface PatientDto {
+export interface CreatePatientDto {
     patientId: string;
     phone: string;
 }
 
-export interface FullPatientDto extends FullUserBase {
-    roleData: PatientDto | undefined;
+export interface CreatePatientInput {
+
 }
+
 
 export interface CreatePatientDto {
     patientId: string;
@@ -49,7 +48,6 @@ export interface UpdatePatientDto {
     phone?: string;
 }
 
-export type UpdatePatientBody = UpdatePatientDto & UpdateUserDto;
 
 export interface PatientFilter {
     firstName?: string;

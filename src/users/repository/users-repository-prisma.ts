@@ -15,14 +15,12 @@ export class UsersRepositoryPrisma implements IUsersRepository {
 
     constructor(private readonly prisma: PrismaClient) {}
 
-    // DONE
     async find(filter?: UserFilter, db: DbClient = this.prisma): Promise<UserEntity[]> {
         const where: UserWhereInput = {};
 
         if (filter?.firstName) where.firstName = {equals: filter.firstName.trim(), mode: 'insensitive'}
 
         if (filter?.lastName) where.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
-
 
         const prismaUsers = await db.user.findMany({
             where,
@@ -41,7 +39,6 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         return prismaUsers
     }
 
-    // DONE
     async findById(id: string, db: DbClient = this.prisma): Promise<UserEntity | null> {
         return db.user.findUnique({
             where: {id},
@@ -56,8 +53,6 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         })
     }
 
-    // DONE
-    //TODO:  if you need email -> create method getCredentialsByEmail
     async findByEmail(email: string, db: DbClient = this.prisma): Promise<UserEntity | null> {
         const authRow = await db.userAuth.findUnique({
             where: {email},
@@ -75,11 +70,9 @@ export class UsersRepositoryPrisma implements IUsersRepository {
             }
         })
 
-
         return authRow?.user ?? null
     }
 
-    // DONE
     async create(userData: CreateUserDto, db: DbClient = this.prisma): Promise<UserEntity> {
         const {firstName, lastName, role, auth: {email, passwordHash}} = userData;
 
@@ -106,7 +99,6 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         })
     }
 
-    // DONE
     async getAuthSubjectById(id: string, db: DbClient = this.prisma): Promise<UserAuthSubject | null> {
         const authRow = await db.userAuth.findUnique({
             where: {userId: id},
@@ -130,7 +122,6 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         }
     }
 
-    // DONE
     async getAuthSubjectByEmail(email: string, db: DbClient = this.prisma): Promise<UserAuthSubject | null> {
         const authRow = await db.userAuth.findUnique({
             where: {email},
@@ -154,7 +145,6 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         }
     }
 
-    // DONE
     async updateProfile(id: string, data: UpdateUserDto, db: DbClient = this.prisma): Promise<UserEntity> {
         const {firstName, lastName} = data;
 

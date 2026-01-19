@@ -1,78 +1,88 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 import {
-    AppointmentsParams,
+    AppointmentEntity,
+    AppointmentFilter,
+    AppointmentsParamsDto,
     CreateAppointmentDto,
-    Appointment,
-    UpdateAppointmentDto
+    UpdateAppointmentDto,
 } from "./types.js";
-import {AppointmentsService} from "./service.js";
-
+import { AppointmentsFlow } from "./appointments-flow.js";
 
 export class AppointmentsController {
-constructor(private readonly appointmentsService: AppointmentsService) {}
+    constructor(private readonly appointmentsFlow: AppointmentsFlow) {}
 
-    getAll = async (req: Request, res: Response<Appointment[] | { message: string }>): Promise<void> => {
-        const filter = req.query
-        const appointments = await this.appointmentsService.get(filter);
+    getAll = async (
+        req: Request,
+        res: Response<AppointmentEntity[] | { message: string }>
+    ): Promise<void> => {
+        const filter = req.query as unknown as AppointmentFilter;
+        const appointments = await this.appointmentsFlow.getAppointments(filter);
 
         if (!appointments.length) {
-            res.status(404).send({message: "Doctors not found"})
-            return
+            res.status(404).send({ message: "Appointments not found" });
+            return;
         }
 
-        res.status(200).send(appointments)
-    }
+        res.status(200).send(appointments);
+    };
 
-    getById = async (req: Request, res: Response<Appointment | {
-        message: string
-    }>): Promise<void> => {
-        const id = req.params.id
+    getById = async (
+        req: Request<AppointmentsParamsDto>,
+        res: Response<AppointmentEntity | { message: string }>
+    ): Promise<void> => {
+        const id = req.params.id;
 
         if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
+            res.status(400).send({ message: "Missing id parameter" });
+            return;
         }
 
-        const appointment = await this.appointmentsService.getById(id)
+        const appointment = await this.appointmentsFlow.getAppointmentById(id);
 
         if (!appointment) {
-            res.status(404).send({message: "Appointment was not found"})
-            return
+            res.status(404).send({ message: "Appointment was not found" });
+            return;
         }
 
-        res.status(200).send(appointment)
-    }
+        res.status(200).send(appointment);
+    };
 
-    create = async (req: Request<{}, unknown, CreateAppointmentDto>, res: Response<Appointment>): Promise<void> => {
-        const appointmentData = req.body
-        const newAppointment = await this.appointmentsService.create(appointmentData);
-        res.status(201).send(newAppointment)
-    }
+    create = async (
+        req: Request<unknown, unknown, CreateAppointmentDto>,
+        res: Response<AppointmentEntity | { message: string }>
+    ): Promise<void> => {
+        const appointmentData = req.body;
+        const created = await this.appointmentsFlow.createAppointment(appointmentData);
+        res.status(201).send(created);
+    };
 
-    update = async (req: Request<AppointmentsParams, unknown, UpdateAppointmentDto>, res: Response<Appointment | {
-        message: string
-    }>): Promise<void> => {
-        const id = req.params.id
+    update = async (
+        req: Request<AppointmentsParamsDto, unknown, UpdateAppointmentDto>,
+        res: Response<AppointmentEntity | { message: string }>
+    ): Promise<void> => {
+        const id = req.params.id;
+
         if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
+            res.status(400).send({ message: "Missing id parameter" });
+            return;
         }
 
-        const appointmentData = req.body
+        const updated = await this.appointmentsFlow.updateAppointment(id, req.body);
+        res.status(200).send(updated);
+    };
 
-        const updatedAppointment = await this.appointmentsService.update(id, appointmentData);
-        res.status(200).send(updatedAppointment)
-    }
+    remove = async (
+        req: Request<AppointmentsParamsDto>,
+        res: Response<void | { message: string }>
+    ): Promise<void> => {
+        const id = req.params.id;
 
-    remove = async (req: Request<AppointmentsParams>, res: Response<boolean | { message: string }>): Promise<void> => {
-        const id = req.params.id
         if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
+            res.status(400).send({ message: "Missing id parameter" });
+            return;
         }
-        await this.appointmentsService.delete(id)
-        res.status(204).send(true)
-    }
 
-
+        await this.appointmentsFlow.deleteAppointment(id);
+        res.sendStatus(204);
+    };
 }

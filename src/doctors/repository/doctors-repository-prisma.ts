@@ -19,7 +19,6 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
     constructor(private readonly prisma: PrismaClient) {
     }
 
-    // DONE
     async find(filter?: DoctorFilter, db: DbClient = this.prisma): Promise<DoctorWithUser[]> {
         const where: DoctorWhereInput = {};
 
@@ -55,7 +54,6 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
         return prismaDoctors
     }
 
-    // DONE
     async findById(doctorId: string, db: DbClient = this.prisma): Promise<DoctorWithUser | null> {
         return db.doctor.findUnique({
             where: {doctorId},
@@ -74,7 +72,6 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
         })
     }
 
-    // DONE
     async create(doctorData: CreateDoctorDto, db: DbClient = this.prisma): Promise<DoctorEntity> {
         const {doctorId, specialization} = doctorData
 
@@ -83,7 +80,6 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
         })
     }
 
-    // DONE
     async update(doctorId: string, doctorData: UpdateDoctorDto, db: DbClient = this.prisma): Promise<DoctorEntity> {
         const {specialization} = doctorData;
 
@@ -99,14 +95,12 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
         })
     }
 
-    // DONE
     async delete(doctorId: string, db: DbClient = this.prisma): Promise<void> {
         await db.doctor.delete({
             where: {doctorId}
         })
     }
 
-    // DONE
     async getWeeklySlots(doctorId: string, db: DbClient = this.prisma): Promise<Slot[]> {
         const rows = await db.$queryRawTyped(getWeeklySlots(doctorId))
 
@@ -123,7 +117,6 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
 
     }
 
-    // DONE
     async addWeeklySlots(doctorId: string, slots: CreateSlotDto[], db: DbClient = this.prisma): Promise<AddWeeklySlotsResult> {
         const payload = {
             slots: slots.map(s => ({
@@ -141,7 +134,6 @@ export class DoctorsRepositoryPrisma implements IDoctorsRepository {
         return result
     }
 
-    // DONE
     async replaceWeeklySlot(doctorId: string, slotId: string, newSlot: CreateSlotDto, db: DbClient = this.prisma): Promise<SlotId> {
         const {weekday, startAt, endAt} = newSlot;
 

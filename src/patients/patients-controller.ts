@@ -1,116 +1,94 @@
-import {
-    FullPatientDto, PatientsParamsDto, UpdatePatientBody
-} from "./types.js";
-import {Request, Response} from "express";
-import {Appointment} from "../appointments/types.js";
-import {PatientsService} from "./service.js";
+import { Request, Response } from "express";
+import { PatientsFlow } from "./patients-flow.js";
+import { PatientFilter, PatientWithUser, PatientsParamsDto, UpdatePatientDto } from "./types.js";
 
 export class PatientsController {
-    constructor(private readonly patientsService: PatientsService){}
+    constructor(private readonly patientsFlow: PatientsFlow) {}
 
-    async getAll  (req: Request, res: Response<FullPatientDto[] | { message: string }>): Promise<void> {
-        const filter = req.query
-
-        const patients = await this.patientsService.get(filter)
+    getAll = async (req: Request, res: Response<PatientWithUser[] | { message: string }>): Promise<void> => {
+        const filter = req.query as unknown as PatientFilter;
+        const patients = await this.patientsFlow.getPatients(filter);
 
         if (!patients.length) {
-            res.status(404).send({message: "Patients not found"})
-            return
+            res.status(404).send({ message: "Patients not found" });
+            return;
         }
 
-        res.status(200).send(patients)
-    }
+        res.status(200).send(patients);
+    };
 
+    getById = async (
+        req: Request<PatientsParamsDto>,
+        res: Response<PatientWithUser | { message: string }>
+    ): Promise<void> => {
+        const patientId = req.params.patientId;
 
-    async getById  (req: Request<PatientsParamsDto>, res: Response<FullPatientDto | {
-        message: string
-    }>): Promise<void> {
-        const id = req.params.id
-
-        if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
+        if (!patientId) {
+            res.status(400).send({ message: "Missing patientId parameter" });
+            return;
         }
 
-        const patient = await this.patientsService.getById(id)
+        const patient = await this.patientsFlow.getPatientById(patientId);
 
         if (!patient) {
-            res.status(404).send({message: "Patient was not found"})
-            return
+            res.status(404).send({ message: "Patient was not found" });
+            return;
         }
 
-        res.status(200).send(patient)
-    }
+        res.status(200).send(patient);
+    };
 
-    async getMe  (req: Request, res: Response<FullPatientDto | { message: string }>): Promise<void> {
-        const loggedUser = req.user!
-        const id = loggedUser.id
-
-        if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
-        }
-
-        const patient = await this.patientsService.getById(id)
+    getMe = async (req: Request, res: Response<PatientWithUser | { message: string }>): Promise<void> => {
+        const loggedUser = req.user!;
+        const patient = await this.patientsFlow.getPatientById(loggedUser.id);
 
         if (!patient) {
-            res.status(404).send({message: "Patient was not found"})
-            return
+            res.status(404).send({ message: "Patient was not found" });
+            return;
         }
 
-        res.status(200).send(patient)
-    }
+        res.status(200).send(patient);
+    };
 
-    async updateById  (req: Request<PatientsParamsDto, unknown, UpdatePatientBody>, res: Response<FullPatientDto | {
-        message: string
-    }>): Promise<void> {
-        const id = req.params.id!
-        if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
-        }
-        const patientData = req.body
+    updateById = async (
+        req: Request<PatientsParamsDto, unknown, UpdatePatientDto>,
+        res: Response<PatientWithUser | { message: string }>
+    ): Promise<void> => {
+        const patientId = req.params.patientId;
 
-        const updatedPatient = await this.patientsService.update(id, patientData)
-        res.status(200).send(updatedPatient)
-    }
-
-    async updateMe  (req: Request<unknown, unknown, UpdatePatientBody>, res: Response<FullPatientDto | {
-        message: string
-    }>): Promise<void> {
-        const loggedUser = req.user!
-        const patientData = req.body
-
-
-        const updatedPatient = await this.patientsService.update(loggedUser.id, patientData)
-        res.status(200).send(updatedPatient)
-    }
-
-    async deleteMe (req: Request<PatientsParamsDto>, res: Response<boolean | {
-        message: string
-    }>): Promise<void> {
-        const loggedUser = req.user!
-
-        await this.patientsService.delete(loggedUser.id)
-        res.status(204).send(true)
-    }
-
-    async deleteById (req: Request<PatientsParamsDto>, res: Response<boolean | {
-        message: string
-    }>): Promise<void> {
-        const id = req.params.id
-        if (!id) {
-            res.status(400).send({message: "Missing id parameter"})
-            return
+        if (!patientId) {
+            res.status(400).send({ message: "Missing patientId parameter" });
+            return;
         }
 
-        await this.patientsService.delete(id)
-        res.status(204).send(true)
-    }
+        const updatedPatient = await this.patientsFlow.updatePatient(patientId, req.body);
+        res.status(200).send(updatedPatient);
+    };
 
-    async getAppointments  (req: Request, res: Response<Appointment[]>): Promise<void> {
-        const appointments = await this.patientsService.getAppointments(req)
-        res.status(200).send(appointments)
-    }
+    updateMe = async (
+        req: Request<unknown, unknown, UpdatePatientDto>,
+        res: Response<PatientWithUser | { message: string }>
+    ): Promise<void> => {
+        const loggedUser = req.user!;
+        const updatedPatient = await this.patientsFlow.updatePatient(loggedUser.id, req.body);
+        res.status(200).send(updatedPatient);
+    };
 
+    deleteMe = async (req: Request, res: Response<void | { message: string }>): Promise<void> => {
+        const loggedUser = req.user!;
+        await this.patientsFlow.deletePatient(loggedUser.id);
+        res.sendStatus(204);
+    };
+
+    deleteById = async (req: Request<PatientsParamsDto>, res: Response<void | { message: string }>): Promise<void> => {
+        const patientId = req.params.patientId;
+
+        if (!patientId) {
+            res.status(400).send({ message: "Missing patientId parameter" });
+            return;
+        }
+
+        await this.patientsFlow.deletePatient(patientId);
+        res.sendStatus(204);
+    };
 }

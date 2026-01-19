@@ -50,10 +50,32 @@ export class MailService {
         const previewUrl = rawPreview ? rawPreview : null;
 
 
-        // TODO should be changed to lo
         return {
             messageId: info.messageId,
             previewUrl,
         };
+    }
+
+    async sendDoctorInviteLink(params: { token: string; toEmail: string }): Promise<MailSendResult> {
+        const { token, toEmail } = params;
+
+        // тут важно: твой registerDoctor ожидает token из URL
+        const inviteUrl = `${this.apiUrl}/auth/register/doctor/${token}`;
+
+        const info = await this.transporter.sendMail({
+            to: toEmail,
+            from: this.user,
+            subject: "Doctor invitation",
+            text:
+                `You are receiving this email because you have been invited to join our medical platform as a doctor.\n\n` +
+                `Please click on the following link, or paste it into your browser, to complete your registration:\n` +
+                `${inviteUrl}\n\n` +
+                `If you did not request this registration, you can ignore this email.\n`,
+        });
+
+        const rawPreview = nodemailer.getTestMessageUrl(info);
+        const previewUrl = rawPreview ? rawPreview : null;
+
+        return { messageId: info.messageId, previewUrl };
     }
 }

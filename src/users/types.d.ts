@@ -1,6 +1,5 @@
 // TODO: UserEntity для работы до слоя HTTP, дальше - оставить UserDto
 import {UserRole} from "../generated/prisma/enums";
-import {User} from "../generated/prisma/client";
 
 export type UserEntity = Prisma.UserGetPayload<{
     select: {
@@ -20,7 +19,7 @@ export interface UserDto {
     role: UserRole;
 }
 
-export type UsersParams = Pick<UserEntity, 'id'>
+export type UsersParams = Partial<Pick<UserEntity, 'id'>>
 
 export interface CreateUserDto {
     firstName: string;

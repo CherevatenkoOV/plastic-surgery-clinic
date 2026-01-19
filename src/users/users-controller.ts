@@ -3,12 +3,12 @@ import {
     UsersParams,
     UpdateUserDto, UserDto
 } from "./types.js";
-import {UsersService} from "./service.js";
+import {UsersFlow} from "./users-flow.js";
 import {sanitizeUsers} from "./helpers/sanitize-users.js";
 import {sanitizeUser} from "./helpers/sanitize-user.js";
 
 export class UsersController {
-    constructor(private readonly usersService: UsersService){}
+    constructor(private readonly usersService: UsersFlow){}
 
     async getAll(req: Request, res: Response<UserDto[]>): Promise<void> {
         const users = await this.usersService.get();

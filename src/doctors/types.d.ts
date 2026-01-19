@@ -16,7 +16,6 @@ export type DoctorWithUser = Prisma.DoctorGetPayload<{
         specialization: true;
         user: {
             select: {
-                id: true;
                 firstName: true;
                 lastName: true;
                 role: true;
@@ -36,10 +35,6 @@ export type Slot = Pick<DoctorWeeklySlots, "id" | "weekday"> & {
 
 // ===== DTO / app-levels types =====
 
-export interface DoctorDto {
-    doctorId: string;
-    specialization: string | null;
-}
 
 export interface CreateDoctorDto {
     doctorId: string;
@@ -63,9 +58,7 @@ export interface DoctorsParamsDto {
     doctorId?: string;
 }
 
-export interface DoctorInviteToken {
-    inviteToken: string;
-}
+export type DoctorInviteToken = string
 
 export type CreateSlotDto = Omit<Slot, "id" | "userId">
 
