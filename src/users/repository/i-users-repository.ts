@@ -1,11 +1,21 @@
-import {CreateUserDto, CredentialsDto, UpdateUserDto, User, UserFilter} from "../types.js";
+import {
+    CreateUserDto,
+    UpdateUserCredentialsDto,
+    UpdateUserDto,
+    UserAuthSubject,
+    UserEntity,
+    UserFilter
+} from "../types.js";
+import {DbClient} from "../../shared/db";
 
 export interface IUsersRepository {
-    find(filter?: UserFilter): Promise<User[]>;
-    findById(id: string): Promise<User>;
-    findByEmail(email: string): Promise<User>;
-    create(userData: CreateUserDto): Promise<User>;
-    updateProfile(id: string, data: UpdateUserDto): Promise<User>;
-    updateCredentials(id: string, credentials: CredentialsDto): Promise<User>;
-    delete(id: string): Promise<void>;
+    find(filter?: UserFilter, db?: DbClient): Promise<UserEntity[]>;
+    findById(id: string, db?: DbClient): Promise<UserEntity | null>;
+    findByEmail(email: string, db?: DbClient): Promise<UserEntity | null>;
+    create(createUserDto: CreateUserDto, db: DbClient): Promise<UserEntity>;
+    updateProfile(id: string, updateUserDto: UpdateUserDto, db: DbClient): Promise<UserEntity>;
+    getAuthSubjectById(id: string, db?: DbClient): Promise<UserAuthSubject | null>;
+    getAuthSubjectByEmail(email: string, db?: DbClient): Promise<UserAuthSubject | null>;
+    updateCredentials(id: string, updateUserCredentialsDto: UpdateUserCredentialsDto, db: DbClient): Promise<void>;
+    delete(id: string, db: DbClient): Promise<void>;
 }

@@ -1,99 +1,141 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 import {
     AuthTokens,
+    LoginDto,
+    RecoverPasswordDto,
+    RecoverPasswordParams,
+    RegisterDoctorDto,
+    RegisterPatientDto,
+    ResetPasswordDto,
     UpdatePasswordDto,
-    ResetPasswordDto, FullRegisterInfo, RecoverPasswordParams, RecoverPasswordDto
 } from "./types.js";
-import {CreateCredentialsDto} from "../users/types.js";
-import {Service} from "../appointments/service.js";
-import {AuthService} from "./service.js";
+import { AuthFlow } from "./auth-flow.js";
+
+const REFRESH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 export class AuthController {
-    constructor(private readonly authService: AuthService){}
+    constructor(private readonly authFlow: AuthFlow){}
 
-    async register (req: Request<{}, unknown, FullRegisterInfo>, res: Response<{
-        message: string
-    }>): Promise<void> {
-        const registerData = req.body
+    registerPatient = async (
+        req: Request<{}, unknown, RegisterPatientDto>,
+        res: Response<AuthTokens>
+    ): Promise<void> => {
+        const tokens = await this.authFlow.registerPatient(req.body);
 
-        const tokens = await this.authService.register(registerData);
+        res.cookie("refreshToken", tokens.refreshToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: REFRESH_COOKIE_MAX_AGE_MS,
+            sameSite: "strict",
+        });
 
-        // TODO: check this code in PostMan. Probably redundant
-        if (!tokens) {
-            res.status(201).send({message: "A problem occurred while generating tokens"})
-            return
+        res.status(201).send(tokens);
+    };
+
+    async inviteDoctor(req: Request, res: Response): Promise<void> {
+        const email = req.body.email;
+        if (!email) {
+            res.status(400).send({ message: "Missing email" });
+            return;
         }
 
-        res.cookie('refreshToken', tokens!.refreshToken, {
+        const previewUrl = await this.authFlow.inviteDoctor(email);
+
+        res.status(200).send({ previewUrl });
+    }
+
+    registerDoctor = async (
+        req: Request<{ token: string }, unknown, RegisterDoctorDto>,
+        res: Response<AuthTokens>
+    ): Promise<void> => {
+        const inviteToken = req.params.token;
+        const tokens = await this.authFlow.registerDoctor(inviteToken, req.body);
+
+        res.cookie("refreshToken", tokens.refreshToken, {
             secure: true,
             httpOnly: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        })
+            maxAge: REFRESH_COOKIE_MAX_AGE_MS,
+            sameSite: "strict",
+        });
 
-        res.status(201).send({message: "New user was registered successfully"})
-    }
+        res.status(201).send(tokens);
+    };
 
-    registerByToken = async (req: Request<{ token: string }, unknown, FullRegisterInfo>, res: Response<{
-        message: string
-    }>): Promise<void> => {
-        const token = req.params.token;
-        const registerInfo = req.body
+    login = async (
+        req: Request<{}, unknown, LoginDto>,
+        res: Response<AuthTokens>
+    ): Promise<void> => {
+        const tokens = await this.authFlow.login(req.body);
 
-        const tokens = await this.authService.registerByToken(token, registerInfo);
-
-        res.cookie('refreshToken', tokens.refreshToken, {
+        res.cookie("refreshToken", tokens.refreshToken, {
             secure: true,
             httpOnly: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        })
+            maxAge: REFRESH_COOKIE_MAX_AGE_MS,
+            sameSite: "strict",
+        });
 
-        res.status(201).send({message: "New user was registered successfully with using invite token"})
-    }
+        res.status(200).send(tokens);
+    };
 
-    login = async (req: Request<{}, unknown, CreateCredentialsDto>, res: Response<AuthTokens>): Promise<void> => {
-        const credentials = req.body
-
-        const tokens = await this.authService.login(credentials)
-
-        res.status(201).send(tokens)
-    }
 
     logout = async (req: Request, res: Response): Promise<void> => {
-        const loggedUser = req.user!
+        const loggedUser = req.user!;
+        await this.authFlow.logout(loggedUser.id);
 
-        await this.authService.logout(loggedUser.id);
+        res.clearCookie("refreshToken", {
+            secure: true,
+            httpOnly: true,
+            sameSite: "strict",
+        });
 
-        res.sendStatus(200)
-    }
+        res.sendStatus(200);
+    };
 
-    updatePassword = async (req: Request<{}, unknown, UpdatePasswordDto>, res: Response<{
-        message: string
-    }>): Promise<void> => {
-        const newPasswordData = req.body
+    updatePassword = async (
+        req: Request<{}, unknown, UpdatePasswordDto>,
+        res: Response<{ message: string }>
+    ): Promise<void> => {
+        const loggedUser = req.user!;
+        await this.authFlow.updatePassword(loggedUser.id, req.body);
 
-        await this.authService.updatePassword(newPasswordData)
+        res.clearCookie("refreshToken", {
+            secure: true,
+            httpOnly: true,
+            sameSite: "strict",
+        });
 
-        res.status(200).send({message: "Password was changed successfully"})
-    }
+        res.status(200).send({ message: "Password was changed successfully" });
+    };
 
-    resetPassword = async (req: Request<{}, unknown, ResetPasswordDto>, res: Response<{
-        message: string
-    }>): Promise<void> => {
-        const requestResetData = req.body
+    resetPassword = async (
+        req: Request<{}, unknown, ResetPasswordDto>,
+        res: Response<{ message: string; previewUrl: string | null }>
+    ): Promise<void> => {
+        const { email } = req.body;
 
-        await this.authService.resetPassword(requestResetData)
+        const previewUrl = await this.authFlow.resetPassword(email.trim().toLowerCase());
 
-        res.status(200).send({message: "Link for changing password was sent to email"})
-    }
+        res.status(200).send({
+            message: "Link for changing password was sent to email",
+            previewUrl,
+        });
+    };
 
-    recoverPassword = async (req: Request<RecoverPasswordParams, unknown, RecoverPasswordDto>, res: Response<{
-        message: string
-    }>): Promise<void> => {
+    recoverPassword = async (
+        req: Request<RecoverPasswordParams, unknown, RecoverPasswordDto>,
+        res: Response<{ message: string }>
+    ): Promise<void> => {
         const resetToken = req.params.resetToken;
-        const newPasswordData = req.body
 
-        await this.authService.recoverPassword(resetToken, newPasswordData)
+        await this.authFlow.recoverPassword(resetToken, req.body);
 
-        res.status(200).send({message: "New password was set successfully"})
-    }
+        res.clearCookie("refreshToken", {
+            secure: true,
+            httpOnly: true,
+            sameSite: "strict",
+        });
+
+        res.status(200).send({ message: "New password was set successfully" });
+    };
 }
+

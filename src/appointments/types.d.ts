@@ -1,30 +1,59 @@
+import type { Prisma } from "../generated/prisma/client";
 
-export interface Appointment {
+// ===== Prisma entities / Payloads =====
+
+export type AppointmentEntity = Prisma.AppointmentGetPayload<{
+    select: {
+        id: true;
+        doctorId: true;
+        patientId: true;
+        serviceName: true;
+        startsAt: true;          
+        createdAt: true;
+        updatedAt: true;
+    };
+}>;
+
+
+// ===== DTO / app-level types =====
+
+type ISODateString = string;
+
+export interface AppointmentDto {
     id: string;
     doctorId: string;
     patientId: string;
-    procedureType: string;
-    timeISO: string;
-    createdAt: string;
-    updatedAt: string;
+    serviceName: string;
+    startsAt: ISODateString;
+    createdAt: ISODateString;
+    updatedAt: ISODateString;
 }
 
 export interface CreateAppointmentDto {
     doctorId: string;
     patientId: string;
-    procedureType: string;
-    timeISO: string;
+    serviceName: string;
+    startsAt: ISODateString;
 }
 
-export type UpdateAppointmentDto = Partial<Omit<Appointment, "id" | "createdAt" | "updatedAt">>;
+export type UpdateAppointmentDto = Partial<
+    Omit<AppointmentDto, "id" | "createdAt" | "updatedAt">
+>;
 
-export interface AppointmentsFilter {
+export interface AppointmentFilter {
     doctorId?: string;
     patientId?: string;
 }
 
-export interface AppointmentsParams {
-    id: string
+export interface AppointmentsParamsDto {
+    id?: string;
 }
+
+AppointmentTimeCheckInput
+
+
+
+
+
 
 

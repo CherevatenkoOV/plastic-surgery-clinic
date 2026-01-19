@@ -1,40 +1,62 @@
-import {Doctor} from "../doctors/types.js";
-import {FullUserBase, UpdateUserDto, FullUserBase} from "../users/types.js";
 
-export interface Patient {
-    userId: string;
-    phone: string | null;
-}
 
-export interface FullPatientDto extends FullUserBase{
-    roleData: PatientDto | undefined
-}
+// ===== Prisma entities / Payloads =====
+
+export type PatientEntity = Prisma.PatientGetPayload<{
+    select: {
+        patientId: true;
+        phone: true;
+    };
+}>;
+
+export type PatientWithUser = Prisma.PatientGetPayload<{
+    select: {
+        patientId: true;
+        phone: true;
+        user: {
+            select: {
+                firstName: true;
+                lastName: true;
+                role: true;
+            };
+        };
+    };
+}>;
+
+export type PatientProfile = PatientWithUser;
+
+// ===== DTO / app-level types =====
 
 export interface CreatePatientDto {
-    userId: string;
-    phone: string | null;
+    patientId: string;
+    phone: string;
+}
+
+export interface CreatePatientInput {
+
+}
+
+
+export interface CreatePatientDto {
+    patientId: string;
+    phone: string;
 }
 
 export interface UpdatePatientDto {
-    firstName?: string | undefined;
-    lastName?: string | undefined;
-    phone?: string | null;
-}
-
-
-
-export type UpdatePatientBody = UpdatePatientData & UpdateUserDto;
-
-export interface PatientsParamsDto {
-    id?: string;
-}
-
-// NOTE: maybe is deprecated. check it
-// export type PatientFilter = Pick<Patient, "userId">
-
-export interface FullPatientFilter {
     firstName?: string;
     lastName?: string;
+    phone?: string;
+}
+
+
+export interface PatientFilter {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+}
+
+export interface PatientsParamsDto {
+    patientId?: string;
 }
 
 
