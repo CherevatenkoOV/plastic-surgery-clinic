@@ -1,22 +1,64 @@
-import {Doctor} from "../doctors/types.js";
-import {UpdateUserData} from "../users/types.js";
 
-export interface Patient {
-    userId: string;
-    phone: string | null;
+
+// ===== Prisma entities / Payloads =====
+
+export type PatientEntity = Prisma.PatientGetPayload<{
+    select: {
+        patientId: true;
+        phone: true;
+    };
+}>;
+
+export type PatientWithUser = Prisma.PatientGetPayload<{
+    select: {
+        patientId: true;
+        phone: true;
+        user: {
+            select: {
+                firstName: true;
+                lastName: true;
+                role: true;
+            };
+        };
+    };
+}>;
+
+export type PatientProfile = PatientWithUser;
+
+// ===== DTO / app-level types =====
+
+export interface CreatePatientDto {
+    patientId: string;
+    phone: string;
 }
 
-export type CreatePatientBody = Omit<Patient, "userId">;
+export interface CreatePatientInput {
 
-export type UpdatePatientData = Partial<Omit<Patient, "userId">>
-
-export type UpdatePatientBody = UpdatePatientData & UpdateUserData;
-
-export interface PatientsParams {
-    id?: string;
 }
 
-export type PatientFilter = Pick<Patient, "userId">
+
+export interface CreatePatientDto {
+    patientId: string;
+    phone: string;
+}
+
+export interface UpdatePatientDto {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+}
+
+
+export interface PatientFilter {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+}
+
+export interface PatientsParamsDto {
+    patientId?: string;
+}
+
 
 
 

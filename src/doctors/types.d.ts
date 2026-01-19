@@ -1,37 +1,75 @@
-import {UpdateUserData} from "../users/types.js";
+import {DoctorWeeklySlots} from "../generated/prisma/client";
+import {addWeeklySlots} from "../generated/prisma/sql/addWeeklySlots";
 
-export interface Doctor {
-    userId: string;
-    specialization: string | null;
-    schedule: ScheduleItem[] | [];
+// ===== Prisma entities / Payloads =====
+
+export type DoctorEntity = Prisma.DoctorGetPayload<{
+    select: {
+        doctorId: true;
+        specialization: true;
+    };
+}>;
+
+export type DoctorWithUser = Prisma.DoctorGetPayload<{
+    select: {
+        doctorId: true;
+        specialization: true;
+        user: {
+            select: {
+                firstName: true;
+                lastName: true;
+                role: true;
+            };
+        };
+    };
+}>;
+
+
+
+// TODO in the future functionality will be used pure SQL-raw for DB based on the type Slot below
+export type Slot = Pick<DoctorWeeklySlots, "id" | "weekday"> & {
+    startAt: Date;
+    endAt: Date;
+};
+
+
+// ===== DTO / app-levels types =====
+
+
+export interface CreateDoctorDto {
+    doctorId: string;
+    specialization: string;
 }
 
-export interface ScheduleItem {
-    _day: string;
-    day: string;
-    isAvailable: boolean;
-    start: string;
-    end: string;
+export interface UpdateDoctorDto {
+    firstName?: string;
+    lastName?: string;
+    specialization?: string;
+    doctorWeeklySlots?: Slot[];
 }
 
-export type CreateDoctorBody = Omit<Doctor, "userId">;
-
-export type UpdateDoctorData = Partial<Omit<Doctor, "userId">>
-
-export type UpdateDoctorBody = UpdateDoctorData & UpdateUserData
-
-
-export interface DoctorsQuery {
+export interface DoctorFilter {
+    firstName?: string;
+    lastName?: string;
     specialization?: string;
 }
 
-export interface DoctorsParams {
-    id?: string;
+export interface DoctorsParamsDto {
+    doctorId?: string;
 }
 
-export interface DoctorInviteToken {
-    inviteToken: string;
+export type DoctorInviteToken = string
+
+export type CreateSlotDto = Omit<Slot, "id" | "userId">
+
+type ISODateString = string;
+
+export type SlotDto = Pick<DoctorWeeklySlots, "id" | "weekday"> & {
+    startAt: ISODateString
+    endAt: ISODateString
 }
 
-export type DoctorFilter = Pick<Doctor, "userId">
+export type SlotId = Brand<string, "SlotId">
+
+export type AddWeeklySlotsResult = Awaited<ReturnType<typeof addWeeklySlots>>[number]
 

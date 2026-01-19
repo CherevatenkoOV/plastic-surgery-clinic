@@ -3,3 +3,4 @@ dist
 .env
 .idea
 package-lock.json
+/generated/prisma

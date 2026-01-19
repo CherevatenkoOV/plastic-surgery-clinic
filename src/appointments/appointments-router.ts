@@ -1,19 +1,46 @@
-import express, {Router} from "express";
-import {remove, getAll, create, update, getById} from "./appointments-controller.js";
-import {authenticate} from "../shared/middleware/authenticate.js";
-import {authorize} from "../shared/middleware/authorize.js";
-import {Role} from "../shared/roles.js";
+import { Router } from "express";
+import { AppointmentsController } from "./appointments-controller.js";
+import { authenticate } from "../shared/middleware/authenticate.js";
+import { authorize } from "../shared/middleware/authorize.js";
+import { Role } from "../shared/roles.js";
 
-const router: Router = express.Router();
+export function createAppointmentsRouter(appointmentsController: AppointmentsController) {
+    const router = Router();
 
-router.get('/', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), getAll)
-router.get('/:id', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), getById)
+    router.get(
+        "/",
+        authenticate,
+        authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]),
+        appointmentsController.getAll
+    );
 
-router.put('/', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), create)
+    router.get(
+        "/:id",
+        authenticate,
+        authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]),
+        appointmentsController.getById
+    );
 
-// @ts-ignore
-router.patch('/:id',authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), update)
-// @ts-ignore
-router.delete('/:id', authenticate, authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]), remove)
+    router.post(
+        "/",
+        authenticate,
+        authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]),
+        appointmentsController.create
+    );
 
-export default router;
+    router.patch(
+        "/:id",
+        authenticate,
+        authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]),
+        appointmentsController.update
+    );
+
+    router.delete(
+        "/:id",
+        authenticate,
+        authorize([Role.ADMIN, Role.DOCTOR, Role.PATIENT]),
+        appointmentsController.remove
+    );
+
+    return router;
+}

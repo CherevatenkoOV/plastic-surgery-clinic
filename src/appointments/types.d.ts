@@ -1,44 +1,59 @@
+import type { Prisma } from "../generated/prisma/client";
 
-export interface Appointment {
+// ===== Prisma entities / Payloads =====
+
+export type AppointmentEntity = Prisma.AppointmentGetPayload<{
+    select: {
+        id: true;
+        doctorId: true;
+        patientId: true;
+        serviceName: true;
+        startsAt: true;          
+        createdAt: true;
+        updatedAt: true;
+    };
+}>;
+
+
+// ===== DTO / app-level types =====
+
+type ISODateString = string;
+
+export interface AppointmentDto {
     id: string;
     doctorId: string;
     patientId: string;
-    procedureType: string;
-    timeISO: string;
-    createdAt: string;
-    updatedAt: string;
+    serviceName: string;
+    startsAt: ISODateString;
+    createdAt: ISODateString;
+    updatedAt: ISODateString;
 }
 
-// TODO: Check if we can delete it
-// export type CreateAppointmentData = Omit<Appointment, "timeISO" | "id" | "createdAt" | "updatedAt">
+export interface CreateAppointmentDto {
+    doctorId: string;
+    patientId: string;
+    serviceName: string;
+    startsAt: ISODateString;
+}
 
-// NOTE: new
-export type CreateAppointmentData = Omit<Appointment, "id" | "createdAt" | "updatedAt">
+export type UpdateAppointmentDto = Partial<
+    Omit<AppointmentDto, "id" | "createdAt" | "updatedAt">
+>;
 
-// TODO: Check if we can delete it
-export type CreateAppointmentBody = Omit<Appointment, "id" | "createdAt" | "updatedAt">;
-
-export type CreateAppointment = Omit<Appointment, "id" | "createdAt" | "updatedAt">;
-
-export type UpdateAppointmentBody = Partial<Omit<Appointment, "id" | "createdAt" | "updatedAt">>;
-// NOTE: NEW
-export type UpdateAppointmentData= Partial<Omit<Appointment, "id" | "createdAt" | "updatedAt">>;
-
-export interface AppointmentsQuery {
+export interface AppointmentFilter {
     doctorId?: string;
     patientId?: string;
 }
 
-export interface AppointmentsParams {
-    id: string
+export interface AppointmentsParamsDto {
+    id?: string;
 }
 
+AppointmentTimeCheckInput
 
-export interface Options {
-    type: "create" | "update" | "delete";
-}
 
-export interface WithId {
-    id: string;
-}
+
+
+
+
 

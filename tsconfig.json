@@ -3,7 +3,7 @@
   "compilerOptions": {
     /* Base Options */
     "esModuleInterop": true,
-    "target": "es2023",
+    "target": "ES2023",
     "allowJs": true,
     "resolveJsonModule": true,
     "moduleDetection": "force",
@@ -14,10 +14,13 @@
     "noUncheckedIndexedAccess": true,
 
     /* Transpiling with TypeScript */
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
+    "moduleResolution": "node",
+    "module": "ESNext",
     "outDir": "dist",
     "sourceMap": true,
+
+    /* Prisma setting */
+    "ignoreDeprecations": "6.0"
 
   },
 

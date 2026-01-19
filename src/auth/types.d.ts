@@ -1,49 +1,46 @@
-import {CreateUserData, CreateRoleData} from "../users/types.js";
 
-export interface AuthItem {
-    userId: string;
+export interface RegisterPatientDto {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
-    refreshToken?: string;
+    phone: string;
 }
 
-export interface AuthRegisterBody{
+export interface RegisterDoctorDto {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    specialization: string;
+}
+
+export interface LoginDto {
     email: string;
     password: string;
 }
 
-export interface RecoverPasswordBody {
+export interface RecoverPasswordDto {
     newPassword: string;
     confirmPassword: string;
 }
 
-export interface ChangePasswordBody {
-    email: string;
+export interface UpdatePasswordDto {
     oldPassword: string;
     newPassword: string;
     confirmPassword: string;
 }
 
-
-export interface ResetPasswordBody {
+export interface ResetPasswordDto {
     email: string;
 }
-
 
 export interface RecoverPasswordParams {
     resetToken: string;
 }
-
-export type Credentials = Pick<AuthItem, 'email' | 'password'>
-
 
 export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
 }
 
-export type FullRegisterInfo = AuthRegisterBody & CreateUserData & CreateRoleData
-
-export type AuthFilter =
-    | { userId: string }
-    | { email: string }

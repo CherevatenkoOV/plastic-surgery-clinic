@@ -1,37 +1,61 @@
 import {Request, Response} from "express";
 import {
     UsersParams,
-    User, UpdateUserBody, CreateUserData
+    UpdateUserDto, UserDto
 } from "./types.js";
-import {Service} from "./service.js";
-import {removeSensitiveData} from "./helpers/remove-sensitive-data.js";
+import {UsersFlow} from "./users-flow.js";
+import {sanitizeUsers} from "./helpers/sanitize-users.js";
+import {sanitizeUser} from "./helpers/sanitize-user.js";
 
-export const getAll = async (req: Request, res: Response<User[]>): Promise<void> => {
-    const users = await Service.get();
-    const publicUsers = await removeSensitiveData(users)
-    res.status(200).send(publicUsers)
-}
+export class UsersController {
+    constructor(private readonly usersService: UsersFlow){}
 
-export const getById = async (req: Request<UsersParams>, res: Response<User[]>): Promise<void> => {
-    const user = await Service.get(req)
-    const publicUser = await removeSensitiveData(user)
-    res.status(200).send(publicUser)
-}
+    async getAll(req: Request, res: Response<UserDto[]>): Promise<void> {
+        const users = await this.usersService.get();
+        const publicUsers = sanitizeUsers(users)
 
-// TODO: Create service
-// export const create = async (req: Request<{}, unknown, CreateUserData>, res: Response<User>): Promise<void> => {
-//     const newUser = await Service.create(req);
-//     res.status(201).send(newUser)
-// }
+        res.status(200).send(publicUsers)
+    }
 
+    async getById(req: Request<UsersParams>, res: Response<UserDto | { message: string }>): Promise<void> {
+        const id = req.params.id;
+        const user = await this.usersService.getById(id)
 
-export const update = async (req: Request<UsersParams, unknown, UpdateUserBody>, res: Response<User>): Promise<void> => {
-    const updatedUser = await Service.update(req);
-    const publicUser = await removeSensitiveData(updatedUser)
-    res.status(200).send(publicUser)
-}
+        const publicUser = sanitizeUser(user!)
 
-export const remove = async (req: Request<UsersParams>, res: Response<void>): Promise<void> => {
-    await Service.remove(req)
-    res.status(204).send()
+        res.status(200).send(publicUser)
+    }
+
+    async getByEmail(req: Request<{}, {}, {}, { email: string }>, res: Response<UserDto | {
+        message: string
+    }>): Promise<void> {
+        const email = req.query.email
+        const user = await this.usersService.getByEmail(email)
+
+        const publicUser = sanitizeUser(user!)
+        res.status(200).send(publicUser)
+    }
+
+    async update(req: Request<UsersParams, unknown, UpdateUserDto>, res: Response<UserDto | {
+        message: string
+    }>): Promise<void> {
+        const id = req.params.id;
+        const userData = req.body;
+
+        const updatedUser = await this.usersService.update(id, userData);
+        if (!updatedUser) {
+            res.status(404).send({message: "User with specified id was not found"})
+            return
+        }
+        const publicUser = sanitizeUser(updatedUser)
+
+        res.status(200).send(publicUser)
+    }
+
+    async delete(req: Request<UsersParams>, res: Response<{ message: string }>): Promise<void> {
+        const id = req.params.id
+
+        await this.usersService.delete(id)
+        res.status(204).send({message: "User was successfully deleted"})
+    }
 }

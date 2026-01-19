@@ -1,55 +1,66 @@
-import {CreateDoctorBody, DoctorsQuery} from "../doctors/types.js";
-import {CreatePatientBody, PatientsQuery} from "../patients/types.js";
-import {Doctor} from "../doctors/types.js";
-import {Patient} from "../patients/types.js";
+// TODO: UserEntity для работы до слоя HTTP, дальше - оставить UserDto
+import {UserRole} from "../generated/prisma/enums";
 
-export interface User {
+export type UserEntity = Prisma.UserGetPayload<{
+    select: {
+        id: true;
+        firstName: true;
+        lastName: true;
+        role: true;
+        createdAt: true;
+        updatedAt: true;
+    };
+}>;
+
+export interface UserDto {
     id: string;
+    firstName: string;
+    lastName: sring;
+    role: UserRole;
+}
+
+export type UsersParams = Partial<Pick<UserEntity, 'id'>>
+
+export interface CreateUserDto {
     firstName: string;
     lastName: string;
     role: UserRole;
-    createdAt: string;
-    updatedAt: string;
     auth: {
         email: string;
-        password: string;
+        passwordHash: string;
+    }
+}
+
+export interface UpdateUserDto {
+    firstName?: string;
+    lastName?: string;
+    auth?: {
+        email?: string;
+        passwordHash?: string;
         refreshToken?: string;
     }
 }
 
-export type UserWithoutAuth = Partial<User, "auth">
+export type UserFilter = Partial<Pick<UserEntity, "firstName" | "lastName">>
 
-export type PublicUser = Pick<User, 'id', 'firstName', 'lastName', 'role'>
-
-export type UsersParams = Pick<User, 'id'>
-
-export type UsersQuery = Pick<User, 'firstName' | 'lastName'>
-
-export interface AllInfoUser {
-    profile: User,
-    roleData: Doctor | Patient | undefined
+export interface UserAuthSubject {
+    id: string;
+    role: Role;
+    email: string;
+    passwordHash: string; // возможно стоит сделать string | null
+    refreshToken: string | null; // возможно стоит сделать string | null
 }
 
-export type AllInfoUsersQuery =
-    | DoctorsQuery & UsersQuery
-    | UsersQuery
-
-export type CreateUserData = Pick<User, 'firstName' | 'lastName' | 'role'>;
-
-export type UpdateUserData = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>;
-
-export type UpdateUserBody = Partial<Pick<User, 'firstName' | 'lastName' | 'role'>>
-
-export type RoleData = Doctor | Patient;
-
-export type CreateRoleData =
-    | { specialization: string } & Partial<CreateDoctorBody>
-    | Partial<CreatePatientBody>;
-
-export type UserFilter =
-    | { id: string }
-    | { email: string }
+export interface CreateUserCredentialsDto {
+    email: string;
+    passwordHash: string;
+}
 
 
+export interface UpdateUserCredentialsDto {
+    email?: string;
+    passwordHash?: string;
+    refreshToken?: string | null;
+}
 
 

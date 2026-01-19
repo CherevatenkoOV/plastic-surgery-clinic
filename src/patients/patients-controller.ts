@@ -1,43 +1,94 @@
-import {
-    PatientsParams, UpdatePatientBody
-} from "./types.js";
-import {Request, Response} from "express";
-import {Service} from "./service.js";
-import {AllInfoUser} from "../users/types.js";
-import {Appointment} from "../appointments/types.js";
-import {removeSensitiveData} from "../users/helpers/remove-sensitive-data.js";
+import { Request, Response } from "express";
+import { PatientsFlow } from "./patients-flow.js";
+import { PatientFilter, PatientWithUser, PatientsParamsDto, UpdatePatientDto } from "./types.js";
 
-export const getAll = async (req: Request, res: Response<AllInfoUser[]>): Promise<void> => {
-    const patients = await Service.get(req)
+export class PatientsController {
+    constructor(private readonly patientsFlow: PatientsFlow) {}
 
-    if (!patients.length) res.sendStatus(404)
+    getAll = async (req: Request, res: Response<PatientWithUser[] | { message: string }>): Promise<void> => {
+        const filter = req.query as unknown as PatientFilter;
+        const patients = await this.patientsFlow.getPatients(filter);
 
-    const publicPatients = await removeSensitiveData(patients)
-    res.status(200).send(publicPatients)
+        if (!patients.length) {
+            res.status(404).send({ message: "Patients not found" });
+            return;
+        }
+
+        res.status(200).send(patients);
+    };
+
+    getById = async (
+        req: Request<PatientsParamsDto>,
+        res: Response<PatientWithUser | { message: string }>
+    ): Promise<void> => {
+        const patientId = req.params.patientId;
+
+        if (!patientId) {
+            res.status(400).send({ message: "Missing patientId parameter" });
+            return;
+        }
+
+        const patient = await this.patientsFlow.getPatientById(patientId);
+
+        if (!patient) {
+            res.status(404).send({ message: "Patient was not found" });
+            return;
+        }
+
+        res.status(200).send(patient);
+    };
+
+    getMe = async (req: Request, res: Response<PatientWithUser | { message: string }>): Promise<void> => {
+        const loggedUser = req.user!;
+        const patient = await this.patientsFlow.getPatientById(loggedUser.id);
+
+        if (!patient) {
+            res.status(404).send({ message: "Patient was not found" });
+            return;
+        }
+
+        res.status(200).send(patient);
+    };
+
+    updateById = async (
+        req: Request<PatientsParamsDto, unknown, UpdatePatientDto>,
+        res: Response<PatientWithUser | { message: string }>
+    ): Promise<void> => {
+        const patientId = req.params.patientId;
+
+        if (!patientId) {
+            res.status(400).send({ message: "Missing patientId parameter" });
+            return;
+        }
+
+        const updatedPatient = await this.patientsFlow.updatePatient(patientId, req.body);
+        res.status(200).send(updatedPatient);
+    };
+
+    updateMe = async (
+        req: Request<unknown, unknown, UpdatePatientDto>,
+        res: Response<PatientWithUser | { message: string }>
+    ): Promise<void> => {
+        const loggedUser = req.user!;
+        const updatedPatient = await this.patientsFlow.updatePatient(loggedUser.id, req.body);
+        res.status(200).send(updatedPatient);
+    };
+
+    deleteMe = async (req: Request, res: Response<void | { message: string }>): Promise<void> => {
+        const loggedUser = req.user!;
+        await this.patientsFlow.deletePatient(loggedUser.id);
+        res.sendStatus(204);
+    };
+
+    deleteById = async (req: Request<PatientsParamsDto>, res: Response<void | { message: string }>): Promise<void> => {
+        const patientId = req.params.patientId;
+
+        if (!patientId) {
+            res.status(400).send({ message: "Missing patientId parameter" });
+            return;
+        }
+
+        await this.patientsFlow.deletePatient(patientId);
+        res.sendStatus(204);
+    };
 }
-
-export const getById = async (req: Request, res: Response<AllInfoUser | undefined>) => {
-    const patient = await Service.get(req)
-
-    if (!patient.length) res.sendStatus(404)
-
-    const publicPatient = await removeSensitiveData(patient)
-    res.status(200).send(publicPatient)
-}
-
-export const update = async (req: Request<{}, unknown, UpdatePatientBody>, res: Response<AllInfoUser>): Promise<void> => {
-    const updatedPatient = await Service.updatePatient(req)
-    res.status(200).send(updatedPatient)
-}
-
-export const remove = async (req: Request, res: Response<void>): Promise<void> => {
-    await Service.deletePatient(req)
-    res.status(204).send()
-}
-
-export const getAppointments = async (req: Request, res: Response<Appointment[]>): Promise<void> => {
-    const appointments = await Service.getAppointments(req)
-    res.status(200).send(appointments)
-}
-
-
