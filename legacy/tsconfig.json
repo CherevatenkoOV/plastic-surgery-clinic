@@ -16,7 +16,7 @@
     /* Transpiling with TypeScript */
     "moduleResolution": "node",
     "module": "ESNext",
-    "outDir": "dist",
+    "outDir": "../dist",
     "sourceMap": true,
 
     /* Prisma setting */
@@ -25,10 +25,10 @@
   },
 
   "include": [
-    "src/**/*",
-    "src/**/*.json"
+    "legacy/src/**/*",
+    "legacy/src/**/*.json"
   ],
   "exclude": [
-    "node_modules"
+    "../node_modules"
   ]
 }

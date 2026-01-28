@@ -1,0 +1,40 @@
+{
+  "name": "project1",
+  "version": "1.0.0",
+  "main": "../dist/main.js",
+  "type": "module",
+  "scripts": {
+    "kill": "taskkill /F /IM node.exe",
+    "start": "../node_modules/.bin/nodemon --env-file=.env dist/main.js",
+    "build": "../node_modules/.bin/tsc",
+    "restart": "npm run build && npm run start",
+    "debug": "node --inspect --env-file=.env ../dist/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.5",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2",
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.4",
+    "@types/nodemailer": "^7.0.0",
+    "@types/pg": "^8.16.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^7.2.0",
+    "typescript": "^5.8.3"
+  }
+}

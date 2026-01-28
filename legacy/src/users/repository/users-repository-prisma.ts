@@ -145,6 +145,7 @@ export class UsersRepositoryPrisma implements IUsersRepository {
         }
     }
 
+    // ОШИБКА: ПРИНИМАЕТ AUTH внутри data: UpdateUserDto, ПО СУТИ ЭТО ЛИШНЕЕ
     async updateProfile(id: string, data: UpdateUserDto, db: DbClient = this.prisma): Promise<UserEntity> {
         const {firstName, lastName} = data;
 

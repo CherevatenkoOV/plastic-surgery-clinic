@@ -27,7 +27,6 @@ export class UsersFlow {
     async delete(id: string): Promise<void> {
         await this.usersRepo.delete(id, this.prisma)
     }
-
 }
 
 

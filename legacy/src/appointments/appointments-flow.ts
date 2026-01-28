@@ -36,6 +36,7 @@ export class AppointmentsFlow {
         return this.appointmentsRepo.findById(appointmentId, this.prisma);
     }
 
+    // TODO: simplify doctorId to id ??? OR NOT? THINK ABOUT IT
     async getDoctorAppointments(doctorId: string): Promise<AppointmentEntity[]> {
         const id = doctorId.trim();
 
