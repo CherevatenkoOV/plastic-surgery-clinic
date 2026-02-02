@@ -14,5 +14,4 @@ export class UpdateUserDto {
     @IsString()
     @Length(2, 50)
     lastName?: string;
-
 }

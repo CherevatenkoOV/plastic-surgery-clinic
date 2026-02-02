@@ -6,9 +6,9 @@ import {
     UserAuthSubject,
     UserEntity,
     UserFilter
-} from "./users.types";
+} from "../../users/users.types";
 import {DbClient} from "src/shared/prisma/db-client.type";
-import { UserWhereInput } from "src/generated/prisma/models";
+import {UserWhereInput} from "src/generated/prisma/models";
 
 @Injectable()
 export class UsersRepositoryService {
@@ -20,7 +20,7 @@ export class UsersRepositoryService {
 
         if (filter?.lastName) where.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
 
-        const prismaUsers = await db.user.findMany({
+        return db.user.findMany({
             where,
             select: {
                 id: true,
@@ -31,8 +31,6 @@ export class UsersRepositoryService {
                 updatedAt: true
             }
         })
-
-        return prismaUsers
     }
 
     async findById(db: DbClient, id: string): Promise<UserEntity | null> {

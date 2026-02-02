@@ -3,7 +3,7 @@ import type {UserEntity, UserFilter} from "./users.types";
 import type {DbClient} from "../shared/prisma/db-client.type";
 import type {UpdateUserDto} from "./dto/update-user.dto";
 import {PrismaService} from "../shared/prisma/prisma.service";
-import {UsersRepositoryService} from "./users.repository.service";
+import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
 
 /*
  1. Обработка ошибок вынесена из репозитория в сервис
@@ -17,14 +17,12 @@ export class UsersService {
     ) {
     }
 
-    async get(filter?: UserFilter, db?: DbClient): Promise<UserEntity[]> {
+    async getMany(filter?: UserFilter, db?: DbClient): Promise<UserEntity[]> {
         const dbClient = db ?? this.prisma
-        const users = await this.usersRepo.find(dbClient, filter)
-
-        return users
+        return await this.usersRepo.find(dbClient, filter)
     }
 
-    async getById(id: string, db?: DbClient): Promise<UserEntity | null> {
+    async getById(id: string, db?: DbClient): Promise<UserEntity> {
         const dbClient = db ?? this.prisma
         const user =  await this.usersRepo.findById(dbClient, id)
 
@@ -33,7 +31,7 @@ export class UsersService {
         return user
     }
 
-    async getByEmail(email: string, db?: DbClient): Promise<UserEntity | null> {
+    async getByEmail(email: string, db?: DbClient): Promise<UserEntity> {
         const dbClient = db ?? this.prisma
         const user = await this.usersRepo.findByEmail(dbClient, email)
 
@@ -42,7 +40,7 @@ export class UsersService {
         return user
     }
 
-    async update(id: string, userData: UpdateUserDto, db?: DbClient): Promise<UserEntity | null> {
+    async update(id: string, userData: UpdateUserDto, db?: DbClient): Promise<UserEntity> {
         const dbClient = db ?? this.prisma
         const user = await this.usersRepo.updateProfile(dbClient, id, userData)
 
