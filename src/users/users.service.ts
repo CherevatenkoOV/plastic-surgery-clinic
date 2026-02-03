@@ -1,9 +1,10 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
-import type {UserEntity, UserFilter} from "./users.types";
+import type {UserEntity} from "./users.types";
 import type {DbClient} from "../shared/prisma/db-client.type";
 import type {UpdateUserDto} from "./dto/update-user.dto";
 import {PrismaService} from "../shared/prisma/prisma.service";
 import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
+import {GetUsersQueryDto} from "./dto/get-users-query.dto";
 
 /*
  1. Обработка ошибок вынесена из репозитория в сервис
@@ -17,9 +18,9 @@ export class UsersService {
     ) {
     }
 
-    async getMany(filter?: UserFilter, db?: DbClient): Promise<UserEntity[]> {
+    async getMany(dto: GetUsersQueryDto, db?: DbClient): Promise<UserEntity[]> {
         const dbClient = db ?? this.prisma
-        return await this.usersRepo.find(dbClient, filter)
+        return await this.usersRepo.find(dbClient, dto)
     }
 
     async getById(id: string, db?: DbClient): Promise<UserEntity> {

@@ -1,4 +1,4 @@
-import {IsEmail, IsOptional, IsString, Length} from "class-validator";
+import { IsOptional, IsString, Length} from "class-validator";
 
 export class GetUsersQueryDto {
     @IsOptional()
@@ -10,9 +10,4 @@ export class GetUsersQueryDto {
     @IsString()
     @Length(2, 50)
     lastName?: string;
-
-    @IsOptional()
-    @IsEmail()
-    email?: string;
-
 }

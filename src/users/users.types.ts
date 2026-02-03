@@ -28,7 +28,6 @@ export interface UserPublic {
     updatedAt: string;
 }
 
-export type UsersParams = Partial<Pick<UserEntity, 'id'>>
 
 export interface CreateUserInput {
     firstName: string;
@@ -56,13 +55,8 @@ export interface UserAuthSubject {
     id: string;
     role: UserRole;
     email: string;
-    passwordHash: string; // возможно стоит сделать string | null
-    refreshToken: string | null; // возможно стоит сделать string | null
-}
-
-export interface CreateUserCredentialsDto {
-    email: string;
     passwordHash: string;
+    refreshToken: string | null;
 }
 
 export interface UpdateUserCredentialsInput {
