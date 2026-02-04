@@ -8,9 +8,10 @@ import { PatientsModule } from './patients/patients.module';
 import { PatientsRepositoryService } from './shared/repositories/patients.repository.service';
 import {DoctorsRepositoryService} from "./shared/repositories/doctors.repository.service";
 import {UsersRepositoryService} from "./shared/repositories/users.repository.service";
+import { AppointmentsModule } from './appointments/appointments.module';
 
 @Module({
-  imports: [UsersModule, PrismaModule, DoctorsModule, PatientsModule],
+  imports: [UsersModule, PrismaModule, DoctorsModule, PatientsModule, AppointmentsModule],
   controllers: [AppController],
   providers: [AppService, UsersRepositoryService, DoctorsRepositoryService, PatientsRepositoryService],
 })
