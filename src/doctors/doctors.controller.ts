@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Query} from "@nestjs/common";
 import {DoctorsService} from "./doctors.service";
 import {GetDoctorsQueryDto} from "./dto/get-doctors-query.dto";
-import { DoctorWithUser } from "./types";
+import { DoctorWithUser } from "./doctors.types";
 import {UpdateDoctorDto} from "./dto/update-doctor.dto";
 
 @Controller('doctors')
@@ -35,7 +35,7 @@ export class DoctorsController {
     // async updateMe(){}
 
     @Delete(':id')
-    async deleteById(@Param('id') id: string) {
+    async deleteById(@Param('id') id: string): Promise<void> {
         await this.doctorsService.deleteDoctor(id)
     }
 

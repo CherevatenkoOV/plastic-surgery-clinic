@@ -1,5 +1,5 @@
-import {DoctorWeeklySlots} from "../generated/prisma/client";
-import {addWeeklySlots} from "../generated/prisma/sql/addWeeklySlots";
+import { addWeeklySlots } from "src/generated/prisma/sql/addWeeklySlots";
+import {DoctorWeeklySlot, Prisma} from "../generated/prisma/client";
 
 // ===== Prisma entities / Payloads =====
 
@@ -27,7 +27,7 @@ export type DoctorWithUser = Prisma.DoctorGetPayload<{
 
 
 // TODO in the future functionality will be used pure SQL-raw for DB based on the type Slot below
-export type Slot = Pick<DoctorWeeklySlots, "id" | "weekday"> & {
+export type Slot = Pick<DoctorWeeklySlot, "id" | "weekday"> & {
     startAt: Date;
     endAt: Date;
 };
@@ -64,12 +64,18 @@ export type CreateSlotDto = Omit<Slot, "id" | "userId">
 
 type ISODateString = string;
 
-export type SlotDto = Pick<DoctorWeeklySlots, "id" | "weekday"> & {
+export type SlotDto = Pick<DoctorWeeklySlot, "id" | "weekday"> & {
     startAt: ISODateString
     endAt: ISODateString
 }
 
-export type SlotId = Brand<string, "SlotId">
+// TODO probably depricated
+// export type SlotId = Brand<string, "SlotId">
 
-export type AddWeeklySlotsResult = Awaited<ReturnType<typeof addWeeklySlots>>[number]
+export type SlotId = string;
+
+export type AddWeeklySlotsRow = addWeeklySlots.Result;
+
+// TODO probably depricated
+// export type AddWeeklySlotsResult = Awaited<ReturnType<typeof addWeeklySlots>>[number]
 

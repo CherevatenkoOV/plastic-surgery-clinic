@@ -1,9 +1,18 @@
 import {Injectable} from "@nestjs/common";
 import {DbClient} from "../prisma/db-client.type";
-import {AddWeeklySlotsResult, CreateDoctorDto, CreateSlotDto, DoctorEntity, DoctorFilter, DoctorWithUser, Slot,
-    SlotId, UpdateDoctorDto } from "src/doctors/types";
-import { DoctorWhereInput } from "src/generated/prisma/models";
-import {addWeeklySlots, getWeeklySlots, replaceWeeklySlot } from "legacy/src/generated/prisma/sql";
+import {
+    AddWeeklySlotsRow,
+    CreateDoctorDto,
+    CreateSlotDto,
+    DoctorEntity,
+    DoctorFilter,
+    DoctorWithUser,
+    Slot,
+    SlotId,
+    UpdateDoctorDto
+} from "src/doctors/doctors.types";
+import {DoctorWhereInput} from "src/generated/prisma/models";
+import {addWeeklySlots, getWeeklySlots, replaceWeeklySlot} from "legacy/src/generated/prisma/sql";
 
 @Injectable()
 export class DoctorsRepositoryService {
@@ -20,7 +29,7 @@ export class DoctorsRepositoryService {
             if (filter.lastName) where.user.lastName = {equals: filter.lastName.trim(), mode: 'insensitive'}
         }
 
-        const prismaDoctors = await db.doctor.findMany({
+        return await db.doctor.findMany({
             where,
             select: {
                 doctorId: true,
@@ -35,12 +44,6 @@ export class DoctorsRepositoryService {
                 }
             },
         })
-
-        if (filter &&
-            (filter.specialization || filter.firstName || filter.lastName) &&
-            prismaDoctors.length === 0) throw new Error("No doctors matched the filter")
-
-        return prismaDoctors
     }
 
     async findById(db: DbClient, doctorId: string): Promise<DoctorWithUser | null> {
@@ -93,20 +96,20 @@ export class DoctorsRepositoryService {
     async getWeeklySlots(db: DbClient, doctorId: string): Promise<Slot[]> {
         const rows = await db.$queryRawTyped(getWeeklySlots(doctorId))
 
-        return rows.map(r => {
-            if (r.startAt === null || r.endAt === null) throw new Error(`Invalid time_range for slot ${r.id}: boundaries are NULL/infinite`)
-
+        // TODO: add logs for broken data
+        return rows
+            .filter(r => r.startAt != null && r.endAt != null)
+            .map(r => {
             return {
                 id: r.id,
                 weekday: r.weekday,
-                startAt: r.startAt,
-                endAt: r.endAt
+                startAt: r.startAt!,
+                endAt: r.endAt!
             }
         })
-
     }
 
-    async addWeeklySlots(db: DbClient, doctorId: string, slots: CreateSlotDto[]): Promise<AddWeeklySlotsResult> {
+    async addWeeklySlots(db: DbClient, doctorId: string, slots: CreateSlotDto[]): Promise<AddWeeklySlotsRow> {
         const payload = {
             slots: slots.map(s => ({
                 weekday: s.weekday,
@@ -117,13 +120,10 @@ export class DoctorsRepositoryService {
 
         const rows = await db.$queryRawTyped(addWeeklySlots(doctorId, payload))
 
-        const result = rows[0]
-        if (!result) throw new Error('addWeeklySlots: expected 1 row')
-
-        return result
+        return rows[0]
     }
 
-    async replaceWeeklySlot(db: DbClient, doctorId: string, slotId: string, newSlot: CreateSlotDto): Promise<SlotId> {
+    async replaceWeeklySlot(db: DbClient, doctorId: string, slotId: string, newSlot: CreateSlotDto): Promise<SlotId | null> {
         const {weekday, startAt, endAt} = newSlot;
 
         const rows = await db.$queryRawTyped(
@@ -131,16 +131,13 @@ export class DoctorsRepositoryService {
         )
 
         const row = rows[0]
-        const newSlotId = row?.id
 
-        if (!newSlotId) {
-            throw new Error(`Slot ${slotId} for doctor ${doctorId} not found`)
-        }
+        if(!row?.id) return null
 
-        return newSlotId as SlotId
+        return row.id as SlotId
     }
 
-    async deleteWeeklySlot(db: DbClient, doctorId: string, slotId: string): Promise<void> {
+    async deleteWeeklySlot(db: DbClient, doctorId: string, slotId: string): Promise<number> {
         const {count} = await db.doctorWeeklySlot.deleteMany({
             where: {
                 id: slotId,
@@ -148,9 +145,7 @@ export class DoctorsRepositoryService {
             },
         })
 
-        if (count === 0) {
-            throw new Error('Slot not found or does not belong to doctor')
-        }
+        return count
     }
 
 

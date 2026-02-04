@@ -2,6 +2,8 @@
 
 // ===== Prisma entities / Payloads =====
 
+import { Prisma } from "src/generated/prisma/client";
+
 export type PatientEntity = Prisma.PatientGetPayload<{
     select: {
         patientId: true;
@@ -42,11 +44,11 @@ export interface CreatePatientDto {
     phone: string;
 }
 
-// export interface UpdatePatientDto {
-//     firstName?: string;
-//     lastName?: string;
-//     phone?: string;
-// }
+export interface UpdatePatientDto {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+}
 
 
 export interface PatientFilter {

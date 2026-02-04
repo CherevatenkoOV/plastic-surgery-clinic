@@ -1,7 +1,7 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
 import {DoctorsRepositoryService} from "../shared/repositories/doctors.repository.service";
 import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
-import { DoctorFilter, DoctorWithUser } from "./types";
+import { DoctorFilter, DoctorWithUser } from "./doctors.types";
 import { DbClient } from "src/shared/prisma/db-client.type";
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
 import { UpdateDoctorDto } from "./dto/update-doctor.dto";
