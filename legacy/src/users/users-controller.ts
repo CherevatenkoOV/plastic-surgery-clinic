@@ -10,7 +10,7 @@ import {sanitizeUser} from "./helpers/sanitize-user.js";
 export class UsersController {
     constructor(private readonly usersService: UsersFlow){}
 
-    async getAll(req: Request, res: Response<UserDto[]>): Promise<void> {
+    async getMany(req: Request, res: Response<UserDto[]>): Promise<void> {
         const users = await this.usersService.get();
         const publicUsers = sanitizeUsers(users)
 

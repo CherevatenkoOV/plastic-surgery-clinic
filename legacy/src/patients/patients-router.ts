@@ -21,7 +21,7 @@ export function createPatientsRouter(patientsController: PatientsController) {
         validateRequest(searchPatientSchema, "query"),
         authenticate,
         authorize([Role.ADMIN, Role.DOCTOR]),
-        patientsController.getAll
+        patientsController.getMany
     );
 
     router.get(

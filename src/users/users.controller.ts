@@ -17,20 +17,18 @@ export class UsersController {
 
     @Get()
     async getMany(@Query() query: GetUsersQueryDto): Promise<UserPublic[]> {
-        const users = await this.usersService.getMany(query);
-        return UserMapper.toPublicList(users)
+       return this.usersService.getMany(query);
+
     }
 
     @Get(':id')
     async getById(@Param('id', ParseUUIDPipe) id: string): Promise<UserPublic> {
-        const user = await this.usersService.getById(id)
-        return UserMapper.toPublic(user)
+        return this.usersService.getById(id)
     }
 
     @Get()
     async getByEmail(@Param('email') query: GetUserByEmailDto): Promise<UserPublic> {
-        const user = await this.usersService.getByEmail(query.email)
-        return UserMapper.toPublic(user)
+        return this.usersService.getByEmail(query.email)
     }
 
     @Patch(':id')
@@ -38,8 +36,7 @@ export class UsersController {
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: UpdateUserDto
     ): Promise<UserPublic> {
-        const user = await this.usersService.update(id, dto)
-        return UserMapper.toPublic(user)
+        return this.usersService.update(id, dto)
     }
 
     @Delete(':id')

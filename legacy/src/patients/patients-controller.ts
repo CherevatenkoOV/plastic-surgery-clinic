@@ -5,7 +5,7 @@ import { PatientFilter, PatientWithUser, PatientsParamsDto, UpdatePatientDto } f
 export class PatientsController {
     constructor(private readonly patientsFlow: PatientsFlow) {}
 
-    getAll = async (req: Request, res: Response<PatientWithUser[] | { message: string }>): Promise<void> => {
+    getMany = async (req: Request, res: Response<PatientWithUser[] | { message: string }>): Promise<void> => {
         const filter = req.query as unknown as PatientFilter;
         const patients = await this.patientsFlow.getPatients(filter);
 

@@ -9,7 +9,7 @@ import {Role} from "../shared/roles.js";
 export function createUsersRouter (usersController: UsersController) {
     const router = Router();
 
-    router.get('/', authenticate, authorize([Role.ADMIN]), usersController.getAll)
+    router.get('/', authenticate, authorize([Role.ADMIN]), usersController.getMany)
     router.get('/:id', authenticate, authorize([Role.ADMIN]), usersController.getById)
 
     router.get('/by-email', authenticate, authorize([Role.ADMIN]), usersController.getByEmail)

@@ -49,7 +49,6 @@ export interface AppointmentsParamsDto {
     id?: string;
 }
 
-AppointmentTimeCheckInput
 
 
 
