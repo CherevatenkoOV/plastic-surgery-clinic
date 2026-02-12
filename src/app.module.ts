@@ -9,9 +9,11 @@ import { PatientsRepositoryService } from './shared/repositories/patients.reposi
 import {DoctorsRepositoryService} from "./shared/repositories/doctors.repository.service";
 import {UsersRepositoryService} from "./shared/repositories/users.repository.service";
 import { AppointmentsModule } from './appointments/appointments.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
-  imports: [UsersModule, PrismaModule, DoctorsModule, PatientsModule, AppointmentsModule],
+  imports: [UsersModule, PrismaModule, DoctorsModule, PatientsModule, AppointmentsModule, AuthModule, ConfigModule.forRoot()],
   controllers: [AppController],
   providers: [AppService, UsersRepositoryService, DoctorsRepositoryService, PatientsRepositoryService],
 })

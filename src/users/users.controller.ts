@@ -1,10 +1,10 @@
-import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Query, UseGuards} from '@nestjs/common';
 import {UsersService} from './users.service';
 import type {UserPublic} from "./users.types";
-import {UserMapper} from "./dto/user.mapper";
 import {GetUsersQueryDto} from "./dto/get-users-query.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {GetUserByEmailDto} from "./dto/get-user-by-email.dto";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 
 /*
   1. В GET запросах filter - query, а не body. Это устоявшаяся практика
@@ -15,6 +15,7 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     async getMany(@Query() query: GetUsersQueryDto): Promise<UserPublic[]> {
        return this.usersService.getMany(query);

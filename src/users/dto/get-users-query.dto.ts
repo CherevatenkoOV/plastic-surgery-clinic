@@ -9,7 +9,7 @@ export class GetUsersQueryDto {
 
     @IsOptional()
     @IsString()
-    @Length(2, 50)ё
+    @Length(2, 50)
     @IsNotEmpty()
     lastName?: string;
 }

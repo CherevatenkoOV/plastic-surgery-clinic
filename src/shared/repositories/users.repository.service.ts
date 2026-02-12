@@ -93,9 +93,10 @@ export class UsersRepositoryService {
         })
     }
 
-    async getAuthSubjectById(db: DbClient, id: string): Promise<UserAuthSubject | null> {
+    // TODO: probably should be removed
+    async getAuthSubjectByUserId(db: DbClient, userId: string): Promise<UserAuthSubject | null> {
         const authRow = await db.userAuth.findUnique({
-            where: {userId: id},
+            where: {userId},
             select: {
                 user: {select: {id: true, role: true}},
                 email: true,
@@ -159,15 +160,36 @@ export class UsersRepositoryService {
         return user
     }
 
+    // async updateCredentials(db: DbClient, id: string, credentials: UpdateUserCredentialsInput): Promise<void> {
+    //     const {email, passwordHash, refreshToken} = credentials;
+    //     await db.userAuth.update({
+    //         where: {userId: id},
+    //         data: {
+    //             email,
+    //             passwordHash,
+    //             refreshToken
+    //         }
+    //     })
+    // }
+
     async updateCredentials(db: DbClient, id: string, credentials: UpdateUserCredentialsInput): Promise<void> {
-        const {email, passwordHash, refreshToken} = credentials;
+        const data: any = {};
+
+        if (credentials.email !== undefined) {
+            data.email = credentials.email;
+        }
+
+        if (credentials.passwordHash !== undefined) {
+            data.passwordHash = credentials.passwordHash;
+        }
+
+        if (credentials.refreshToken !== undefined) {
+            data.refreshToken = credentials.refreshToken;
+        }
+
         await db.userAuth.update({
             where: {userId: id},
-            data: {
-                email,
-                passwordHash,
-                refreshToken
-            }
+            data
         })
     }
 
