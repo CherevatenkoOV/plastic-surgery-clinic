@@ -3,23 +3,38 @@ import {AuthService} from './auth.service';
 import {UsersModule} from "../users/users.module";
 import {PassportModule} from "@nestjs/passport";
 import {LocalStrategy} from "./strategies/local.strategy";
-import {HashService} from "./hash.service";
+import {HashService} from "./services/hash.service";
 import {AuthController} from "./auth.controller";
 import {LocalAuthGuard} from "./guards/local-auth.guard";
 import {JwtModule} from "@nestjs/jwt";
 import { JwtStrategy } from "./strategies/jwt.strategy";
-import {TokenService} from "./token.service";
+import {TokenService} from "./services/token.service";
 import {ConfigModule} from "@nestjs/config";
+import {PatientsModule} from "../patients/patients.module";
+import { MailService } from "./services/mail.service";
+import {DoctorsModule} from "../doctors/doctors.module";
+import {PasswordService} from "./services/password.service";
 
 @Module({
     controllers: [AuthController],
     imports: [
         UsersModule,
+        PatientsModule,
+        DoctorsModule,
         PassportModule,
         JwtModule.register({}),
         ConfigModule
     ],
-    providers: [AuthService, LocalStrategy, HashService, LocalAuthGuard, JwtStrategy, TokenService]
+    providers: [
+        AuthService,
+        LocalStrategy,
+        HashService,
+        LocalAuthGuard,
+        JwtStrategy,
+        TokenService,
+        MailService,
+        PasswordService
+    ]
 })
 export class AuthModule {
 }

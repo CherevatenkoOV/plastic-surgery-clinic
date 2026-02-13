@@ -10,11 +10,6 @@ import { UpdateAppointmentDto } from "./dto/update-appointment.dto";
 
 type ISODateString = string;
 
-export interface AppointmentTimeCheckInput {
-    doctorId: string;
-    startsAt: ISODateString;
-}
-
 @Injectable()
 export class AppointmentsService {
     constructor(
@@ -52,7 +47,6 @@ export class AppointmentsService {
     }
 
     async createAppointment(dto: CreateAppointmentDto): Promise<AppointmentEntity> {
-        // const input = this.mapToCreateInput(dto)
         const doctorId = dto.doctorId.trim();
         const patientId = dto.patientId.trim();
         const serviceName = dto.serviceName.trim();

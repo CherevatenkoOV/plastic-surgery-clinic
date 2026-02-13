@@ -12,7 +12,7 @@ import {
     UpdateDoctorDto
 } from "src/doctors/doctors.types";
 import {DoctorWhereInput} from "src/generated/prisma/models";
-import {addWeeklySlots, getWeeklySlots, replaceWeeklySlot} from "legacy/src/generated/prisma/sql";
+import {addWeeklySlots, getWeeklySlots, replaceWeeklySlot } from "src/generated/prisma/sql";
 
 @Injectable()
 export class DoctorsRepositoryService {

@@ -35,6 +35,6 @@ export class AppointmentsController {
 
     @Delete('id')
     async delete(@Param('id') id: string) {
-
+        await this.appointmentsService.deleteAppointment(id)
     }
 }

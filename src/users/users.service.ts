@@ -1,5 +1,5 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
-import {UserAuthSubject, UserPublic} from "./users.types";
+import {UserAuthRecord, UserPublic} from "./users.types";
 import type {DbClient} from "../shared/prisma/db-client.type";
 import type {UpdateUserDto} from "./dto/update-user.dto";
 import {PrismaService} from "../shared/prisma/prisma.service";
@@ -58,7 +58,7 @@ export class UsersService {
         await this.usersRepo.delete(dbClient, id)
     }
 
-    async getAuthSubjectByEmail(email: string, db?: DbClient): Promise<UserAuthSubject | null> {
+    async getAuthSubjectByEmail(email: string, db?: DbClient): Promise<UserAuthRecord | null> {
         const dbClient = db ?? this.prisma
         return this.usersRepo.getAuthSubjectByEmail(dbClient, email);
     }

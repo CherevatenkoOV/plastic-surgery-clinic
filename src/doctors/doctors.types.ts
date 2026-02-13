@@ -1,4 +1,4 @@
-import { addWeeklySlots } from "src/generated/prisma/sql/addWeeklySlots";
+import { addWeeklySlots } from "src/generated/prisma/sql";
 import {DoctorWeeklySlot, Prisma} from "../generated/prisma/client";
 
 // ===== Prisma entities / Payloads =====

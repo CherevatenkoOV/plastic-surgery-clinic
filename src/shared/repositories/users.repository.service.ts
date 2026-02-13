@@ -3,7 +3,7 @@ import {
     CreateUserInput,
     UpdateUserCredentialsInput,
     UpdateUserInput,
-    UserAuthSubject,
+    UserAuthRecord,
     UserEntity,
     UserFilter
 } from "../../users/users.types";
@@ -94,14 +94,14 @@ export class UsersRepositoryService {
     }
 
     // TODO: probably should be removed
-    async getAuthSubjectByUserId(db: DbClient, userId: string): Promise<UserAuthSubject | null> {
+    async getAuthSubjectByUserId(db: DbClient, userId: string): Promise<UserAuthRecord | null> {
         const authRow = await db.userAuth.findUnique({
             where: {userId},
             select: {
                 user: {select: {id: true, role: true}},
                 email: true,
                 passwordHash: true,
-                refreshToken: true
+                refreshTokenHash: true
             }
         })
 
@@ -112,18 +112,18 @@ export class UsersRepositoryService {
             role: authRow.user.role,
             email: authRow.email,
             passwordHash: authRow.passwordHash,
-            refreshToken: authRow.refreshToken
+            refreshTokenHash: authRow.refreshTokenHash
         }
     }
 
-    async getAuthSubjectByEmail(db: DbClient, email: string): Promise<UserAuthSubject | null> {
+    async getAuthSubjectByEmail(db: DbClient, email: string): Promise<UserAuthRecord | null> {
         const authRow = await db.userAuth.findUnique({
             where: {email},
             select: {
                 user: {select: {id: true, role: true}},
                 email: true,
                 passwordHash: true,
-                refreshToken: true
+                refreshTokenHash: true
             }
         })
 
@@ -134,11 +134,10 @@ export class UsersRepositoryService {
             role: authRow.user.role,
             email: authRow.email,
             passwordHash: authRow.passwordHash,
-            refreshToken: authRow.refreshToken
+            refreshTokenHash: authRow.refreshTokenHash
         }
     }
 
-    // ОШИБКА: ПРИНИМАЕТ AUTH внутри data: UpdateUserDto, ПО СУТИ ЭТО ЛИШНЕЕ
     async updateProfile(db: DbClient, id: string, data: UpdateUserInput): Promise<UserEntity | null> {
         const {firstName, lastName} = data;
 
@@ -160,18 +159,6 @@ export class UsersRepositoryService {
         return user
     }
 
-    // async updateCredentials(db: DbClient, id: string, credentials: UpdateUserCredentialsInput): Promise<void> {
-    //     const {email, passwordHash, refreshToken} = credentials;
-    //     await db.userAuth.update({
-    //         where: {userId: id},
-    //         data: {
-    //             email,
-    //             passwordHash,
-    //             refreshToken
-    //         }
-    //     })
-    // }
-
     async updateCredentials(db: DbClient, id: string, credentials: UpdateUserCredentialsInput): Promise<void> {
         const data: any = {};
 
@@ -183,13 +170,22 @@ export class UsersRepositoryService {
             data.passwordHash = credentials.passwordHash;
         }
 
-        if (credentials.refreshToken !== undefined) {
-            data.refreshToken = credentials.refreshToken;
+        if (credentials.refreshTokenHash !== undefined) {
+            data.refreshTokenHash = credentials.refreshTokenHash;
         }
 
         await db.userAuth.update({
             where: {userId: id},
             data
+        })
+    }
+
+    async clearRefreshToken(db: DbClient, userId: string): Promise<void> {
+        await db.userAuth.update({
+            where: {userId},
+            data: {
+                refreshTokenHash: null
+            }
         })
     }
 

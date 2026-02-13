@@ -42,29 +42,23 @@ export interface CreateUserInput {
 export interface UpdateUserInput {
     firstName?: string;
     lastName?: string;
-    auth?: {
-        email?: string;
-        passwordHash?: string;
-        refreshToken?: string;
-    }
 }
 
 export type UserFilter = Partial<Pick<UserEntity, "firstName" | "lastName">>
 
-export interface UserAuthSubject {
+export interface UserAuthRecord {
     id: string;
     role: UserRole;
     email: string;
     passwordHash: string;
-    refreshToken: string | null;
+    refreshTokenHash: string | null;
 }
 
 export interface UpdateUserCredentialsInput {
     email?: string;
     passwordHash?: string;
-    refreshToken?: string | null;
+    refreshTokenHash?: string | null;
 }
-
 
 
 
