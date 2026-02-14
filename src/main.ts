@@ -1,22 +1,19 @@
-import express, {Application} from 'express'
-import {errorHandler} from "./shared/middleware/error-handler.js";
-import {doctorsRouter, usersRouter, patientsRouter, authRouter, appointmentsRouter} from "./di.js";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import {ValidationPipe} from "@nestjs/common";
+import cookieParser from 'cookie-parser';
 
-const app: Application = express()
-const PORT = process.env.PORT
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
 
-app.use(express.json())
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }))
 
-app.use('/doctors', doctorsRouter)
-app.use('/patients', patientsRouter)
-app.use('/appointments', appointmentsRouter)
-app.use('/users', usersRouter)
-app.use('/auth', authRouter)
+  app.use(cookieParser());
 
-app.use(errorHandler)
-
-app.listen(PORT, () => {
-    console.log(`Response: ${PORT}`)
-})
-
-
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
