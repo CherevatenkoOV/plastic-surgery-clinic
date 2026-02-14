@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {DbClient} from "../prisma/db-client.type";
+import {DbClient} from "../shared/prisma/db-client.type";
 import {CreatePatientDto, PatientEntity, PatientFilter, PatientWithUser, UpdatePatientDto} from "src/patients/patients.types";
 import {PatientWhereInput} from "src/generated/prisma/models";
 

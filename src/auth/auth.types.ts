@@ -1,8 +1,8 @@
-import {UserRole} from "../generated/prisma/enums";
+import {Role} from "../users/users.types";
 
 export type AuthUser = {
     id: string;
-    role: UserRole
+    role: Role
 }
 
 export type AuthTokens = {

@@ -78,7 +78,6 @@ export class MailService {
     async sendDoctorInviteLink(params: { token: string; toEmail: string }): Promise<MailSendResult> {
         const { token, toEmail } = params;
 
-        // тут важно: твой registerDoctor ожидает token из URL
         const inviteUrl = `${this.apiUrl}/auth/register/doctor/${token}`;
 
         const info = await this.transporter.sendMail({

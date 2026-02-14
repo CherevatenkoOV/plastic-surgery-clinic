@@ -1,13 +1,6 @@
-// TODO: UserEntity для работы до слоя HTTP, дальше - оставить UserDto
 
 import { Prisma, UserRole } from "src/generated/prisma/client";
 
-
-/*
- 1. В типах в модулях необходимо создать ...PublicDto для ответа в контроллерах и для маппера
- */
-
-// done
 export type UserEntity = Prisma.UserGetPayload<{
     select: {
         id: true;
@@ -58,6 +51,12 @@ export interface UpdateUserCredentialsInput {
     email?: string;
     passwordHash?: string;
     refreshTokenHash?: string | null;
+}
+
+export enum Role {
+    PATIENT = "patient",
+    DOCTOR = "doctor",
+    ADMIN = "admin"
 }
 
 

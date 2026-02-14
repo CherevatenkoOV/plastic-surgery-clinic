@@ -1,8 +1,6 @@
 import { addWeeklySlots } from "src/generated/prisma/sql";
 import {DoctorWeeklySlot, Prisma} from "../generated/prisma/client";
 
-// ===== Prisma entities / Payloads =====
-
 export type DoctorEntity = Prisma.DoctorGetPayload<{
     select: {
         doctorId: true;
@@ -31,9 +29,6 @@ export type Slot = Pick<DoctorWeeklySlot, "id" | "weekday"> & {
     startAt: Date;
     endAt: Date;
 };
-
-
-// ===== DTO / app-levels types =====
 
 
 export interface CreateDoctorDto {

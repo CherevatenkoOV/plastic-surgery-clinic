@@ -1,12 +1,14 @@
 import {BadRequestException, ConflictException, Injectable, NotFoundException} from "@nestjs/common";
 import {PrismaService} from "src/shared/prisma/prisma.service";
-import {AppointmentsRepositoryService} from "src/shared/repositories/appointments.repository.service";
-import {DoctorsRepositoryService} from "src/shared/repositories/doctors.repository.service";
-import {PatientsRepositoryService} from "src/shared/repositories/patients.repository.service";
+import {AppointmentsRepositoryService} from "src/appointments/appointments.repository.service";
+import {DoctorsRepositoryService} from "src/doctors/doctors.repository.service";
+import {PatientsRepositoryService} from "src/patients/patients.repository.service";
 import {AppointmentEntity, AppointmentFilter, UpdateAppointmentInput} from "./appointments.types";
 import {DbClient} from "../shared/prisma/db-client.type";
 import {CreateAppointmentDto} from "./dto/create-appointment.dto";
 import { UpdateAppointmentDto } from "./dto/update-appointment.dto";
+import { Role } from "src/users/users.types";
+import {AuthUser} from "../auth/auth.types";
 
 type ISODateString = string;
 
@@ -20,12 +22,12 @@ export class AppointmentsService {
     ) {
     }
 
-    async getAppointments(filter: AppointmentFilter, db?: DbClient): Promise<AppointmentEntity[]> {
+    async getMany(filter: AppointmentFilter, db?: DbClient): Promise<AppointmentEntity[]> {
         const dbClient = db ?? this.prisma
         return this.appointmentsRepo.find(dbClient, filter);
     }
 
-    async getAppointmentById(id: string, db?: DbClient): Promise<AppointmentEntity> {
+    async getById(id: string, db?: DbClient): Promise<AppointmentEntity> {
         const dbClient = db ?? this.prisma
         const appointment = await this.appointmentsRepo.findById(dbClient, id);
 
@@ -34,19 +36,16 @@ export class AppointmentsService {
         return appointment
     }
 
-    async getDoctorAppointments(doctorId: string, db?: DbClient): Promise<AppointmentEntity[]> {
+    async getMy(user: AuthUser, db?: DbClient): Promise<AppointmentEntity[]> {
         const dbClient = db ?? this.prisma
 
-        return this.appointmentsRepo.find(dbClient, {doctorId});
+        if(user.role === Role.DOCTOR) return this.appointmentsRepo.find(dbClient, {doctorId: user.id})
+        if(user.role === Role.PATIENT) return this.appointmentsRepo.find(dbClient, {patientId: user.id})
+
+        return []
     }
 
-    async getPatientAppointments(patientId: string, db?: DbClient): Promise<AppointmentEntity[]> {
-        const dbClient = db ?? this.prisma
-
-        return this.appointmentsRepo.find(dbClient, {patientId});
-    }
-
-    async createAppointment(dto: CreateAppointmentDto): Promise<AppointmentEntity> {
+    async create(dto: CreateAppointmentDto): Promise<AppointmentEntity> {
         const doctorId = dto.doctorId.trim();
         const patientId = dto.patientId.trim();
         const serviceName = dto.serviceName.trim();
@@ -70,7 +69,7 @@ export class AppointmentsService {
         });
     }
 
-    async updateAppointment(id: string, dto: UpdateAppointmentDto): Promise<AppointmentEntity> {
+    async updateById(id: string, dto: UpdateAppointmentDto): Promise<AppointmentEntity> {
 
         const updatePatch: UpdateAppointmentInput = {};
         if (dto.doctorId !== undefined) updatePatch.doctorId = dto.doctorId.trim();
@@ -109,7 +108,7 @@ export class AppointmentsService {
         });
     }
 
-    async deleteAppointment(id: string, db?: DbClient): Promise<void> {
+    async deleteById(id: string, db?: DbClient): Promise<void> {
         const dbDlient = db ?? this.prisma
         const appointment = await this.appointmentsRepo.findById(dbDlient, id);
         if (!appointment) throw new Error("Appointment not found");

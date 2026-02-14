@@ -16,22 +16,4 @@ export class HashService {
     async compare(plain: string, hash: string): Promise<boolean> {
         return await bcrypt.compare(plain, hash)
     }
-
-    // TODO: delete from here and use logic directly in service method
-    // async validatePasswordChange(params: {
-    //     currentPasswordHash: string,
-    //     newPassword: string,
-    //     confirmPassword: string
-    // }): Promise<void> {
-    //     const { currentPasswordHash, newPassword, confirmPassword } = params;
-    //
-    //     if (newPassword !== confirmPassword) {
-    //         throw new Error("Password confirmation failed. Please make sure both passwords match.");
-    //     }
-    //
-    //     const isSameAsCurrent = await this.compare(newPassword, currentPasswordHash);
-    //     if (isSameAsCurrent) {
-    //         throw new Error("New password must be different from the current password.");
-    //     }
-    // }
 }

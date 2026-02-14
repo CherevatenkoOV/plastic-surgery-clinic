@@ -1,8 +1,8 @@
 import {JwtService} from "@nestjs/jwt";
 import { AuthTokens } from "../auth.types";
-import {UserRole} from "../../generated/prisma/enums";
 import {Injectable, UnauthorizedException} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { Role } from "src/users/users.types";
 
 @Injectable()
 export class TokenService {
@@ -12,7 +12,7 @@ export class TokenService {
     ) {
     }
 
-    generateAuthTokens(payload: { sub: string, role: UserRole }): AuthTokens {
+    generateAuthTokens(payload: { sub: string, role: Role }): AuthTokens {
         const accessToken = this.jwtService.sign(
             payload,
             {
@@ -29,9 +29,6 @@ export class TokenService {
 
         return {accessToken, refreshToken}
     }
-
-
-    // ===== RESET PASSWORD =====
 
     generateResetPasswordToken(email: string): string {
         return this.jwtService.sign(
@@ -50,7 +47,6 @@ export class TokenService {
         return decoded.email
     }
 
-    // ===== DOCTOR INVITE =====
 
     generateDoctorInviteToken(email: string): string {
         return this.jwtService.sign(

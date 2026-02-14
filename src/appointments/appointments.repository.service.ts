@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import { DbClient } from "../prisma/db-client.type";
+import { DbClient } from "../shared/prisma/db-client.type";
 import {AppointmentEntity, AppointmentFilter, CreateAppointmentInput, UpdateAppointmentInput } from "src/appointments/appointments.types";
 import { AppointmentWhereInput } from "src/generated/prisma/models";
 

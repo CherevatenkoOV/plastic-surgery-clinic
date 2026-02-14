@@ -1,7 +1,4 @@
 
-
-// ===== Prisma entities / Payloads =====
-
 import { Prisma } from "src/generated/prisma/client";
 
 export type PatientEntity = Prisma.PatientGetPayload<{
@@ -25,19 +22,10 @@ export type PatientWithUser = Prisma.PatientGetPayload<{
     };
 }>;
 
-export type PatientProfile = PatientWithUser;
-
-// ===== DTO / app-level types =====
-
 export interface CreatePatientDto {
     patientId: string;
     phone: string;
 }
-
-export interface CreatePatientInput {
-
-}
-
 
 export interface CreatePatientDto {
     patientId: string;
@@ -55,10 +43,6 @@ export interface PatientFilter {
     firstName?: string;
     lastName?: string;
     phone?: string;
-}
-
-export interface PatientsParamsDto {
-    patientId?: string;
 }
 
 

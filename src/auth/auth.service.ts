@@ -1,21 +1,22 @@
 import {ConflictException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {HashService} from "./services/hash.service";
-import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
+import {UsersRepositoryService} from "../users/users.repository.service";
 import {PrismaService} from "../shared/prisma/prisma.service";
 import {AuthMapper} from "./dto/auth.mapper";
 import {AuthTokens, AuthUser} from "./auth.types";
 import {TokenService} from "./services/token.service";
-import {PatientsRepositoryService} from "../shared/repositories/patients.repository.service";
+import {PatientsRepositoryService} from "../patients/patients.repository.service";
 import {RegisterPatientDto} from "./dto/register-patient.dto";
-import { MailService } from "./services/mail.service";
+import { MailService } from "../mail/mail.service";
 import {InviteDoctorDto} from "./dto/invite-doctor.dto";
-import {DoctorsRepositoryService} from "../shared/repositories/doctors.repository.service";
+import {DoctorsRepositoryService} from "../doctors/doctors.repository.service";
 import { DoctorInviteToken } from "src/doctors/doctors.types";
 import { RegisterDoctorDto } from "./dto/register-doctor.dto";
 import {UserRole} from "../generated/prisma/enums";
 import { RecoverPasswordDto } from "./dto/recover-password.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { PasswordService } from "./services/password.service";
+import { Role } from "src/users/users.types";
 
 @Injectable()
 export class AuthService {
@@ -85,7 +86,7 @@ export class AuthService {
                 patientId: user.id, phone: dto.phone,
             })
 
-            const tokens = this.tokenService.generateAuthTokens({sub: user.id, role: user.role})
+            const tokens = this.tokenService.generateAuthTokens({sub: user.id, role: user.role as Role})
 
             const refreshTokenHash = await this.hashService.hash(tokens.refreshToken)
 
@@ -135,7 +136,7 @@ export class AuthService {
                 specialization
             })
 
-            const tokens = this.tokenService.generateAuthTokens({sub: user.id, role: user.role})
+            const tokens = this.tokenService.generateAuthTokens({sub: user.id, role: user.role as Role})
 
             const refreshTokenHash = await this.hashService.hash(tokens.refreshToken)
 
@@ -153,7 +154,7 @@ export class AuthService {
             if (!authSubject) throw new UnauthorizedException('Invalid credentials');
 
             const isValid = await this.passwordService.verify(oldPassword, authSubject.passwordHash)
-            if (!isValid) throw new Error("Invalid credentials");
+            if (!isValid) throw new UnauthorizedException("Invalid credentials");
 
             await this.passwordService.validatePasswordChange({
                 currentPasswordHash: authSubject.passwordHash,

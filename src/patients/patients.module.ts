@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PatientsService } from './patients.service';
 import { PatientsController } from './patients.controller';
-import {PatientsRepositoryService} from "../shared/repositories/patients.repository.service";
-import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
+import {PatientsRepositoryService} from "./patients.repository.service";
+import {UsersRepositoryService} from "../users/users.repository.service";
 
 @Module({
   controllers: [PatientsController],

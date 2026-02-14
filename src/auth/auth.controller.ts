@@ -1,8 +1,8 @@
-import {Controller, Post, UseGuards, Request, Body, Res, Param} from "@nestjs/common";
-import type {Response,} from "express";
-import {LocalAuthGuard} from "./guards/local-auth.guard";
+import {Body, Controller, Param, Post, Request, Res, UseGuards} from "@nestjs/common";
+import type {Response} from "express";
+import {LocalAuthGuard} from "./local-auth.guard";
 import {AuthService} from "./auth.service";
-import {JwtAuthGuard} from "./guards/jwt-auth.guard";
+import {JwtAuthGuard} from "../security/jwt/jwt-auth.guard";
 import {RegisterPatientDto} from "./dto/register-patient.dto";
 import {ConfigService} from "@nestjs/config";
 import {InviteDoctorDto} from "./dto/invite-doctor.dto";
@@ -72,8 +72,8 @@ export class AuthController {
         return {accessToken};
     }
 
-    @UseGuards(JwtAuthGuard)
     @Post('/password/update')
+    @UseGuards(JwtAuthGuard)
     async updatePassword(
         @Request() req,
         @Body() dto: UpdatePasswordDto,
@@ -91,6 +91,7 @@ export class AuthController {
     }
 
     @Post('/password/reset')
+    @UseGuards(JwtAuthGuard)
     async resetPassword(@Body() dto: ResetPasswordDto) {
 
         const previewUrl = await this.authService.resetPassword(dto.email);
@@ -102,6 +103,7 @@ export class AuthController {
     }
 
     @Post('/password/recover/:resetToken')
+    @UseGuards(JwtAuthGuard)
     async recoverPassword(
         @Param('resetToken') token: string,
         @Body() dto: RecoverPasswordDto,
@@ -118,6 +120,5 @@ export class AuthController {
 
         return {message: "New password was set successfully"}
     }
-
 
 }

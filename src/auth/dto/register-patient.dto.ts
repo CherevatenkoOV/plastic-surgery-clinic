@@ -11,8 +11,8 @@ export class RegisterPatientDto {
     @IsNotEmpty()
     lastName: string;
 
-    // TODO: default old passwords: 12345678 or 123456789
-    // TODO: default password: Qwerty123!
+    //  default old passwords: 12345678 or 123456789
+    //  default password: Qwerty123!
     @IsEmail()
     email: string;
 

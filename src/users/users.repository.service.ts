@@ -6,7 +6,7 @@ import {
     UserAuthRecord,
     UserEntity,
     UserFilter
-} from "../../users/users.types";
+} from "./users.types";
 import {DbClient} from "src/shared/prisma/db-client.type";
 import {UserWhereInput} from "src/generated/prisma/models";
 
@@ -93,7 +93,6 @@ export class UsersRepositoryService {
         })
     }
 
-    // TODO: probably should be removed
     async getAuthSubjectByUserId(db: DbClient, userId: string): Promise<UserAuthRecord | null> {
         const authRow = await db.userAuth.findUnique({
             where: {userId},

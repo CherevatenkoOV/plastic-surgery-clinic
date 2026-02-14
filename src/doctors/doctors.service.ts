@@ -1,6 +1,6 @@
 import {Injectable, NotFoundException} from "@nestjs/common";
-import {DoctorsRepositoryService} from "../shared/repositories/doctors.repository.service";
-import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
+import {DoctorsRepositoryService} from "./doctors.repository.service";
+import {UsersRepositoryService} from "../users/users.repository.service";
 import { DoctorFilter, DoctorWithUser } from "./doctors.types";
 import { DbClient } from "src/shared/prisma/db-client.type";
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
@@ -17,14 +17,12 @@ export class DoctorsService {
     ) {
     }
 
-    // TODO: could expand by weekly slots
-    async getDoctors(filter: DoctorFilter, db?: DbClient): Promise<DoctorWithUser[]> {
+    async getMany(filter: DoctorFilter, db?: DbClient): Promise<DoctorWithUser[]> {
         const dbClient = db ?? this.prisma
         return this.doctorsRepo.find(dbClient, filter);
     }
 
-    // TODO: could expand by weekly slots
-    async getDoctorById(doctorId: string, db?: DbClient): Promise<DoctorWithUser> {
+    async getById(doctorId: string, db?: DbClient): Promise<DoctorWithUser> {
         const dbClient = db ?? this.prisma
         const doctor = await this.doctorsRepo.findById(dbClient, doctorId);
 
@@ -33,7 +31,7 @@ export class DoctorsService {
         return doctor
     }
 
-    async updateDoctor(doctorId: string, updateDoctorData: UpdateDoctorDto): Promise<DoctorWithUser> {
+    async updateById(doctorId: string, updateDoctorData: UpdateDoctorDto): Promise<DoctorWithUser> {
         const specialization =
             updateDoctorData.specialization !== undefined ? updateDoctorData.specialization.trim() : undefined;
 
@@ -61,7 +59,7 @@ export class DoctorsService {
                     ? await this.usersRepo.updateProfile(tx, doctorId, userPatch)
                     : await this.usersRepo.findById(tx, doctorId)
 
-            if (!updatedUser) throw new Error("User not found"); // на всякий
+            if(!updatedUser) throw new NotFoundException('User with specified id was not found')
 
             return {
                 doctorId,
@@ -75,7 +73,7 @@ export class DoctorsService {
         });
     }
 
-    async deleteDoctor(doctorId: string): Promise<void> {
+    async deleteById(doctorId: string): Promise<void> {
         await this.prisma.$transaction(async (tx) => {
             const doctor = await this.doctorsRepo.findById(tx, doctorId);
             if(!doctor) throw new NotFoundException('Doctor with specified id was not found')

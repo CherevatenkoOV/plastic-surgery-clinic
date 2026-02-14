@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {DbClient} from "../prisma/db-client.type";
+import {DbClient} from "../shared/prisma/db-client.type";
 import {
     AddWeeklySlotsRow,
     CreateDoctorDto,
@@ -96,7 +96,6 @@ export class DoctorsRepositoryService {
     async getWeeklySlots(db: DbClient, doctorId: string): Promise<Slot[]> {
         const rows = await db.$queryRawTyped(getWeeklySlots(doctorId))
 
-        // TODO: add logs for broken data
         return rows
             .filter(r => r.startAt != null && r.endAt != null)
             .map(r => {

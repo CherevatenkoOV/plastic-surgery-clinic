@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {PrismaService} from "../shared/prisma/prisma.service";
-import {PatientsRepositoryService} from "../shared/repositories/patients.repository.service";
-import {UsersRepositoryService} from "../shared/repositories/users.repository.service";
+import {PatientsRepositoryService} from "./patients.repository.service";
+import {UsersRepositoryService} from "../users/users.repository.service";
 import { PatientFilter, PatientWithUser, UpdatePatientDto } from "./patients.types";
 import {DbClient} from "../shared/prisma/db-client.type";
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
@@ -15,17 +15,17 @@ export class PatientsService {
         private readonly usersRepo: UsersRepositoryService
     ) {}
 
-    async getPatients(filter: PatientFilter, db?: DbClient): Promise<PatientWithUser[]> {
+    async getMany(filter: PatientFilter, db?: DbClient): Promise<PatientWithUser[]> {
         const dbClient = db ?? this.prisma
         return this.patientsRepo.find(dbClient, filter)
     }
 
-    async getPatientById(patientId: string, db?: DbClient): Promise<PatientWithUser | null> {
+    async getById(patientId: string, db?: DbClient): Promise<PatientWithUser | null> {
         const dbClient = db ?? this.prisma
         return this.patientsRepo.findById(dbClient, patientId)
     }
 
-    async updatePatient(patientId: string, updatePatientData: UpdatePatientDto): Promise<PatientWithUser> {
+    async updateById(patientId: string, updatePatientData: UpdatePatientDto): Promise<PatientWithUser> {
         const phone =
             updatePatientData.phone !== undefined ? updatePatientData.phone : undefined;
 
@@ -67,7 +67,7 @@ export class PatientsService {
         });
     }
 
-    async deletePatient(patientId: string): Promise<void> {
+    async deleteById(patientId: string): Promise<void> {
         await this.prisma.$transaction(async (tx) => {
             const patient = await this.patientsRepo.findById(tx, patientId);
             if (!patient) throw new Error("Patient not found");
