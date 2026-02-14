@@ -1,34 +1,25 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
-    /* Base Options */
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
     "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "target": "ES2023",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "rootDir": "src",
-
-    /* Strictness */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-
-    /* Transpiling with TypeScript */
-    "moduleResolution": "node",
-    "module": "ESNext",
-    "outDir": "dist",
     "sourceMap": true,
-
-    /* Prisma setting */
-    "ignoreDeprecations": "6.0"
-
-  },
-
-  "include": [
-    "src/**/*",
-    "src/**/*.json"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
 }
